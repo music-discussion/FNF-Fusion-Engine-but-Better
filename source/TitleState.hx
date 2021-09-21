@@ -368,9 +368,21 @@ class TitleState extends MusicBeatState
 		}
 	}
 
+	var titleStateTXT:Array<String> = CoolUtil.coolTextFile(Paths.txt('titleState')); // hold on. finding tzxt.
+	var txtVis:Bool; // = Std.string(titleStateTXT[20]); // this is suprisingly easy to do my god.
+
+	// CURWACKY TEXT SHIT
+
+	var topText:String; // = Std.string(titleStateTXT[25]);
+	var bottomText:String; // =  Std.string(titleStateTXT[26]);W
+
 	override function beatHit()
 	{
 		super.beatHit();
+
+		bottomText = Std.string(titleStateTXT[26]);
+		topText = Std.string(titleStateTXT[25]);
+	//	txtVis = Std.string(titleStateTXT[20]); // ok so had a bit of trouble but back on track
 
 		logoBl.animation.play('bump');
 		danceLeft = !danceLeft;
@@ -384,11 +396,14 @@ class TitleState extends MusicBeatState
 
 		switch (curBeat)
 		{
+			//  Std.string(titleStateTXT[0]);
 			case 1:
-				createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
+			//	createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
+			createCoolText([Std.string(titleStateTXT[2]), Std.string(titleStateTXT[3]), Std.string(titleStateTXT[4]), Std.string(titleStateTXT[5])]);
 			// credTextShit.visible = true;
 			case 3:
-				addMoreText('present');
+			//	addMoreText('present');
+			addMoreText(Std.string(titleStateTXT[6]));
 			// credTextShit.text += '\npresent...';
 			// credTextShit.addText();
 			case 4:
@@ -398,30 +413,41 @@ class TitleState extends MusicBeatState
 			// credTextShit.screenCenter();
 			case 5:
 				if (Main.watermarks)
-					createCoolText(['Fusion Engine', 'by']);
+					createCoolText([Std.string(titleStateTXT[9]), Std.string(titleStateTXT[10])]); //god so much copy and paste, but its worth it
 				else
-					createCoolText(['In Partnership', 'with']);
+					createCoolText([Std.string(titleStateTXT[12]), Std.string(titleStateTXT[13])]);
 			case 7:
 				if (Main.watermarks)
-					addMoreText('Kidsfreej on Github');
+					addMoreText(Std.string(titleStateTXT[16]));
 				else
 				{
-					addMoreText('Newgrounds');
-					ngSpr.visible = true;
+					addMoreText(Std.string(titleStateTXT[19]));
+				//	ngSpr.visible = true;
+					if (Std.string(titleStateTXT[20]).startsWith('false')) // diff way cause haxes wants to be a bitch
+						ngSpr.visible = false;
+					else {
+						ngSpr.visible = true;
+					}
 				}
 			// credTextShit.text += '\nNewgrounds';
 			case 8:
 				deleteCoolText();
-				ngSpr.visible = false;
+				ngSpr.visible = false; //clear check lol
 			// credTextShit.visible = false;
 
 			// credTextShit.text = 'Shoutouts Tom Fulp';
 			// credTextShit.screenCenter();
 			case 9:
-				createCoolText([curWacky[0]]);
+				if (topText == 'false')
+					createCoolText([Std.string(titleStateTXT[29])]);
+				else
+					createCoolText([curWacky[0]]);
 			// credTextShit.visible = true;
 			case 11:
-				addMoreText(curWacky[1]);
+				if (bottomText == 'false')
+					createCoolText([Std.string(titleStateTXT[30])]);
+				else
+					addMoreText(curWacky[1]);
 			// credTextShit.text += '\nlmao';
 			case 12:
 				deleteCoolText();
@@ -429,14 +455,15 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = "Friday";
 			// credTextShit.screenCenter();
 			case 13:
-				addMoreText('Friday');
+				addMoreText(Std.string(titleStateTXT[32]));
 			// credTextShit.visible = true;
 			case 14:
-				addMoreText('Night');
+				addMoreText(Std.string(titleStateTXT[33]));
 			// credTextShit.text += '\nNight';
 			case 15:
-				addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
-
+				addMoreText(Std.string(titleStateTXT[34])); // credTextShit.text += '\nFunkin';
+				// finally its over, only to get a billlion errors. hopefully not
+				// I was right but they are fixed :)
 			case 16:
 				skipIntro();
 		}
