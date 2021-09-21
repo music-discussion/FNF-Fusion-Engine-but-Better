@@ -445,7 +445,7 @@ class TitleState extends MusicBeatState
 			// credTextShit.visible = true;
 			case 11:
 				if (bottomText == 'false')
-					createCoolText([Std.string(titleStateTXT[30])]);
+					addMoreText([Std.string(titleStateTXT[30])]);
 				else
 					addMoreText(curWacky[1]);
 			// credTextShit.text += '\nlmao';
