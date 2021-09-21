@@ -317,15 +317,34 @@ class TitleState extends MusicBeatState
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
 
-				// Get current version of Kade Engine
-
-					
-						FlxG.switchState(new MainMenuState());
-					
-
+				// Get current version of Better Fusion Engine
 				
-
-
+				var http = new haxe.Http("https://raw.githubusercontent.com/music-discussion/FNF-Fusion-Engine-but-Better/master/version.downloadMe"); // get versio check :)
+				var returnedData:Array<String> = [];
+				
+				http.onData = function (data:String)
+				{
+					returnedData[0] = data.substring(0, data.indexOf(';'));
+					returnedData[1] = data.substring(data.indexOf('-'), data.length);
+				  	if (!MainMenuState.kadeEngineVer.contains(returnedData[0].trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "")
+					{
+						trace('outdated lmao! ' + returnedData[0] + ' != ' + MainMenuState.kadeEngineVer);
+						OutdatedSubState.needVer = returnedData[0];
+						OutdatedSubState.currChanges = returnedData[1];
+						FlxG.switchState(new MainMenuState());
+					}
+					else
+					{
+						FlxG.switchState(new MainMenuState());
+					}
+				}
+				
+				http.onError = function (error) {
+				  trace('error: $error');
+				  FlxG.switchState(new MainMenuState()); // fail but we go anyway
+				}
+				
+				http.request();
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
@@ -380,8 +399,8 @@ class TitleState extends MusicBeatState
 	{
 		super.beatHit();
 
-		bottomText = Std.string(titleStateTXT[26]);
-		topText = Std.string(titleStateTXT[25]);
+		bottomText = Std.string(titleStateTXT[26]); // if (Std.string(titleStateTXT[26]).startsWith('false'))
+		topText = Std.string(titleStateTXT[25]);  // if (Std.string(titleStateTXT[25]).startsWith('false'))
 	//	txtVis = Std.string(titleStateTXT[20]); // ok so had a bit of trouble but back on track
 
 		logoBl.animation.play('bump');
@@ -399,7 +418,11 @@ class TitleState extends MusicBeatState
 			//  Std.string(titleStateTXT[0]);
 			case 1:
 			//	createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
-			createCoolText([Std.string(titleStateTXT[2]), Std.string(titleStateTXT[3]), Std.string(titleStateTXT[4]), Std.string(titleStateTXT[5])]);
+		//	createCoolText([Std.string(titleStateTXT[2]), Std.string(titleStateTXT[3]), Std.string(titleStateTXT[4]), Std.string(titleStateTXT[5])]);
+			createCoolText([Std.string(titleStateTXT[2])]); //this way cause it wouldnt show up
+			addMoreText(Std.string(titleStateTXT[3]));
+			addMoreText(Std.string(titleStateTXT[4]));
+			addMoreText(Std.string(titleStateTXT[5]));
 			// credTextShit.visible = true;
 			case 3:
 			//	addMoreText('present');
@@ -438,14 +461,14 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = 'Shoutouts Tom Fulp';
 			// credTextShit.screenCenter();
 			case 9:
-				if (topText == 'false')
+				if (topText.startsWith('false'))
 					createCoolText([Std.string(titleStateTXT[29])]);
 				else
 					createCoolText([curWacky[0]]);
 			// credTextShit.visible = true;
 			case 11:
-				if (bottomText == 'false')
-					addMoreText([Std.string(titleStateTXT[30])]);
+				if (bottomText.startsWith('false'))
+					addMoreText(Std.string(titleStateTXT[30]));
 				else
 					addMoreText(curWacky[1]);
 			// credTextShit.text += '\nlmao';

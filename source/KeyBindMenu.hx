@@ -41,14 +41,19 @@ class KeyBindMenu extends FlxSubState
     var defaultGpKeys:Array<String> = ["DPAD_LEFT", "DPAD_DOWN", "DPAD_UP", "DPAD_RIGHT"];
     var curSelected:Int = 0;
 
-    var keys:Array<String> = [FlxG.save.data.leftBind,
-                              FlxG.save.data.downBind,
-                              FlxG.save.data.upBind,
-                              FlxG.save.data.rightBind];
-    var gpKeys:Array<String> = [FlxG.save.data.gpleftBind,
-                              FlxG.save.data.gpdownBind,
-                              FlxG.save.data.gpupBind,
-                              FlxG.save.data.gprightBind];
+    var keys:Array<String> = [
+                              Controls.LEFT,
+                              Controls.DOWN,
+                              Controls.UP,
+                              Controls.RIGHT
+                            ];
+    var gpKeys:Array<String> = //useless thing but makes it easy for me
+                            [
+                                Controls.LEFT,
+                                Controls.DOWN,
+                                Controls.UP,
+                                Controls.RIGHT
+                            ];
     var tempKey:String = "";
     var blacklist:Array<String> = ["ESCAPE", "ENTER", "BACKSPACE", "SPACE", "TAB"];
 

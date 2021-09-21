@@ -125,6 +125,7 @@ class PlayState extends MusicBeatState
 
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
+	public var camSustains:FlxCamera;
 
 	private var camFollow:FlxObject;
 
@@ -193,12 +194,15 @@ class PlayState extends MusicBeatState
 	var songScoreDef:Int = 0;
 	var scoreTxt:FlxText;
 	var replayTxt:FlxText;
+	private var sDir:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
+//	public var strumLine:FlxSprite;
 
 	public static var campaignScore:Int = 0;
 
 	var defaultCamZoom:Float = 1.05;
 
 	public static var daPixelZoom:Float = 6;
+	public var camNotes:FlxCamera;
 
 	public static var isNew:Bool = true;
 	var funneEffect:FlxSprite;
@@ -493,9 +497,15 @@ class PlayState extends MusicBeatState
 		camGame = new FlxCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
+		camSustains = new FlxCamera();
+		camSustains.bgColor.alpha = 0;
+		camNotes = new FlxCamera();
+		camNotes.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camHUD);
+		FlxG.cameras.add(camSustains);
+		FlxG.cameras.add(camNotes);
 
 		FlxCamera.defaultCameras = [camGame];
 
@@ -1633,8 +1643,8 @@ class PlayState extends MusicBeatState
 		// healthBar
 		add(healthBar);
 
-		// Add Kade Engine watermark
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " " + (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy") + (Main.watermarks ? " - Fusion " + MainMenuState.kadeEngineVer : ""), 16);
+		// Add Kade Engine watermark, could have changed to Fusion? - Discussions
+		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " " + (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy") + (Main.watermarks ? " - Better Fusion " + MainMenuState.kadeEngineVer : ""), 16);
 		kadeEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		kadeEngineWatermark.scrollFactor.set();
 		add(kadeEngineWatermark);
@@ -1868,12 +1878,25 @@ class PlayState extends MusicBeatState
 	var startTimer:FlxTimer;
 	var perfectMode:Bool = false;
 
+	//#if windows
+	//public static var luaModchart:ModChart = null;
+	//#end
+
 	function startCountdown():Void
 	{
 		inCutscene = false;
 
 		generateStaticArrows(0);
 		generateStaticArrows(1);
+
+		#if windows
+		// pre lowercasing the song name (startCountdown)
+		var songLowercase = StringTools.replace(PlayState.SONG.song, " ", "-").toLowerCase();
+		switch (songLowercase) {
+			case 'dad-battle': songLowercase = 'dadbattle';
+			case 'philly-nice': songLowercase = 'philly';
+		}
+		#end
 
 
 		if (executeModchart) // dude I hate lua (jkjkjkjk)
@@ -2833,8 +2856,8 @@ class PlayState extends MusicBeatState
 			{
 				case 0:
 					cpuStrums.add(babyArrow);
-					if (PlayStateChangeables.bothSide)
-						babyArrow.x -= 500;
+				//	if (PlayStateChangeables.bothSide)
+	//					babyArrow.x -= 500;
 				case 1:
 					playerStrums.add(babyArrow);
 			}
@@ -3033,28 +3056,32 @@ class PlayState extends MusicBeatState
 		perfectMode = false;
 		#end
 
-		if (executeModchart && lua != null && songStarted)
+		#if windows
+		if (executeModchart && songStarted)
 		{
-			setVar('songPos',Conductor.songPosition);
-			setVar('hudZoom', camHUD.zoom);
-			setVar('cameraZoom',FlxG.camera.zoom);
-			callLua('update', [elapsed]);
+
+		/*	for (i in luaWiggles)
+			{
+				trace('wiggle le gaming');
+				i.update(elapsed);
+			}*/
 
 			/*for (i in 0...strumLineNotes.length) {
 				var member = strumLineNotes.members[i];
-				member.x = getVar("strum" + i + "X", "float");
-				member.y = getVar("strum" + i + "Y", "float");
-				member.angle = getVar("strum" + i + "Angle", "float");
+				member.x = luaModchart.getVar("strum" + i + "X", "float");
+				member.y = luaModchart.getVar("strum" + i + "Y", "float");
+				member.angle = luaModchart.getVar("strum" + i + "Angle", "float");
 			}*/
 
-			FlxG.camera.angle = getVar('cameraAngle', 'float');
-			camHUD.angle = getVar('camHudAngle','float');
+		//	FlxG.camera.angle = luaModchart.getVar('cameraAngle', 'float');
+		//	camHUD.angle = luaModchart.getVar('camHudAngle','float');
 
-			if (getVar("showOnlyStrums",'bool'))
+	/*		if (luaModchart.getVar("showOnlyStrums",'bool'))
 			{
 				healthBarBG.visible = false;
 				kadeEngineWatermark.visible = false;
 				healthBar.visible = false;
+				overhealthBar.visible = false;
 				iconP1.visible = false;
 				iconP2.visible = false;
 				scoreTxt.visible = false;
@@ -3064,21 +3091,33 @@ class PlayState extends MusicBeatState
 				healthBarBG.visible = true;
 				kadeEngineWatermark.visible = true;
 				healthBar.visible = true;
+				overhealthBar.visible = false;
 				iconP1.visible = true;
 				iconP2.visible = true;
 				scoreTxt.visible = true;
 			}
 
-			var p1 = getVar("strumLine1Visible",'bool');
-			var p2 = getVar("strumLine2Visible",'bool');
+		//	var p1 = luaModchart.getVar("strumLine1Visible",'bool');
+			//var p2 = luaModchart.getVar("strumLine2Visible",'bool');
 
-			for (i in 0...4)
+			for (i in 0...keyAmmo[mania])
 			{
 				strumLineNotes.members[i].visible = p1;
 				if (i <= playerStrums.length)
 					playerStrums.members[i].visible = p2;
-			}
+			}*/
+
+			camNotes.zoom = camHUD.zoom;
+			camNotes.x = camHUD.x;
+			camNotes.y = camHUD.y;
+			camNotes.angle = camHUD.angle;
+			camSustains.zoom = camHUD.zoom;
+			camSustains.x = camHUD.x;
+			camSustains.y = camHUD.y;
+			camSustains.angle = camHUD.angle;
 		}
+
+		#end
 
 		if (currentFrames == FlxG.save.data.fpsCap)
 		{
@@ -3410,8 +3449,22 @@ class PlayState extends MusicBeatState
 		}
 		if (camZooming)
 		{
-			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
-			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
+			if (!executeModchart)
+				{
+					FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
+					camHUD.zoom = FlxMath.lerp(FlxG.save.data.zoom, camHUD.zoom, 0.95);
+	
+					camNotes.zoom = camHUD.zoom;
+					camSustains.zoom = camHUD.zoom;
+				}
+				else
+				{
+					FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
+					camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
+	
+					camNotes.zoom = camHUD.zoom;
+					camSustains.zoom = camHUD.zoom;
+				}
 		}
 
 		FlxG.watch.addQuick("beatShit", curBeat);
@@ -3529,150 +3582,22 @@ class PlayState extends MusicBeatState
 								health -= SONG.noteValues[0];
 							*/
 							
-							if (FlxG.save.data.cpuStrums)
-							{
-								cpuStrums.forEach(function(spr:FlxSprite)
-								{
-									if (Math.abs(daNote.noteData) == spr.ID)
-									{
-										spr.animation.play('confirm', true);
-									}
-									if (spr.animation.curAnim.name == 'confirm' && !curStage.startsWith('school'))
-									{
-										spr.centerOffsets();
-										switch(maniaToChange)
-										{
-											case 0: 
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-											case 1: 
-												spr.offset.x -= 16;
-												spr.offset.y -= 16;
-											case 2: 
-												spr.offset.x -= 22;
-												spr.offset.y -= 22;
-											case 3: 
-												spr.offset.x -= 15;
-												spr.offset.y -= 15;
-											case 4: 
-												spr.offset.x -= 18;
-												spr.offset.y -= 18;
-											case 5: 
-												spr.offset.x -= 20;
-												spr.offset.y -= 20;
-											case 6: 
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-											case 7: 
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-											case 8:
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-											case 10: 
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-											case 11: 
-												spr.offset.x -= 16;
-												spr.offset.y -= 16;
-											case 12: 
-												spr.offset.x -= 22;
-												spr.offset.y -= 22;
-											case 13: 
-												spr.offset.x -= 15;
-												spr.offset.y -= 15;
-											case 14: 
-												spr.offset.x -= 18;
-												spr.offset.y -= 18;
-											case 15: 
-												spr.offset.x -= 20;
-												spr.offset.y -= 20;
-											case 16: 
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-											case 17: 
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-											case 18:
-												spr.offset.x -= 13;
-												spr.offset.y -= 13;
-										}
-									}
-									else
-										spr.centerOffsets();
-								});
-							}
+					}
 							
-						dad.holdTimer = 0;
-	
-						if (SONG.needsVoices)
-							vocals.volume = 1;
-	
-						daNote.active = false;
-
-						daNote.kill();
-						notes.remove(daNote, true);
-						daNote.destroy();
-					}
-	
-					if (FlxG.save.data.downscroll)
-						daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (-0.45 * FlxMath.roundDecimal(FlxG.save.data.scrollSpeed == 1 ? SONG.speed : FlxG.save.data.scrollSpeed, 2)));
-					else
-						daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(FlxG.save.data.scrollSpeed == 1 ? SONG.speed : FlxG.save.data.scrollSpeed, 2)));
-
-					if (daNote.mustPress && !daNote.modifiedByLua)
-					{
-						daNote.visible = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].visible;
-						daNote.x = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].x;
-						if (!daNote.isSustainNote)
-							daNote.angle = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].angle;
-						daNote.alpha = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].alpha;
-					}
-					else if (!daNote.wasGoodHit && !daNote.modifiedByLua)
-					{
-						daNote.visible = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].visible;
-						daNote.x = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].x;
-						if (!daNote.isSustainNote)
-							daNote.angle = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].angle;
-						daNote.alpha = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].alpha;
-					}
-					
-					
-
-					if (daNote.isSustainNote)
-						daNote.x += daNote.width / 2 + 17;
-					
-
-					//trace(daNote.y);
-					// WIP interpolation shit? Need to fix the pause issue
-					// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
-	
-					if ((daNote.y < -daNote.height && !FlxG.save.data.downscroll || daNote.y >= strumLine.y + 106 && FlxG.save.data.downscroll) && daNote.mustPress)
-					{
-
-							if (daNote.isSustainNote && daNote.wasGoodHit)
-							{
-								daNote.kill();
-								notes.remove(daNote, true);
-								daNote.destroy();
-							}
-							else
-							{
-								health -= 0.075;
-								vocals.volume = 0;
-
-								noteMiss(daNote.noteData, daNote);
-							}
-						
-						daNote.active = false;
-						daNote.visible = false;
-	
-						daNote.kill();
-						notes.remove(daNote, true);
-						daNote.destroy();
-					}
 				});
 			}
+
+			if (FlxG.save.data.cpuStrums)
+				{
+					cpuStrums.forEach(function(spr:FlxSprite)
+					{
+						if (spr.animation.finished)
+						{
+							spr.animation.play('static');
+							spr.centerOffsets();
+						}
+					});
+				}
 
 
 		if (!inCutscene)
@@ -4693,6 +4618,7 @@ class PlayState extends MusicBeatState
 		
 
 	var fastCarCanDrive:Bool = true;
+
 	function generateFusionStage(){
 	
 		curStage = "";

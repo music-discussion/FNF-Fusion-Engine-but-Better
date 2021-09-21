@@ -12,6 +12,7 @@ class OutdatedSubState extends MusicBeatState
 	public static var leftState:Bool = false;
 
 	public static var needVer:String = "IDFK LOL";
+	public static var currChanges:String = "dk";
 
 	override function create()
 	{
@@ -19,10 +20,13 @@ class OutdatedSubState extends MusicBeatState
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(bg);
 		var txt:FlxText = new FlxText(0, 0, FlxG.width,
-			"Kade Engine is Outdated!\n"
+			"Your Better Fusion Engine is outdated!\nYou are on "
 			+ MainMenuState.kadeEngineVer
-			+ " is your current version\nwhile the most recent version is " + needVer
-			+ "!\nPress Space to go to the github or ESCAPE to ignore this!!",
+			+ "\nwhile the most recent version is " + needVer + "."
+			+ "\n\nWhat's new:\n\n"
+			+ currChanges
+			+ "\n& more changes and bugfixes in the full changelog"
+			+ "\n\nPress Space to view the full changelog and update\nor ESCAPE to ignore this",
 			32);
 		txt.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, CENTER);
 		txt.screenCenter();
@@ -33,7 +37,7 @@ class OutdatedSubState extends MusicBeatState
 	{
 		if (controls.ACCEPT)
 		{
-			FlxG.openURL("https://github.com/KadeDev/Kade-Engine/releases/latest");
+			FlxG.openURL("https://github.com/music-discussion/FNF-Fusion-Engine-but-Better/releases/latest");
 		}
 		if (controls.BACK)
 		{

@@ -22,8 +22,8 @@ class OptionsMenu extends MusicBeatState
 	var options:Array<OptionCatagory> = [
 		new OptionCatagory("Gameplay", [
 			new DFJKOption(controls),
-			new NewInputOption("Swaps the input system"),
-			new ResetKey("gamer goes brr ior no brrr"),
+			new NewInputOption("Swaps the input system from New to Week 7 Kinda."),
+			new ResetKey("Enable or Disable the use of R to kill yourself."),
 			new Judgement("Customize your Hit Timings (LEFT or RIGHT)"),
 			#if desktop
 			new FPSCapOption("Cap your FPS (Left for -10, Right for +10. SHIFT to go faster)"),
@@ -48,11 +48,12 @@ class OptionsMenu extends MusicBeatState
 			new FPSOption("Toggle the FPS Counter"),
 			new ReplayOption("View replays"),
 			#end
-			new WatermarkOption("Turn off all watermarks from the engine.")
+			new WatermarkOption("Turn off all watermarks from the engine."),
 			
 		]),
-		new OptionCategory("Mod Extras", [
-			new SplashOption("Disable or ReEnable note splashes on notes.")
+		new OptionCatagory("Mod Extras", [
+			new SplashOption("Disable or ReEnable note splashes on notes."),
+			new CpuStrumsOption("Disable or Enable note glows on the CPU's side.")
 		])
 		
 	];

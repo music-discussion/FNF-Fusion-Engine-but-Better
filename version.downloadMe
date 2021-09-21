@@ -1,1 +1,5 @@
-1.4.2
+0.1;
+- Custom Title State. (Can be found in assets/data/titlestate.txt i think)
+- Added support for dialogue to be "SONGNAMEDialogue.txt" or "SONGNAMEDialog.txt" Example: ruckDialog.txt
+- Added Enenemy glow notes for when they sing.
+- Added Note Splashes.

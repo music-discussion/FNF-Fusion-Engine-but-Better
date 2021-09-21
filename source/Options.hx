@@ -100,6 +100,29 @@ class DFJKOption extends Option
 		return  visualRotation[FlxG.save.data.controls];
 	}
 }
+
+/*class DFJKOption extends Option //maybe one day
+{
+	private var controls:Controls;
+
+	public function new(controls:Controls)
+	{
+		super();
+		this.controls = controls;
+	}
+
+	public override function press():Bool
+	{
+		OptionsMenu.instance.openSubState(new KeyBindMenu());
+		return false;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Key Bindings for Four Key";
+	}
+}*/
+
 class NewInputOption extends Option{
 
 	public function new(desc:String){
@@ -119,6 +142,7 @@ class NewInputOption extends Option{
 				return true;
 			}
 }
+
 class ResetKey extends Option{
 
 	public function new(desc:String){
@@ -300,6 +324,28 @@ class SplashOption extends Option
 	private override function updateDisplay():String
 	{
 		return "Note Splashes " + (!FlxG.save.data.notesplash ? "Off" : "On");
+	}
+}
+
+class CpuStrumsOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.cpuStrums = !FlxG.save.data.cpuStrums;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "CPU Note Glows " + (!FlxG.save.data.cpuStrums ? "Off" : "On");
 	}
 }
 
