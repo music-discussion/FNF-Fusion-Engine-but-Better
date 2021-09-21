@@ -387,7 +387,7 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	var titleStateTXT:Array<String> = CoolUtil.coolTextFile(Paths.txt('titleState')); // hold on. finding tzxt.
+	var titleStateTXT:Array<String> = CoolUtil.coolTextFile(Paths.txt('titleState')); // hold on. finding txt.
 	var txtVis:Bool; // = Std.string(titleStateTXT[20]); // this is suprisingly easy to do my god.
 
 	// CURWACKY TEXT SHIT

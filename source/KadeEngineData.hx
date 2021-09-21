@@ -68,6 +68,9 @@ class KadeEngineData
 		if (FlxG.save.data.cpuStrums == null)
 			FlxG.save.data.cpuStrums = true;
 
+		if (FlxG.save.data.freeplayInst == null)
+			FlxG.save.data.freeplayInst = true;
+
 		Conductor.recalculateTimings();
 
 		Main.watermarks = FlxG.save.data.watermark;

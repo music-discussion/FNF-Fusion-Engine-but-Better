@@ -21,6 +21,7 @@ import Discord.DiscordClient;
 #end
 
 using StringTools;
+
 class SongMetadatas
 {
 	public var songName:String = "";
@@ -49,16 +50,21 @@ class FreeplayState extends MusicBeatState
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
+	private var iconArray:Array<HealthIcon> = [];
 
 	override function create()
 	{
 		var parsed = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
+		var freeplayIcons:Array<String> = CoolUtil.coolTextFile(Paths.txt('freeplayIcons')); // FOR TESTING SHIT, MAY SOON BE ADDED
 		var initSonglist:Dynamic = parsed[id].songs;
 		for (i in 0...initSonglist.length)
 		{
 
-			songs.push(new SongMetadatas(initSonglist[i], 1, "bf"));
+			songs.push(new SongMetadatas(initSonglist[i], 1, "face"));
+			// songs.push(new SongMetadata(initSonglist[i], 1, data[1]));
 		}
+
+		// Std.string(titleStateTXT[0]);
 
 		/* 
 			if (FlxG.sound.music != null)
@@ -96,9 +102,12 @@ class FreeplayState extends MusicBeatState
 			songText.targetY = i;
 			grpSongs.add(songText);
 
+			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
+			icon.sprTracker = songText;
 
-
-
+			// using a FlxGroup is too much fuss!
+			iconArray.push(icon);
+			add(icon);
 
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
@@ -306,27 +315,33 @@ class FreeplayState extends MusicBeatState
 		// lerpScore = 0;
 		#end
 
-		#if PRELOAD_ALL
+	//	#if PRELOAD_ALL
 		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
-		#end
+//		#end
 
 		var bullShit:Int = 0;
 
-
-		for (item in grpSongs.members)
-		{
-			item.targetY = bullShit - curSelected;
-			bullShit++;
-
-			item.alpha = 0.6;
-			// item.setGraphicSize(Std.int(item.width * 0.8));
-
-			if (item.targetY == 0)
+		for (i in 0...iconArray.length)
 			{
-				item.alpha = 1;
-				// item.setGraphicSize(Std.int(item.width));
+				iconArray[i].alpha = 0.6;
 			}
-		}
+	
+			iconArray[curSelected].alpha = 1;
+	
+			for (item in grpSongs.members)
+			{
+				item.targetY = bullShit - curSelected;
+				bullShit++;
+	
+				item.alpha = 0.6;
+				// item.setGraphicSize(Std.int(item.width * 0.8));
+	
+				if (item.targetY == 0)
+				{
+					item.alpha = 1;
+					// item.setGraphicSize(Std.int(item.width));
+				}
+			}
 	}
 }
 

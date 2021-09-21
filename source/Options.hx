@@ -349,6 +349,28 @@ class CpuStrumsOption extends Option
 	}
 }
 
+class FreeplayInstOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.freeplayInst = !FlxG.save.data.freeplayInst;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Inst in Freeplay " + (!FlxG.save.data.freeplayInst ? "Off" : "On");
+	}
+}
+
 class FPSCapOption extends Option
 {
 	public function new(desc:String)
