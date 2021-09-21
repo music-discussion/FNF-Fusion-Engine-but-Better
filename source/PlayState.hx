@@ -98,6 +98,7 @@ class PlayState extends MusicBeatState
 
 	var songLength:Float = 0;
 	var kadeEngineWatermark:FlxText;
+	var noteSplashes:FlxTypedGroup<NoteSplash>;
 	
 	#if windows
 	// Discord RPC variables
@@ -119,6 +120,8 @@ class PlayState extends MusicBeatState
 
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
+	public static var playerStrums:FlxTypedGroup<FlxSprite> = null;
+	public static var cpuStrums:FlxTypedGroup<FlxSprite> = null;
 
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
@@ -128,7 +131,7 @@ class PlayState extends MusicBeatState
 	private static var prevCamFollow:FlxObject;
 
 	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
-	private var playerStrums:FlxTypedGroup<FlxSprite>;
+	//private var playerStrums:FlxTypedGroup<FlxSprite>;
 
 	private var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -438,6 +441,11 @@ class PlayState extends MusicBeatState
 
 		trace('Mod chart: ' + executeModchart + " - " + Paths.lua(PlayState.SONG.song.toLowerCase() + "/modchart"));
 
+		noteSplashes = new FlxTypedGroup<NoteSplash>();
+		var daSplash = new NoteSplash(100, 100, 0);
+		daSplash.alpha = 0;
+		noteSplashes.add(daSplash);
+
 		#if windows
 		// Making difficulty text for Discord Rich Presence.
 		switch (storyDifficulty)
@@ -514,7 +522,7 @@ class PlayState extends MusicBeatState
 			dialogue = CoolUtil.coolDynamicTextFile('assets/data/' + SONG.song.toLowerCase() + '/dialogue.txt');
 		// otherwise, make the dialog an error message
 		} else {
-			dialogue = [':dad: The game tried to get a dialog file but couldn\'t find it. Please make sure there is a dialog file named "dialog.txt".'];
+			dialogue = [':dad: check your shit cause, no dialog.txt was found. from discussoons'];
 		}
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 		dad = new Character(100, 100, SONG.player2);
@@ -1553,8 +1561,12 @@ class PlayState extends MusicBeatState
 
 		strumLineNotes = new FlxTypedGroup<FlxSprite>();
 		add(strumLineNotes);
+		add(noteSplashes);
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
+		cpuStrums = new FlxTypedGroup<FlxSprite>();
+
+	//	playerStrums = new FlxTypedGroup<FlxSprite>();
 
 		// startCountdown();
 
@@ -1655,6 +1667,7 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
+		noteSplashes.cameras = [camNotes];
 		strumLineNotes.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -2266,6 +2279,34 @@ class PlayState extends MusicBeatState
 			FlxG.sound.playMusic(Sound.fromFile(Paths.inst(PlayState.SONG.song)), 1, false);
 		}
 
+		if (FlxG.save.data.noteSplash)
+			{
+				NoteSplash.colors = ['purple', 'blue', 'green', 'red'];
+				/*switch (mania)
+				{
+					case 0: 
+						NoteSplash.colors = ['purple', 'blue', 'green', 'red'];
+					case 1: 
+						NoteSplash.colors = ['purple', 'green', 'red', 'yellow', 'blue', 'darkblue'];	
+					case 2: 
+						NoteSplash.colors = ['purple', 'blue', 'green', 'red', 'white', 'yellow', 'violet', 'darkred', 'darkblue'];
+					case 3: 
+						NoteSplash.colors = ['purple', 'blue', 'white', 'green', 'red'];
+						if (FlxG.save.data.gthc)
+							NoteSplash.colors = ['green', 'red', 'yellow', 'darkblue', 'orange'];
+					case 4: 
+						NoteSplash.colors = ['purple', 'green', 'red', 'white', 'yellow', 'blue', 'darkblue'];
+					case 5: 
+						NoteSplash.colors = ['purple', 'blue', 'green', 'red', 'yellow', 'violet', 'darkred', 'darkblue'];
+					case 6: 
+						NoteSplash.colors = ['white'];
+					case 7: 
+						NoteSplash.colors = ['purple', 'red'];
+					case 8: 
+						NoteSplash.colors = ['purple', 'white', 'red'];
+				}*/
+			}
+
 		FlxG.sound.music.onComplete = endSong;
 		vocals.play();
 
@@ -2788,9 +2829,28 @@ class PlayState extends MusicBeatState
 				playerStrums.add(babyArrow);
 			}
 
+			switch (player)
+			{
+				case 0:
+					cpuStrums.add(babyArrow);
+					if (PlayStateChangeables.bothSide)
+						babyArrow.x -= 500;
+				case 1:
+					playerStrums.add(babyArrow);
+			}
+
 			babyArrow.animation.play('static');
 			babyArrow.x += 50;
+
 			babyArrow.x += ((FlxG.width / 2) * player);
+			
+	//		if (PlayStateChangeables.Optimize)
+		//		babyArrow.x -= 275;
+			
+			cpuStrums.forEach(function(spr:FlxSprite)
+			{					
+				spr.centerOffsets(); //CPU arrows start out slightly off-center
+			});
 
 			strumLineNotes.add(babyArrow);
 		}
@@ -3458,18 +3518,91 @@ class PlayState extends MusicBeatState
 										altAnim = '-' + SONG.notes[Math.floor(curStep / 16)].altAnimNum+'alt';
 							}
 	
-						switch (Math.abs(daNote.noteData))
-						{
-							case 2:
-								dad.playAnim('singUP' + altAnim, true);
-							case 3:
-								dad.playAnim('singRIGHT' + altAnim, true);
-							case 1:
-								dad.playAnim('singDOWN' + altAnim, true);
-							case 0:
-								dad.playAnim('singLEFT' + altAnim, true);
-						}
-	
+							dad.playAnim('sing' + sDir[daNote.noteData] + altAnim, true);
+
+
+							/*if (daNote.isSustainNote)
+							{
+								health -= SONG.noteValues[0] / 3;
+							}
+							else
+								health -= SONG.noteValues[0];
+							*/
+							
+							if (FlxG.save.data.cpuStrums)
+							{
+								cpuStrums.forEach(function(spr:FlxSprite)
+								{
+									if (Math.abs(daNote.noteData) == spr.ID)
+									{
+										spr.animation.play('confirm', true);
+									}
+									if (spr.animation.curAnim.name == 'confirm' && !curStage.startsWith('school'))
+									{
+										spr.centerOffsets();
+										switch(maniaToChange)
+										{
+											case 0: 
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+											case 1: 
+												spr.offset.x -= 16;
+												spr.offset.y -= 16;
+											case 2: 
+												spr.offset.x -= 22;
+												spr.offset.y -= 22;
+											case 3: 
+												spr.offset.x -= 15;
+												spr.offset.y -= 15;
+											case 4: 
+												spr.offset.x -= 18;
+												spr.offset.y -= 18;
+											case 5: 
+												spr.offset.x -= 20;
+												spr.offset.y -= 20;
+											case 6: 
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+											case 7: 
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+											case 8:
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+											case 10: 
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+											case 11: 
+												spr.offset.x -= 16;
+												spr.offset.y -= 16;
+											case 12: 
+												spr.offset.x -= 22;
+												spr.offset.y -= 22;
+											case 13: 
+												spr.offset.x -= 15;
+												spr.offset.y -= 15;
+											case 14: 
+												spr.offset.x -= 18;
+												spr.offset.y -= 18;
+											case 15: 
+												spr.offset.x -= 20;
+												spr.offset.y -= 20;
+											case 16: 
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+											case 17: 
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+											case 18:
+												spr.offset.x -= 13;
+												spr.offset.y -= 13;
+										}
+									}
+									else
+										spr.centerOffsets();
+								});
+							}
+							
 						dad.holdTimer = 0;
 	
 						if (SONG.needsVoices)
@@ -4394,6 +4527,30 @@ class PlayState extends MusicBeatState
 			
 			
 		}
+
+		function doNoteSplash(noteX:Float, noteY:Float, nData:Int)
+			{
+				var recycledNote = noteSplashes.recycle(NoteSplash);
+				recycledNote.makeSplash(playerStrums.members[nData].x, playerStrums.members[nData].y, nData);
+				noteSplashes.add(recycledNote);
+				
+			}
+	
+		function HealthDrain():Void //code from vs bob
+			{
+				badNoteHit();
+				new FlxTimer().start(0.01, function(tmr:FlxTimer)
+				{
+					health -= 0.005;
+				}, 300);
+			}
+	
+		function badNoteHit():Void
+			{
+				boyfriend.playAnim('hit', true);
+				FlxG.sound.play(Paths.soundRandom('badnoise', 1, 3), FlxG.random.float(0.7, 1));
+			}
+	
 
 
 	function getKeyPresses(note:Note):Int

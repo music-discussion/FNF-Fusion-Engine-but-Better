@@ -50,6 +50,9 @@ class OptionsMenu extends MusicBeatState
 			#end
 			new WatermarkOption("Turn off all watermarks from the engine.")
 			
+		]),
+		new OptionCategory("Mod Extras", [
+			new SplashOption("Disable or ReEnable note splashes on notes.")
 		])
 		
 	];

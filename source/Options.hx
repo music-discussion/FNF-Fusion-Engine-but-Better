@@ -270,7 +270,7 @@ class FPSOption extends Option
 	public override function press():Bool
 	{
 		FlxG.save.data.fps = !FlxG.save.data.fps;
-		(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.fps);
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.fps);
 		display = updateDisplay();
 		return true;
 	}
@@ -278,6 +278,28 @@ class FPSOption extends Option
 	private override function updateDisplay():String
 	{
 		return "FPS Counter " + (!FlxG.save.data.fps ? "off" : "on");
+	}
+}
+
+class SplashOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.notesplash = !FlxG.save.data.notesplash;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Note Splashes " + (!FlxG.save.data.notesplash ? "Off" : "On");
 	}
 }
 
