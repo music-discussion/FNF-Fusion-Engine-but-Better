@@ -21,15 +21,19 @@ import sys.io.File;
 import sys.FileSystem;
 #end
 using StringTools;
-typedef StorySongsJson = {
+
+typedef StorySongsJson = 
+{
 	var songs: Array<Array<String>>;
 	var weekNames: Array<String>;
 	var characters: Array<Array<String>>;
 }
-typedef DifficultysJson = {
+typedef DifficultysJson = 
+{
 	var difficulties:Array<Dynamic>;
 	var defaultDiff:Int;
 }
+
 class StoryMenuState extends MusicBeatState
 {
 	var scoreText:FlxText;
@@ -77,28 +81,40 @@ class StoryMenuState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 		}
 		var storySongJson:StorySongsJson = CoolUtil.parseJson(File.getContent('assets/data/storySonglist.json'));
+
 		persistentUpdate = persistentDraw = true;
-		for (storySongList in storySongJson.songs) {
+
+		for (storySongList in storySongJson.songs) 
+		{
 			var weekSongs = [];
-			for (song in storySongList) {
-				if (storySongList[0] == song) {
+			for (song in storySongList) 
+			{
+				if (storySongList[0] == song) 
+				{
 					weekNames.push(song);
-				} else {
+				} else 
+				{
 					weekSongs.push(song);
 				}
 			}
 			weekData.push(weekSongs);
 		}
-		for (weekTitle in storySongJson.weekNames) {
+
+		for (weekTitle in storySongJson.weekGreyText) 
+		{
 			weekTitles.push(weekTitle);
 		}
-		for (storyCharList in storySongJson.characters) {
+
+		for (storyCharList in storySongJson.characters) 
+		{
 			var weekChars = [];
-			for (char in storyCharList) {
+			for (char in storyCharList) 
+			{
 				weekChars.push(char);
 			}
 			weekCharacters.push(weekChars);
 		}
+
 		persistentUpdate = persistentDraw = true;
 
 		scoreText = new FlxText(10, 10, 0, "SCORE: 49324858", 36);
@@ -479,6 +495,7 @@ class StoryMenuState extends MusicBeatState
 			txtTracklist.text += "\n" + i;
 		}
 
+		txtTracklist.text += "\n";
 		txtTracklist.text = txtTracklist.text.toUpperCase();
 
 		txtTracklist.screenCenter(X);
