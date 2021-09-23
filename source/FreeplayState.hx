@@ -1,20 +1,66 @@
 package;
 
-import flash.text.TextField;
+import openfl.geom.Matrix;
+import openfl.display.BitmapData;
+import openfl.utils.AssetType;
+import lime.graphics.Image;
+import flixel.graphics.FlxGraphic;
+import openfl.utils.AssetManifest;
+import openfl.utils.AssetLibrary;
+import flixel.system.FlxAssets;
+import llua.Convert;
+import llua.Lua;
+import llua.State;
+import llua.LuaL;
+import lime.app.Application;
+import lime.media.AudioContext;
+import lime.media.AudioManager;
+import openfl.Lib;
+import Section.SwagSection;
+import Song.SwagSong;
+import WiggleEffect.WiggleEffectType;
+import flixel.FlxBasic;
+import flixel.FlxCamera;
 import flixel.FlxG;
+import flixel.FlxGame;
+import flixel.FlxObject;
 import flixel.FlxSprite;
+import flixel.FlxState;
+import flixel.FlxSubState;
 import flixel.addons.display.FlxGridOverlay;
+import flixel.addons.effects.FlxTrail;
+import flixel.addons.effects.FlxTrailArea;
+import flixel.addons.effects.chainable.FlxEffectSprite;
+import flixel.addons.effects.chainable.FlxWaveEffect;
+import flixel.addons.transition.FlxTransitionableState;
+import flixel.graphics.atlas.FlxAtlas;
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
+import flixel.math.FlxPoint;
+import flixel.math.FlxRect;
+import flixel.system.FlxSound;
 import flixel.text.FlxText;
+import flixel.tweens.FlxEase;
+import flixel.tweens.FlxTween;
+import flixel.ui.FlxBar;
+import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
+import flixel.util.FlxSort;
+import flixel.util.FlxStringUtil;
+import flixel.util.FlxTimer;
+import haxe.Json;
 import lime.utils.Assets;
+import openfl.display.BlendMode;
+import openfl.display.StageQuality;
+import openfl.filters.ShaderFilter;
 
 #if sys
 import sys.io.File;
 import sys.FileSystem;
 
 import flash.media.Sound;
+
 #end
 #if windows
 import Discord.DiscordClient;
@@ -47,6 +93,8 @@ class FreeplayState extends MusicBeatState
 	var diffText:FlxText;
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
+	//var iconRPC:String = "";
+	var SONG:SwagSong;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
@@ -54,14 +102,21 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
+
 		var parsed = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
-		var freeplayIcons:Array<String> = CoolUtil.coolTextFile(Paths.txt('freeplayIcons')); // FOR TESTING SHIT, MAY SOON BE ADDED
+	//	var freeplayIcons:Array<String> = CoolUtil.coolTextFile(Paths.txt('freeplayIcons')); // FOR TESTING SHIT, MAY SOON BE ADDED
 		var initSonglist:Dynamic = parsed[id].songs;
+		var initSonglistIcons:Dynamic = parsed[id].icons;
+	//	var ICONinitSonglist = CoolUtil.coolTextFile(Paths.txt('ICONfreeplaySonglist'));
+
 		for (i in 0...initSonglist.length)
 		{
-
-			songs.push(new SongMetadatas(initSonglist[i], 1, "face"));
+			songs.push(new SongMetadatas(initSonglist[i], 1, initSonglistIcons[i])); 
+		//	songs.push(new SongMetadata(initSonglist[i], 1, Std.string(ICONfreeplaySonglist.data[1]))); 
+			// Std.string(titleStateTXT[26])
 			// songs.push(new SongMetadata(initSonglist[i], 1, data[1]));
+		//	var data:Array<String> = initSonglist[i].split(':');
+		//	songs.push(new SongMetadata(data[0], Std.parseInt(data[2]), data[1]));
 		}
 
 		// Std.string(titleStateTXT[0]);
@@ -315,9 +370,11 @@ class FreeplayState extends MusicBeatState
 		// lerpScore = 0;
 		#end
 
+		if (FlxG.save.data.freeplayInst) {
 	//	#if PRELOAD_ALL
 		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
 //		#end
+		}
 
 		var bullShit:Int = 0;
 

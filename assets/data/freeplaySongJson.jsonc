@@ -24,7 +24,39 @@
       "Senpai",
       "Roses",
       "Thorns"
-    ]
+    ],
+      "icons": [
+        // might add support for category icons
+        "gf",
+        "dad",
+        "dad",
+        "dad",
+        "spooky",
+        "spooky",
+        "monster",
+        "pico",
+        "pico",
+        "pico",
+        "mom",
+        "mom",
+        "mom",
+        "parents-christmas",
+        "parents-christmas",
+        "monster-christmas",
+        "senpai",
+        "senpai",
+        "spirit"
+      ],
+      "categoryIcons": [
+        // just testing some shit.
+        "gf",
+        "dad",
+        "spooky",
+        "pico",
+        "mom",
+        "parents-christmas",
+        "senpai"
+      ]
   },
   // trailing commas don't matter with tjson
   // visual studio code is just pissy

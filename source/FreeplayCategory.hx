@@ -31,6 +31,7 @@ class FreeplayCategory extends MusicBeatState
 	var diffText:FlxText;
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
+	//var id:Int = 1;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
@@ -40,11 +41,11 @@ class FreeplayCategory extends MusicBeatState
 	override function create()
 	{
 		var parsed:Dynamic = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
+		var categoryIcons:Dynamic = parsed[FreeplayState.id].icons;
 
 		for (i in 0...parsed.length)
 		{
-
-			songs.push(new SongMetadata(parsed[i].name, 1, "bf"));
+			songs.push(new SongMetadata(parsed[i].name, 1, categoryIcons[i]));
 		}
 
 		/* 

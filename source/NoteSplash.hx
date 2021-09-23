@@ -16,6 +16,10 @@ class NoteSplash extends FlxSprite
 
 	var colorsThatDontChange:Array<String> = ['purple', 'blue', 'green', 'red'];
 
+	var randos:Int = FlxG.random.int(-2, 2); //fuck this
+
+	var SplashFrameRate:Int = 24 + FlxG.random.int(-2, 2);
+
 	public function new(nX:Float, nY:Float, color:Int)
 	{
 		x = nX;
@@ -40,7 +44,7 @@ class NoteSplash extends FlxSprite
         animation.play(colors[color] + ' splash', true);
 		animation.curAnim.frameRate = 24 + FlxG.random.int(-2, 2);
 		//offset.set(500, 200);
-        updateHitbox();
+        this.updateHitbox();   
     }
 
 	override public function update(elapsed) 
@@ -51,5 +55,4 @@ class NoteSplash extends FlxSprite
         }
         super.update(elapsed);
     }
-
 }

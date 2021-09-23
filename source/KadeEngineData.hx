@@ -71,6 +71,12 @@ class KadeEngineData
 		if (FlxG.save.data.freeplayInst == null)
 			FlxG.save.data.freeplayInst = true;
 
+		if (FlxG.save.data.zoom == null)
+			FlxG.save.data.zoom = 1;
+
+		if (FlxG.save.data.noZoom == null)
+			FlxG.save.data.noZoom = false;
+
 		Conductor.recalculateTimings();
 
 		Main.watermarks = FlxG.save.data.watermark;

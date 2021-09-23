@@ -445,10 +445,12 @@ class PlayState extends MusicBeatState
 
 		trace('Mod chart: ' + executeModchart + " - " + Paths.lua(PlayState.SONG.song.toLowerCase() + "/modchart"));
 
+		if (FlxG.save.data.notesplash) {
 		noteSplashes = new FlxTypedGroup<NoteSplash>();
 		var daSplash = new NoteSplash(100, 100, 0);
 		daSplash.alpha = 0;
 		noteSplashes.add(daSplash);
+		}
 
 		#if windows
 		// Making difficulty text for Discord Rich Presence.
@@ -1677,7 +1679,8 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
-		noteSplashes.cameras = [camNotes];
+		if (FlxG.save.data.notesplash)
+			noteSplashes.cameras = [camNotes];
 		strumLineNotes.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -3449,6 +3452,12 @@ class PlayState extends MusicBeatState
 		}
 		if (camZooming)
 		{
+			if (FlxG.save.data.zoom < 0.8)
+				FlxG.save.data.zoom = 0.8;
+	
+			if (FlxG.save.data.zoom > 1.2)
+				FlxG.save.data.zoom = 1.2;
+			
 			if (!executeModchart)
 				{
 					FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
