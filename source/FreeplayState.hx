@@ -371,9 +371,14 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		if (FlxG.save.data.freeplayInst) {
+			if (FileSystem.exists('assets/music/'+songs[curSelected].songName+'_Inst'+".ogg")) {
 	//	#if PRELOAD_ALL
 		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
 //		#end
+			}
+			else {
+				FlxG.sound.playMusic(Paths.inst('Bopeebo_Inst'), 0);
+			}
 		}
 
 		var bullShit:Int = 0;

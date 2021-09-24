@@ -25,6 +25,7 @@ using StringTools;
 typedef StorySongsJson = 
 {
 	var songs: Array<Array<String>>;
+	var weekGreyText: Array<String>;
 	var weekNames: Array<String>;
 	var characters: Array<Array<String>>;
 }

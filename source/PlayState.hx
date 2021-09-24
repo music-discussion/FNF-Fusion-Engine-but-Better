@@ -85,6 +85,7 @@ class PlayState extends MusicBeatState
 	public static var bads:Int = 0;
 	public static var goods:Int = 0;
 	public static var sicks:Int = 0;
+	var id:Int = 1;
 
 	public static var songPosBG:FlxSprite;
 	public static var songPosBar:FlxBar;
@@ -98,7 +99,6 @@ class PlayState extends MusicBeatState
 
 	var songLength:Float = 0;
 	var kadeEngineWatermark:FlxText;
-	var noteSplashes:FlxTypedGroup<NoteSplash>;
 	
 	#if windows
 	// Discord RPC variables
@@ -120,19 +120,16 @@ class PlayState extends MusicBeatState
 
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
-	public static var playerStrums:FlxTypedGroup<FlxSprite> = null;
-	public static var cpuStrums:FlxTypedGroup<FlxSprite> = null;
 
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
-	public var camSustains:FlxCamera;
 
 	private var camFollow:FlxObject;
 
 	private static var prevCamFollow:FlxObject;
 
 	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
-	//private var playerStrums:FlxTypedGroup<FlxSprite>;
+	private var playerStrums:FlxTypedGroup<FlxSprite>;
 
 	private var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -151,6 +148,7 @@ class PlayState extends MusicBeatState
 
 	private var healthBarBG:FlxSprite;
 	private var healthBar:FlxBar;
+	//var parsed;
 	private var songPositionBar:Float = 0;
 	
 	private var generatedMusic:Bool = false;
@@ -194,15 +192,12 @@ class PlayState extends MusicBeatState
 	var songScoreDef:Int = 0;
 	var scoreTxt:FlxText;
 	var replayTxt:FlxText;
-	private var sDir:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
-//	public var strumLine:FlxSprite;
 
 	public static var campaignScore:Int = 0;
 
 	var defaultCamZoom:Float = 1.05;
 
 	public static var daPixelZoom:Float = 6;
-	public var camNotes:FlxCamera;
 
 	public static var isNew:Bool = true;
 	var funneEffect:FlxSprite;
@@ -445,13 +440,6 @@ class PlayState extends MusicBeatState
 
 		trace('Mod chart: ' + executeModchart + " - " + Paths.lua(PlayState.SONG.song.toLowerCase() + "/modchart"));
 
-		if (FlxG.save.data.notesplash) {
-		noteSplashes = new FlxTypedGroup<NoteSplash>();
-		var daSplash = new NoteSplash(100, 100, 0);
-		daSplash.alpha = 0;
-		noteSplashes.add(daSplash);
-		}
-
 		#if windows
 		// Making difficulty text for Discord Rich Presence.
 		switch (storyDifficulty)
@@ -499,15 +487,9 @@ class PlayState extends MusicBeatState
 		camGame = new FlxCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
-		camSustains = new FlxCamera();
-		camSustains.bgColor.alpha = 0;
-		camNotes = new FlxCamera();
-		camNotes.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camHUD);
-		FlxG.cameras.add(camSustains);
-		FlxG.cameras.add(camNotes);
 
 		FlxCamera.defaultCameras = [camGame];
 
@@ -534,7 +516,7 @@ class PlayState extends MusicBeatState
 			dialogue = CoolUtil.coolDynamicTextFile('assets/data/' + SONG.song.toLowerCase() + '/dialogue.txt');
 		// otherwise, make the dialog an error message
 		} else {
-			dialogue = [':dad: check your shit cause, no dialog.txt was found. from discussoons'];
+			dialogue = [':dad: The game tried to get a dialog file but couldn\'t find it. Please make sure there is a dialog file named "dialog.txt".'];
 		}
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 		dad = new Character(100, 100, SONG.player2);
@@ -1573,12 +1555,8 @@ class PlayState extends MusicBeatState
 
 		strumLineNotes = new FlxTypedGroup<FlxSprite>();
 		add(strumLineNotes);
-		add(noteSplashes);
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
-		cpuStrums = new FlxTypedGroup<FlxSprite>();
-
-	//	playerStrums = new FlxTypedGroup<FlxSprite>();
 
 		// startCountdown();
 
@@ -1638,15 +1616,22 @@ class PlayState extends MusicBeatState
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
 
-		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
-			'health', 0, 2);
+		var parsed = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColors.jsonc'));
+		var thatsKindaSUS:Dynamic = parsed[id].colors;
+
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,'health', 0, 2);
 		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
+		healthBar.createFilledBar(Std.parseInt(thatsKindaSUS[SONG.player2]), Std.parseInt(thatsKindaSUS[SONG.player1]));
 		// healthBar
+	//	healthBar.onError = function (error) {
+	//		trace('error: $error');
+	///		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
+	//	  }
+	//	  healthBar.request();
 		add(healthBar);
 
-		// Add Kade Engine watermark, could have changed to Fusion? - Discussions
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " " + (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy") + (Main.watermarks ? " - Better Fusion " + MainMenuState.kadeEngineVer : ""), 16);
+		// Add Kade Engine watermark
+		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " " + (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy") + (Main.watermarks ? " - Fusion " + MainMenuState.kadeEngineVer : ""), 16);
 		kadeEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		kadeEngineWatermark.scrollFactor.set();
 		add(kadeEngineWatermark);
@@ -1679,8 +1664,6 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
-		if (FlxG.save.data.notesplash)
-			noteSplashes.cameras = [camNotes];
 		strumLineNotes.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -1881,25 +1864,12 @@ class PlayState extends MusicBeatState
 	var startTimer:FlxTimer;
 	var perfectMode:Bool = false;
 
-	//#if windows
-	//public static var luaModchart:ModChart = null;
-	//#end
-
 	function startCountdown():Void
 	{
 		inCutscene = false;
 
 		generateStaticArrows(0);
 		generateStaticArrows(1);
-
-		#if windows
-		// pre lowercasing the song name (startCountdown)
-		var songLowercase = StringTools.replace(PlayState.SONG.song, " ", "-").toLowerCase();
-		switch (songLowercase) {
-			case 'dad-battle': songLowercase = 'dadbattle';
-			case 'philly-nice': songLowercase = 'philly';
-		}
-		#end
 
 
 		if (executeModchart) // dude I hate lua (jkjkjkjk)
@@ -2304,34 +2274,6 @@ class PlayState extends MusicBeatState
 		{
 			FlxG.sound.playMusic(Sound.fromFile(Paths.inst(PlayState.SONG.song)), 1, false);
 		}
-
-		if (FlxG.save.data.noteSplash)
-			{
-				NoteSplash.colors = ['purple', 'blue', 'green', 'red'];
-				/*switch (mania)
-				{
-					case 0: 
-						NoteSplash.colors = ['purple', 'blue', 'green', 'red'];
-					case 1: 
-						NoteSplash.colors = ['purple', 'green', 'red', 'yellow', 'blue', 'darkblue'];	
-					case 2: 
-						NoteSplash.colors = ['purple', 'blue', 'green', 'red', 'white', 'yellow', 'violet', 'darkred', 'darkblue'];
-					case 3: 
-						NoteSplash.colors = ['purple', 'blue', 'white', 'green', 'red'];
-						if (FlxG.save.data.gthc)
-							NoteSplash.colors = ['green', 'red', 'yellow', 'darkblue', 'orange'];
-					case 4: 
-						NoteSplash.colors = ['purple', 'green', 'red', 'white', 'yellow', 'blue', 'darkblue'];
-					case 5: 
-						NoteSplash.colors = ['purple', 'blue', 'green', 'red', 'yellow', 'violet', 'darkred', 'darkblue'];
-					case 6: 
-						NoteSplash.colors = ['white'];
-					case 7: 
-						NoteSplash.colors = ['purple', 'red'];
-					case 8: 
-						NoteSplash.colors = ['purple', 'white', 'red'];
-				}*/
-			}
 
 		FlxG.sound.music.onComplete = endSong;
 		vocals.play();
@@ -2855,28 +2797,9 @@ class PlayState extends MusicBeatState
 				playerStrums.add(babyArrow);
 			}
 
-			switch (player)
-			{
-				case 0:
-					cpuStrums.add(babyArrow);
-				//	if (PlayStateChangeables.bothSide)
-	//					babyArrow.x -= 500;
-				case 1:
-					playerStrums.add(babyArrow);
-			}
-
 			babyArrow.animation.play('static');
 			babyArrow.x += 50;
-
 			babyArrow.x += ((FlxG.width / 2) * player);
-			
-	//		if (PlayStateChangeables.Optimize)
-		//		babyArrow.x -= 275;
-			
-			cpuStrums.forEach(function(spr:FlxSprite)
-			{					
-				spr.centerOffsets(); //CPU arrows start out slightly off-center
-			});
 
 			strumLineNotes.add(babyArrow);
 		}
@@ -3059,32 +2982,28 @@ class PlayState extends MusicBeatState
 		perfectMode = false;
 		#end
 
-		#if windows
-		if (executeModchart && songStarted)
+		if (executeModchart && lua != null && songStarted)
 		{
-
-		/*	for (i in luaWiggles)
-			{
-				trace('wiggle le gaming');
-				i.update(elapsed);
-			}*/
+			setVar('songPos',Conductor.songPosition);
+			setVar('hudZoom', camHUD.zoom);
+			setVar('cameraZoom',FlxG.camera.zoom);
+			callLua('update', [elapsed]);
 
 			/*for (i in 0...strumLineNotes.length) {
 				var member = strumLineNotes.members[i];
-				member.x = luaModchart.getVar("strum" + i + "X", "float");
-				member.y = luaModchart.getVar("strum" + i + "Y", "float");
-				member.angle = luaModchart.getVar("strum" + i + "Angle", "float");
+				member.x = getVar("strum" + i + "X", "float");
+				member.y = getVar("strum" + i + "Y", "float");
+				member.angle = getVar("strum" + i + "Angle", "float");
 			}*/
 
-		//	FlxG.camera.angle = luaModchart.getVar('cameraAngle', 'float');
-		//	camHUD.angle = luaModchart.getVar('camHudAngle','float');
+			FlxG.camera.angle = getVar('cameraAngle', 'float');
+			camHUD.angle = getVar('camHudAngle','float');
 
-	/*		if (luaModchart.getVar("showOnlyStrums",'bool'))
+			if (getVar("showOnlyStrums",'bool'))
 			{
 				healthBarBG.visible = false;
 				kadeEngineWatermark.visible = false;
 				healthBar.visible = false;
-				overhealthBar.visible = false;
 				iconP1.visible = false;
 				iconP2.visible = false;
 				scoreTxt.visible = false;
@@ -3094,33 +3013,21 @@ class PlayState extends MusicBeatState
 				healthBarBG.visible = true;
 				kadeEngineWatermark.visible = true;
 				healthBar.visible = true;
-				overhealthBar.visible = false;
 				iconP1.visible = true;
 				iconP2.visible = true;
 				scoreTxt.visible = true;
 			}
 
-		//	var p1 = luaModchart.getVar("strumLine1Visible",'bool');
-			//var p2 = luaModchart.getVar("strumLine2Visible",'bool');
+			var p1 = getVar("strumLine1Visible",'bool');
+			var p2 = getVar("strumLine2Visible",'bool');
 
-			for (i in 0...keyAmmo[mania])
+			for (i in 0...4)
 			{
 				strumLineNotes.members[i].visible = p1;
 				if (i <= playerStrums.length)
 					playerStrums.members[i].visible = p2;
-			}*/
-
-			camNotes.zoom = camHUD.zoom;
-			camNotes.x = camHUD.x;
-			camNotes.y = camHUD.y;
-			camNotes.angle = camHUD.angle;
-			camSustains.zoom = camHUD.zoom;
-			camSustains.x = camHUD.x;
-			camSustains.y = camHUD.y;
-			camSustains.angle = camHUD.angle;
+			}
 		}
-
-		#end
 
 		if (currentFrames == FlxG.save.data.fpsCap)
 		{
@@ -3452,28 +3359,8 @@ class PlayState extends MusicBeatState
 		}
 		if (camZooming)
 		{
-			if (FlxG.save.data.zoom < 0.8)
-				FlxG.save.data.zoom = 0.8;
-	
-			if (FlxG.save.data.zoom > 1.2)
-				FlxG.save.data.zoom = 1.2;
-			
-			if (!executeModchart)
-				{
-					FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
-					camHUD.zoom = FlxMath.lerp(FlxG.save.data.zoom, camHUD.zoom, 0.95);
-	
-					camNotes.zoom = camHUD.zoom;
-					camSustains.zoom = camHUD.zoom;
-				}
-				else
-				{
-					FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
-					camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
-	
-					camNotes.zoom = camHUD.zoom;
-					camSustains.zoom = camHUD.zoom;
-				}
+			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
+			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
 		}
 
 		FlxG.watch.addQuick("beatShit", curBeat);
@@ -3580,33 +3467,88 @@ class PlayState extends MusicBeatState
 										altAnim = '-' + SONG.notes[Math.floor(curStep / 16)].altAnimNum+'alt';
 							}
 	
-							dad.playAnim('sing' + sDir[daNote.noteData] + altAnim, true);
+						switch (Math.abs(daNote.noteData))
+						{
+							case 2:
+								dad.playAnim('singUP' + altAnim, true);
+							case 3:
+								dad.playAnim('singRIGHT' + altAnim, true);
+							case 1:
+								dad.playAnim('singDOWN' + altAnim, true);
+							case 0:
+								dad.playAnim('singLEFT' + altAnim, true);
+						}
+	
+						dad.holdTimer = 0;
+	
+						if (SONG.needsVoices)
+							vocals.volume = 1;
+	
+						daNote.active = false;
 
+						daNote.kill();
+						notes.remove(daNote, true);
+						daNote.destroy();
+					}
+	
+					if (FlxG.save.data.downscroll)
+						daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (-0.45 * FlxMath.roundDecimal(FlxG.save.data.scrollSpeed == 1 ? SONG.speed : FlxG.save.data.scrollSpeed, 2)));
+					else
+						daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(FlxG.save.data.scrollSpeed == 1 ? SONG.speed : FlxG.save.data.scrollSpeed, 2)));
 
-							/*if (daNote.isSustainNote)
+					if (daNote.mustPress && !daNote.modifiedByLua)
+					{
+						daNote.visible = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].visible;
+						daNote.x = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].x;
+						if (!daNote.isSustainNote)
+							daNote.angle = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].angle;
+						daNote.alpha = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].alpha;
+					}
+					else if (!daNote.wasGoodHit && !daNote.modifiedByLua)
+					{
+						daNote.visible = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].visible;
+						daNote.x = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].x;
+						if (!daNote.isSustainNote)
+							daNote.angle = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].angle;
+						daNote.alpha = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].alpha;
+					}
+					
+					
+
+					if (daNote.isSustainNote)
+						daNote.x += daNote.width / 2 + 17;
+					
+
+					//trace(daNote.y);
+					// WIP interpolation shit? Need to fix the pause issue
+					// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
+	
+					if ((daNote.y < -daNote.height && !FlxG.save.data.downscroll || daNote.y >= strumLine.y + 106 && FlxG.save.data.downscroll) && daNote.mustPress)
+					{
+
+							if (daNote.isSustainNote && daNote.wasGoodHit)
 							{
-								health -= SONG.noteValues[0] / 3;
+								daNote.kill();
+								notes.remove(daNote, true);
+								daNote.destroy();
 							}
 							else
-								health -= SONG.noteValues[0];
-							*/
-							
+							{
+								health -= 0.075;
+								vocals.volume = 0;
+
+								noteMiss(daNote.noteData, daNote);
+							}
+						
+						daNote.active = false;
+						daNote.visible = false;
+	
+						daNote.kill();
+						notes.remove(daNote, true);
+						daNote.destroy();
 					}
-							
 				});
 			}
-
-			if (FlxG.save.data.cpuStrums)
-				{
-					cpuStrums.forEach(function(spr:FlxSprite)
-					{
-						if (spr.animation.finished)
-						{
-							spr.animation.play('static');
-							spr.centerOffsets();
-						}
-					});
-				}
 
 
 		if (!inCutscene)
@@ -4462,30 +4404,6 @@ class PlayState extends MusicBeatState
 			
 		}
 
-		function doNoteSplash(noteX:Float, noteY:Float, nData:Int)
-			{
-				var recycledNote = noteSplashes.recycle(NoteSplash);
-				recycledNote.makeSplash(playerStrums.members[nData].x, playerStrums.members[nData].y, nData);
-				noteSplashes.add(recycledNote);
-				
-			}
-	
-		function HealthDrain():Void //code from vs bob
-			{
-				badNoteHit();
-				new FlxTimer().start(0.01, function(tmr:FlxTimer)
-				{
-					health -= 0.005;
-				}, 300);
-			}
-	
-		function badNoteHit():Void
-			{
-				boyfriend.playAnim('hit', true);
-				FlxG.sound.play(Paths.soundRandom('badnoise', 1, 3), FlxG.random.float(0.7, 1));
-			}
-	
-
 
 	function getKeyPresses(note:Note):Int
 	{
@@ -4627,7 +4545,6 @@ class PlayState extends MusicBeatState
 		
 
 	var fastCarCanDrive:Bool = true;
-
 	function generateFusionStage(){
 	
 		curStage = "";
