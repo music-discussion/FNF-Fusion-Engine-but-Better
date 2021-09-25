@@ -534,7 +534,7 @@ class ChartingState extends MusicBeatState
 			{
 				_song.notes[curSection].altAnimNum = Std.int(nums.value);
 			}
-			}else if (wname == 'song_instvol')
+			else if (wname == 'song_instvol')
 			{
 				if (nums.value <= 0.1)
 					nums.value = 0.1;
