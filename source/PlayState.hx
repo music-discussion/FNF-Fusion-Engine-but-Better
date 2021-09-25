@@ -516,13 +516,42 @@ class PlayState extends MusicBeatState
 		} else if (FileSystem.exists('assets/images/custom_chars/'+SONG.player2+'/'+SONG.song.toLowerCase()+'Dialog.txt')) {
 			dialogue = CoolUtil.coolDynamicTextFile('assets/images/custom_chars/'+SONG.player2+'/'+SONG.song.toLowerCase()+'Dialog.txt');
 		// if no player dialog, use default
-		}	else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/dialog.txt')) {
+		}	
+		else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/dialog.txt')) 
+		{
 			dialogue = CoolUtil.coolDynamicTextFile('assets/data/'+SONG.song.toLowerCase()+'/dialog.txt');
-		} else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/dialogue.txt')){
+		} 
+		else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/dialogue.txt'))
+		{
 			// nerds spell dialogue properly gotta make em happy
-			dialogue = CoolUtil.coolDynamicTextFile('assets/data/' + SONG.song.toLowerCase() + '/dialogue.txt');
+			dialogue = CoolUtil.coolDynamicTextFile('assets/data/'+SONG.song.toLowerCase()+'/dialogue.txt');
 		// otherwise, make the dialog an error message
-		} else {
+		} 
+		else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/Dialogue.txt'))
+		{
+			dialogue = CoolUtil.coolDynamicTextFile('assets/data/' + SONG.song.toLowerCase() + '/dialogue.txt');
+		}	 
+		else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'Dialogue.txt'))
+			{
+				dialogue = CoolUtil.coolDynamicTextFile('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'Dialogue.txt');
+			}	 
+		else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'Dialog.txt'))
+		{
+			// nerds spell dialogue properly gotta make em happy
+			dialogue = CoolUtil.coolDynamicTextFile('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'Dialog.txt');
+			// otherwise, make the dialog an error message
+		} //people who dont use caps, we got u
+		else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'dialogue.txt'))
+			{
+				dialogue = CoolUtil.coolDynamicTextFile('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'dialogue.txt');
+			}	 
+		else if (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'dialog.txt'))
+		{
+			// nerds spell dialogue properly gotta make em happy
+			dialogue = CoolUtil.coolDynamicTextFile('assets/data/'+SONG.song.toLowerCase()+'/'+SONG.song.toLowerCase()+'dialog.txt');
+			// otherwise, make the dialog an error message
+		} 
+		else {
 			dialogue = [':dad: The game tried to get a dialog file but couldn\'t find it. Please make sure there is a dialog file named "dialog.txt".'];
 		}
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
@@ -4432,6 +4461,10 @@ class PlayState extends MusicBeatState
 					{
 						p1Color = Std.parseInt(bfTxTColor[0]);
 					}
+				else if (FileSystem.exists('assets/images/'+SONG.player1+'/color'+".txt")) 
+					{
+						p1Color = Std.parseInt(bfTxTColor[0]);
+					}
 				else {
 					p1Color = 0xFF31B0D1;
 				}
@@ -4480,9 +4513,13 @@ class PlayState extends MusicBeatState
 				// assuming its a custom character
 				// oh well. i hope i didnt forget someone
 				// filesystem.exists
-				if (FileSystem.exists('assets/images/'+SONG.player1+'/healthBarColor'+".txt")) 
+				if (FileSystem.exists('assets/images/'+SONG.player2+'/healthBarColor'+".txt")) 
 					{
 						p2Color = Std.parseInt(dadTxTColor[0]);
+					}
+				else if (FileSystem.exists('assets/images/'+SONG.player2+'/color'+".txt")) 
+					{
+						p2Color = Std.parseInt(bfTxTColor[0]);
 					}
 				else {
 					p2Color = 0xFFAF66CE;

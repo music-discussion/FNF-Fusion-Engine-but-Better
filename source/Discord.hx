@@ -12,7 +12,7 @@ class DiscordClient
 	{
 		trace("Discord Client starting...");
 		DiscordRpc.start({
-			clientID: "841094755613933618", // change this to what ever the fuck you want lol
+			clientID: "891172786586914856", // change this to what ever the fuck you want lol
 			onReady: onReady,
 			onError: onError,
 			onDisconnected: onDisconnected
@@ -40,7 +40,8 @@ class DiscordClient
 			details: "In the Menus",
 			state: null,
 			largeImageKey: 'logo',
-			largeImageText: "https://github.com/kidsfreej/FNF-Fusion-Engine"
+			//largeImageText: "https://github.com/kidsfreej/FNF-Fusion-Engine"
+			largeImageText: "https://github.com/music-discussion/FNF-Fusion-Engine-but-Better"
 		});
 	}
 

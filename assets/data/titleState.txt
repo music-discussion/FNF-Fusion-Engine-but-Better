@@ -30,8 +30,8 @@ true
 Fusion Better by
 Discussions
 -- Now thats basically everything. All that is left is the beginning FNF text which can be set here~
-Friday
-Night
-Funkin
+Better
+Fusion
+Engine
 -- Thanks for using Fusion but Better.
 -- I hope some people use this cause I don't even fucking care.
