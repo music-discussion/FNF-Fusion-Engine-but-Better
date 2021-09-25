@@ -66,6 +66,7 @@ class ChartingState extends MusicBeatState
 	var curSong:String = 'Dadbattle';
 	var amountSteps:Int = 0;
 	var bullshitUI:FlxGroup;
+	var claps:Array<Note> = [];
 
 	var highlight:FlxSprite;
 
@@ -245,6 +246,8 @@ class ChartingState extends MusicBeatState
 		var stepperSpeed:FlxUINumericStepper = new FlxUINumericStepper(10, 80, 0.1, 1, 0.1, 10, 1);
 		stepperSpeed.value = _song.speed;
 		stepperSpeed.name = 'song_speed';
+
+		var stepperSongVolLabel = new FlxText(74, 110, 'Instrumental Volume');
 
 		var stepperSongVol:FlxUINumericStepper = new FlxUINumericStepper(10, 110, 0.1, 1, 0.1, 10, 1);
 		stepperSongVol.value = FlxG.sound.music.volume;
@@ -691,6 +694,7 @@ class ChartingState extends MusicBeatState
 				if (FlxG.sound.music.playing)
 				{
 					FlxG.sound.music.pause();
+					claps.splice(0, claps.length);
 					if (_song.needsVoices) {
 						vocals.pause();
 					}
@@ -704,6 +708,22 @@ class ChartingState extends MusicBeatState
 					FlxG.sound.music.play();
 				}
 			}
+			/*
+			if (FlxG.keys.justPressed.SPACE)
+			{
+				if (FlxG.sound.music.playing)
+				{
+					FlxG.sound.music.pause();
+					vocals.pause();
+					claps.splice(0, claps.length);
+				}
+				else
+				{
+					vocals.play();
+					FlxG.sound.music.play();
+				}
+			}
+			*/
 
 			if (FlxG.keys.justPressed.R)
 			{
