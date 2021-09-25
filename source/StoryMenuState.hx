@@ -29,6 +29,7 @@ typedef StorySongsJson =
 	var weekNames: Array<String>;
 	var characters: Array<Array<String>>;
 }
+
 typedef DifficultysJson = 
 {
 	var difficulties:Array<Dynamic>;
@@ -48,6 +49,7 @@ class StoryMenuState extends MusicBeatState
 	var weekCharacters:Array<Dynamic> = [];
 
 	var weekNames:Array<String> = [];
+	var weekGreyText:Array<String> = [];
 	var weekTitles:Array<String> = [];
 	var txtWeekTitle:FlxText;
 
@@ -272,7 +274,7 @@ class StoryMenuState extends MusicBeatState
 
 		scoreText.text = "WEEK SCORE:" + lerpScore;
 
-		txtWeekTitle.text = weekNames[curWeek].toUpperCase();
+		txtWeekTitle.text = weekGreyText[curWeek].toUpperCase();
 		txtWeekTitle.x = FlxG.width - (txtWeekTitle.width + 10);
 
 		// FlxG.watch.addQuick('font', scoreText.font);

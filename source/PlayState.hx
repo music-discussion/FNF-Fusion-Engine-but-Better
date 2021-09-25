@@ -85,7 +85,14 @@ class PlayState extends MusicBeatState
 	public static var bads:Int = 0;
 	public static var goods:Int = 0;
 	public static var sicks:Int = 0;
-	var id:Int = 1;
+	public static var colors:Int;
+	var id:String;
+	var p1:Int = Std.parseInt(SONG.player1);
+	var p2:Int = Std.parseInt(SONG.player2);
+	var p1Color:Int;
+	var p2Color:Int;
+	var bfTxTColor:Array<String>;
+	var dadTxTColor:Array<String>;
 
 	public static var songPosBG:FlxSprite;
 	public static var songPosBar:FlxBar;
@@ -1616,12 +1623,23 @@ class PlayState extends MusicBeatState
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
 
-		var parsed = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColors.jsonc'));
-		var thatsKindaSUS:Dynamic = parsed[id].colors;
+		/*
+		typedef healthBarColors = 
+		{
+			var colors: Array<Array<String>>;
+		//	var weekGreyText: Array<String>;
+			var colors: Array<String>;
+		}
+		*/
+
+	//	var parsed = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColors.jsonc'));
+	//	var color:Int;
+		//var thatsKindaSUS:Dynamic = parsed[id].colors;
 
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,'health', 0, 2);
 		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(Std.parseInt(thatsKindaSUS[SONG.player2]), Std.parseInt(thatsKindaSUS[SONG.player1]));
+		createFilledBar();
+		healthBar.createFilledBar(p2Color, p1Color);
 		// healthBar
 	//	healthBar.onError = function (error) {
 	//		trace('error: $error');
@@ -1631,7 +1649,7 @@ class PlayState extends MusicBeatState
 		add(healthBar);
 
 		// Add Kade Engine watermark
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " " + (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy") + (Main.watermarks ? " - Fusion " + MainMenuState.kadeEngineVer : ""), 16);
+		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " " + (storyDifficulty == 2 ? "Hard" : storyDifficulty == 1 ? "Normal" : "Easy") + (Main.watermarks ? " - Better Fusion " + MainMenuState.kadeEngineVer : ""), 16);
 		kadeEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		kadeEngineWatermark.scrollFactor.set();
 		add(kadeEngineWatermark);
@@ -4371,6 +4389,97 @@ class PlayState extends MusicBeatState
 
 			updateAccuracy();
 		}
+	}
+
+	function createFilledBar():Void
+	{
+		switch(SONG.player1)
+		{
+		/*	"colors" : 
+    		{
+    "gf": "0xFFA5004D",
+    "dad": "0xFFAF66CE",
+    "spooky": "0xFFBDA47F",
+    "mom":  "0xFFD8558E",
+    "mom-car":  "0xFFD8558E",
+    "monster": "0xFFF3FF6E",
+    "monster-christmas": "0xFFF3FF6E",
+    "pico": "0xFFD57E00",
+    "bf": "0xFF31B0D1",
+    "senpai": "0xFFFFAA6F",
+    "senpai-angry": "0xFFFFAA6F",
+    "spirit": "0xFFFF3C6E",
+    "parents-christams": "0xFFD65555",
+    "defaultDad": "0xFFAF66CE",
+    "defaultBF": "0xFF31B0D1"
+    }*/
+
+			case 'bf' | 'bf-christmas' | 'bf-car':
+				p1Color = 0xFF31B0D1;
+			default: 
+				// assuming its a custom character
+				//filesystem.exists
+				if (FileSystem.exists('assets/images/'+SONG.player1+'/healthBarColor'+".txt")) 
+					{
+						p1Color = Std.parseInt(bfTxTColor[0]);
+					}
+				else {
+					p1Color = 0xFF31B0D1;
+				}
+		}
+
+		switch(SONG.player2)
+		{
+		/*	"colors" : 
+    		{
+    "gf": "0xFFA5004D",
+    "dad": "0xFFAF66CE",
+    "spooky": "0xFFBDA47F",
+    "mom":  "0xFFD8558E",
+    "mom-car":  "0xFFD8558E",
+    "monster": "0xFFF3FF6E",
+    "monster-christmas": "0xFFF3FF6E",
+    "pico": "0xFFD57E00",
+    "bf": "0xFF31B0D1",
+    "senpai": "0xFFFFAA6F",
+    "senpai-angry": "0xFFFFAA6F",
+    "spirit": "0xFFFF3C6E",
+    "parents-christams": "0xFFD65555",
+    "defaultDad": "0xFFAF66CE",
+    "defaultBF": "0xFF31B0D1"
+    }*/
+
+				case 'gf':
+				p2Color = 0xFFA5004D;
+				case 'dad':
+				p2Color = 0xFFAF66CE;
+				case 'spooky':
+				p2Color = 0xFFBDA47F;
+				case 'mom' | 'mom-car':
+				p2Color = 0xFFD8558E;
+				case 'monetser' | 'monster-christmas':
+				p2Color = 0xFFF3FF6E;
+				case 'pico':
+				p2Color = 0xFFD57E00;
+				case 'senpai' | 'senpai-angry':
+				p2Color = 0xFFFFAA6F;
+				case 'spirit':
+				p2Color = 0xFFFF3C6E;
+				case 'parents-christmas':
+				p2Color = 0xFFD65555;
+			default: 
+				// assuming its a custom character
+				// oh well. i hope i didnt forget someone
+				// filesystem.exists
+				if (FileSystem.exists('assets/images/'+SONG.player1+'/healthBarColor'+".txt")) 
+					{
+						p2Color = Std.parseInt(dadTxTColor[0]);
+					}
+				else {
+					p2Color = 0xFFAF66CE;
+				}
+		}
+
 	}
 
 	function badNoteCheck(daNote:Note)

@@ -393,6 +393,27 @@ class NoZoomOption extends Option
 	}
 }
 
+class CircleOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		Main.cirleArrows = !Main.cirleArrows;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Circle Arrows " + (!Main.cirleArrows ? "Off" : "On");
+	}
+}
 
 class FPSCapOption extends Option
 {

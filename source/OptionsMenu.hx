@@ -52,9 +52,10 @@ class OptionsMenu extends MusicBeatState
 			
 		]),
 		new OptionCatagory("Mod Extras", [
-			new SplashOption("Disable or ReEnable note splashes on notes."),
-			new CpuStrumsOption("Disable or Enable note glows on the CPU's side."),
-			new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay.")
+			new SplashOption("Disable or ReEnable note splashes on notes. (doesnt work ): "),
+			new CpuStrumsOption("Disable or Enable note glows on the CPU's side.(doesnt work ): "),
+			new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
+			new CircleOption("Activate Circle Arrows like Funky Friday!")
 		])
 		
 	];
