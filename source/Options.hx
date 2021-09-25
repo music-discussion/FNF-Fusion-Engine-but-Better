@@ -403,7 +403,7 @@ class CircleOption extends Option
 
 	public override function press():Bool
 	{
-		Main.cirleArrows = !Main.cirleArrows;
+		FlxG.save.data.circleShit = !FlxG.save.data.circleShit;
 	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
 		display = updateDisplay();
 		return true;
@@ -411,7 +411,7 @@ class CircleOption extends Option
 
 	private override function updateDisplay():String
 	{
-		return "Circle Arrows " + (!Main.cirleArrows ? "Off" : "On");
+		return "Circle Arrows " + (!FlxG.save.data.circleShit ? "Off" : "On");
 	}
 }
 

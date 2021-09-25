@@ -50,6 +50,7 @@ class ChartingState extends MusicBeatState
 	var _file:FileReference;
 
 	var UI_box:FlxUITabMenu;
+	public var playClaps:Bool = false;
 
 	/**
 	 * Array of notes showing when each section STARTS in STEPS
@@ -245,6 +246,17 @@ class ChartingState extends MusicBeatState
 		stepperSpeed.value = _song.speed;
 		stepperSpeed.name = 'song_speed';
 
+		var stepperSongVol:FlxUINumericStepper = new FlxUINumericStepper(10, 110, 0.1, 1, 0.1, 10, 1);
+		stepperSongVol.value = FlxG.sound.music.volume;
+		stepperSongVol.name = 'song_instvol';
+
+		var hitsounds = new FlxUICheckBox(10, stepperSongVol.y + 60, null, null, "Play hitsounds", 100);
+		hitsounds.checked = false;
+		hitsounds.callback = function()
+		{
+			playClaps = hitsounds.checked;
+		};
+
 		var stepperBPM:FlxUINumericStepper = new FlxUINumericStepper(10, 65, 1, 1, 1, 339, 0);
 		stepperBPM.value = Conductor.bpm;
 		stepperBPM.name = 'song_bpm';
@@ -279,6 +291,9 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(loadAutosaveBtn);
 		tab_group_song.add(stepperBPM);
 		tab_group_song.add(stepperSpeed);
+		tab_group_song.add(stepperSongVol);
+		tab_group_song.add(stepperSongVolLabel);
+		tab_group_song.add(hitsounds);
 
 		UI_box.addGroup(tab_group_song);
 		UI_box.scrollFactor.set();
@@ -518,6 +533,12 @@ class ChartingState extends MusicBeatState
 			} else if (wname == 'alt_anim_number')
 			{
 				_song.notes[curSection].altAnimNum = Std.int(nums.value);
+			}
+			}else if (wname == 'song_instvol')
+			{
+				if (nums.value <= 0.1)
+					nums.value = 0.1;
+				FlxG.sound.music.volume = nums.value;
 			}
 		}
 
@@ -769,9 +790,23 @@ class ChartingState extends MusicBeatState
 			if (FlxG.keys.justPressed.DOWN)
 				Conductor.changeBPM(Conductor.bpm - 1); */
 
-
-
-
+			if (playClaps)
+				{
+					curRenderedNotes.forEach(function(note:Note)
+					{
+						if (FlxG.sound.music.playing)
+						{
+							FlxG.overlap(strumLine, note, function(_, _)
+							{
+								if(!claps.contains(note))
+								{
+									claps.push(note);
+									FlxG.sound.play(Paths.sound('SNAP'));
+								}
+							});
+						}
+					});
+				}	
 
 		bpmTxt.text = bpmTxt.text = Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2))
 			+ " / "
