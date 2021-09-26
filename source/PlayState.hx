@@ -93,6 +93,10 @@ class PlayState extends MusicBeatState
 	var p2Color:Int;
 	var bfTxTColor:Array<String>;
 	var dadTxTColor:Array<String>;
+	public static var startTime = 0.0;
+
+	public static var isSM:Bool = false;
+
 
 	public static var songPosBG:FlxSprite;
 	public static var songPosBar:FlxBar;
@@ -4457,11 +4461,11 @@ class PlayState extends MusicBeatState
 			default: 
 				// assuming its a custom character
 				//filesystem.exists
-				if (FileSystem.exists('assets/images/'+SONG.player1+'/healthBarColor'+".txt")) 
+				if (FileSystem.exists('assets/images/'+SONG.player1+'/healthBarColor.txt')) 
 					{
 						p1Color = Std.parseInt(bfTxTColor[0]);
 					}
-				else if (FileSystem.exists('assets/images/'+SONG.player1+'/color'+".txt")) 
+				else if (FileSystem.exists('assets/images/'+SONG.player1+'/color.txt')) 
 					{
 						p1Color = Std.parseInt(bfTxTColor[0]);
 					}
@@ -4513,11 +4517,13 @@ class PlayState extends MusicBeatState
 				// assuming its a custom character
 				// oh well. i hope i didnt forget someone
 				// filesystem.exists
-				if (FileSystem.exists('assets/images/'+SONG.player2+'/healthBarColor'+".txt")) 
+				// dialogue
+				// (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/dialogue.txt'))
+				if (FileSystem.exists('assets/images/'+SONG.player2+'/healthBarColor.txt')) 
 					{
 						p2Color = Std.parseInt(dadTxTColor[0]);
 					}
-				else if (FileSystem.exists('assets/images/'+SONG.player2+'/color'+".txt")) 
+				else if (FileSystem.exists('assets/images/'+SONG.player2+'/color.txt')) 
 					{
 						p2Color = Std.parseInt(bfTxTColor[0]);
 					}
