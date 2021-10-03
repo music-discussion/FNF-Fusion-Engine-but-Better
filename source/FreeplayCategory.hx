@@ -12,9 +12,14 @@ import lime.utils.Assets;
 
 #if sys
 import sys.io.File;
-
+import sys.FileSystem;
+import haxe.io.Path;
+import openfl.utils.ByteArray;
+import lime.media.AudioBuffer;
+import flash.media.Sound;
 import flash.media.Sound;
 #end
+
 #if windows
 import Discord.DiscordClient;
 #end
@@ -238,9 +243,15 @@ class FreeplayCategory extends MusicBeatState
 		// lerpScore = 0;
 		#end
 
-		#if PRELOAD_ALL
-		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
-		#end
+		if (FlxG.save.data.freeplayInst)
+		{
+			if (FileSystem.exists('assets/categoryMusic/option'+curSelected+".ogg"))
+				FlxG.sound.playMusic(Paths.categoryMusic('option'+curSelected), 0); //this might not work lol.
+			else {
+				if (!FlxG.sound.music.playing)
+					FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			}
+		}
 
 		var bullShit:Int = 0;
 

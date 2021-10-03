@@ -2463,7 +2463,9 @@ class PlayState extends MusicBeatState
 				else
 					oldNote = null;
 
-				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, customImage, customXml, arrowEndsImage);
+				var daType = songNotes[3];
+				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, daType, customImage, customXml, arrowEndsImage);
+				//var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, customImage, customXml, arrowEndsImage);
 
 
 				
@@ -2479,7 +2481,8 @@ class PlayState extends MusicBeatState
 				{
 					oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
-					var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true, customImage, customXml, arrowEndsImage);
+					//var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true, customImage, customXml, arrowEndsImage);
+					var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true, daType, customImage, customXml, arrowEndsImage);
 					sustainNote.scrollFactor.set();
 					unspawnNotes.push(sustainNote);
 
@@ -3583,29 +3586,153 @@ class PlayState extends MusicBeatState
 					// WIP interpolation shit? Need to fix the pause issue
 					// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
 	
-					if ((daNote.y < -daNote.height && !FlxG.save.data.downscroll || daNote.y >= strumLine.y + 106 && FlxG.save.data.downscroll) && daNote.mustPress)
+					if ((daNote.mustPress && daNote.tooLate && !FlxG.save.data.downscrol || daNote.mustPress && daNote.tooLate && FlxG.save.data.downscrol) && daNote.mustPress) //ke 1.5.4 code rocks
 					{
 
-							if (daNote.isSustainNote && daNote.wasGoodHit)
-							{
-								daNote.kill();
-								notes.remove(daNote, true);
-								daNote.destroy();
-							}
-							else
-							{
-								health -= 0.075;
-								vocals.volume = 0;
-
-								noteMiss(daNote.noteData, daNote);
-							}
-						
-						daNote.active = false;
-						daNote.visible = false;
-	
-						daNote.kill();
-						notes.remove(daNote, true);
-						daNote.destroy();
+						switch (daNote.noteType) //you can add as many cases as you want, just make sure the noteType number matches properly!
+						{
+					
+							case 0: //normal
+								{
+									if (daNote.isSustainNote && daNote.wasGoodHit)
+										{
+											daNote.kill();
+											notes.remove(daNote, true);
+										}
+										else
+										{
+											if (loadRep && daNote.isSustainNote)
+											{
+												// im tired and lazy this sucks I know i'm dumb
+												if (findByTime(daNote.strumTime) != null)
+													totalNotesHit += 1;
+												else
+												{
+													vocals.volume = 0;
+													if (theFunne && !daNote.isSustainNote)
+													{
+														noteMiss(daNote.noteData, daNote);
+													}
+													if (daNote.isParent)
+													{
+														health -= 0.15; // give a health punishment for failing a LN
+														trace("hold fell over at the start");
+														for (i in daNote.children)
+														{
+															i.alpha = 0.3;
+															i.sustainActive = false;
+														}
+													}
+													else
+													{
+														if (!daNote.wasGoodHit
+															&& daNote.isSustainNote
+															&& daNote.sustainActive
+															&& daNote.spotInLine != daNote.parent.children.length)
+														{
+															health -= 0.2; // give a health punishment for failing a LN
+															trace("hold fell over at " + daNote.spotInLine);
+															for (i in daNote.parent.children)
+															{
+																i.alpha = 0.3;
+																i.sustainActive = false;
+															}
+															if (daNote.parent.wasGoodHit)
+																misses++;
+															updateAccuracy();
+														}
+														else
+														{
+															health -= 0.15;
+														}
+													}
+												}
+											}
+											else
+											{
+												vocals.volume = 0;
+												if (theFunne && !daNote.isSustainNote)
+												{
+													if (PlayStateChangeables.botPlay)
+													{
+														daNote.rating = "bad";
+														goodNoteHit(daNote);
+													}
+													else
+														noteMiss(daNote.noteData, daNote);
+												}
+				
+												if (daNote.isParent)
+												{
+													health -= 0.15; // give a health punishment for failing a LN
+													trace("hold fell over at the start");
+													for (i in daNote.children)
+													{
+														i.alpha = 0.3;
+														i.sustainActive = false;
+														trace(i.alpha);
+													}
+												}
+												else
+												{
+													if (!daNote.wasGoodHit
+														&& daNote.isSustainNote
+														&& daNote.sustainActive
+														&& daNote.spotInLine != daNote.parent.children.length)
+													{
+														health -= 0.25; // give a health punishment for failing a LN
+														trace("hold fell over at " + daNote.spotInLine);
+														for (i in daNote.parent.children)
+														{
+															i.alpha = 0.3;
+															i.sustainActive = false;
+															trace(i.alpha);
+														}
+														if (daNote.parent.wasGoodHit)
+															misses++;
+														updateAccuracy();
+													}
+													else
+													{
+														health -= 0.15;
+													}
+												}
+											}
+										}
+				
+										daNote.visible = false;
+										daNote.kill();
+										notes.remove(daNote, true);
+								}
+								case 1: //fire notes - makes missing them not count as one -- YOUR WELCOME PEOPLE FOR THE KILL NOTES FUNCTION -discussions | killNotes(daNote);
+								{
+									killNotes(daNote);
+								}
+								case 2: //halo notes, same as fire
+								{
+									killNotes(daNote);
+								}
+								case 3:  //warning notes, removes half health and then removed so it doesn't repeatedly deal damage
+								{
+									health -= 1;
+									vocals.volume = 0;
+									badNoteHit();
+									killNotes(daNote);
+								}
+								case 4: //angel notes
+								{
+									killNotes(daNote);
+								}
+								case 6:  //bob notes
+								{
+									killNotes(daNote);
+								}
+								case 7: //gltich notes
+								{
+									HealthDrain();
+									killNotes(daNote);
+								}
+						}
 					}
 				});
 			}
@@ -3615,7 +3742,7 @@ class PlayState extends MusicBeatState
 			keyShit();
 
 
-		#if debug
+		#if debug 
 		if (FlxG.keys.justPressed.ONE)
 			endSong();
 		#end
@@ -4433,6 +4560,15 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	function killNotes(daNote:Note):Void //dumbest/easiet function ever
+		{
+			daNote.kill();
+			notes.remove(daNote, true);
+			daNote.destroy();
+		}
+
+		// killNotes();
+
 	function createFilledBar():Void
 	{
 		switch(SONG.player1)
@@ -4555,15 +4691,28 @@ class PlayState extends MusicBeatState
 				updateAccuracy();
 			}
 		}
+
+		function HealthDrain():Void //code from vs bob
+			{
+				badNoteHit();
+				new FlxTimer().start(0.01, function(tmr:FlxTimer)
+				{
+					health -= 0.005;
+				}, 300);
+			}
+	
+		function badNoteHit():Void
+			{
+				boyfriend.playAnim('hit', true);
+				FlxG.sound.play(Paths.soundRandom('badnoise', 1, 3), FlxG.random.float(0.4, 0.7));
+			}
 	
 	function updateAccuracy() 
-{
-				totalPlayed += 1;
-				accuracy = Math.max(0,totalNotesHit / totalPlayed * 100);
-				accuracyDefault = Math.max(0, totalNotesHitDefault / totalPlayed * 100);
-			
-			
-		}
+	{
+		totalPlayed += 1;
+		accuracy = Math.max(0,totalNotesHit / totalPlayed * 100);
+		accuracyDefault = Math.max(0, totalNotesHitDefault / totalPlayed * 100);	
+	}
 
 
 	function getKeyPresses(note:Note):Int
@@ -4660,48 +4809,118 @@ class PlayState extends MusicBeatState
 				if (resetMashViolation)
 					mashViolations--;
 
+				
 				if (!note.wasGoodHit)
-				{
-					if (!note.isSustainNote)
 					{
-						popUpScore(note);
-						combo += 1;
-					}
-					else{
-						trace("other?");
-						totalNotesHit += 1;
-					}
-
-					switch (note.noteData)
-					{
-						case 2:
-							boyfriend.playAnim('singUP', true);
-						case 3:
-							boyfriend.playAnim('singRIGHT', true);
-						case 1:
-							boyfriend.playAnim('singDOWN', true);
-						case 0:
-							boyfriend.playAnim('singLEFT', true);
-					}
-		
-					if (!loadRep)
-						playerStrums.forEach(function(spr:FlxSprite)
+						if (!note.isSustainNote)
 						{
-							if (Math.abs(note.noteData) == spr.ID)
+							popUpScore(note);
+							combo += 1;
+						}
+						else
+							totalNotesHit += 1;
+		
+						var altAnim:String = "";
+	
+						if (note.alt)
+							altAnim = '-alt';
+	
+						switch (note.noteData)
+						{
+							case 2:
+								boyfriend.playAnim('singUP', true);
+							case 3:
+								boyfriend.playAnim('singRIGHT', true);
+							case 1:
+								boyfriend.playAnim('singDOWN', true);
+							case 0:
+								boyfriend.playAnim('singLEFT', true);
+						}
+
+
+
+
+			
+						#if windows
+						if (luaModchart != null)
+							luaModchart.executeState('playerOneSing', [note.noteData, Conductor.songPosition]);
+						#end
+	
+						if (note.burning) //fire note
+						{
+							badNoteHit();
+							health -= 0.45;
+						}
+
+					else if (note.death) //halo note
+						{
+							badNoteHit();
+							health -= 2.2;
+						}
+					else if (note.angel) //angel note
+						{
+							switch(note.rating)
 							{
-								spr.animation.play('confirm', true);
+								case "shit": 
+									badNoteHit();
+									health -= 2;
+								case "bad": 
+									badNoteHit();
+									health -= 0.5;
+								case "good": 
+									health += 0.5;
+								case "sick": 
+									health += 1;
+
 							}
-						});
+						}
+					else if (note.bob) //bob note
+						{
+							HealthDrain();
+						}
+
+
+					if(!loadRep && note.mustPress)
+					{
+						var array = [note.strumTime,note.sustainLength,note.noteData,noteDiff];
+						if (note.isSustainNote)
+							array[1] = -1;
+						saveNotes.push(array);
+						saveJudge.push(note.rating);
+					}
+					
+					playerStrums.forEach(function(spr:FlxSprite)
+					{
+						if (Math.abs(note.noteData) == spr.ID)
+						{
+							spr.animation.play('confirm', true);
+						}
+					});
+					
 		
-					note.wasGoodHit = true;
-					vocals.volume = 1;
-		
-					note.kill();
-					notes.remove(note, true);
-					note.destroy();
+					if (!note.isSustainNote)
+						{
+							note.kill();
+							notes.remove(note, true);
+							note.destroy();
+						}
+						else
+						{
+							note.wasGoodHit = true;
+						}
 					
 					updateAccuracy();
-				}
+
+					if (FlxG.save.data.gracetmr)
+						{
+							grace = true;
+							new FlxTimer().start(0.15, function(tmr:FlxTimer)
+							{
+								grace = false;
+							});
+						}
+
+					}
 			}
 		
 

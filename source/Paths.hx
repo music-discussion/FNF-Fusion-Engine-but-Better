@@ -107,6 +107,12 @@ class Paths
 		return 'assets/music/${song}_Inst.$SOUND_EXT';
 	}
 
+	inline static public function categoryMusic(song:String)
+	{ //this wasnt soooooooo bad.
+		trace('assets/categoryMusic/${song}');
+		return 'assets/categoryMusic/${song}';
+	}
+
 	inline static public function image(key:String, ?library:String)
 	{
 		return getPath('images/$key.png', IMAGE, library);

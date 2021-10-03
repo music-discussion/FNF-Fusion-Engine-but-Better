@@ -294,6 +294,7 @@ class FreeplayState extends MusicBeatState
 					diffic = '-hard';
 			}
 			var poop:String = songs[curSelected].songName.toLowerCase() + diffic;
+
 			if (!FileSystem.exists('assets/data/' + songs[curSelected].songName.toLowerCase() + '/' + poop.toLowerCase() + '.json'))
 			{
 				// assume we pecked up the difficulty, return to default difficulty
@@ -370,8 +371,10 @@ class FreeplayState extends MusicBeatState
 		// lerpScore = 0;
 		#end
 
-		if (FlxG.save.data.freeplayInst) {
-			if (FileSystem.exists('assets/music/'+songs[curSelected].songName+'_Inst.ogg') { //hold on, just checking if the song exists.
+		if (FlxG.save.data.freeplayInst) 
+		{
+			if (FileSystem.exists('assets/music/'+songs[curSelected].songName+'_Inst.ogg'))
+			{ //hold on, just checking if the song exists.
 				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
 			}
 			else { //to prevent crashes just play bopeebo.
