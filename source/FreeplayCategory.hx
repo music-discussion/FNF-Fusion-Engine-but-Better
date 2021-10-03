@@ -31,17 +31,16 @@ class FreeplayCategory extends MusicBeatState
 	var diffText:FlxText;
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
-	//var id:Int = 1;
+	private var id:Int = 1; //gotcha gotcha
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
-
-
+	private var iconArray:Array<HealthIcon> = [];
 
 	override function create()
 	{
 		var parsed:Dynamic = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
-		var categoryIcons:Dynamic = parsed[FreeplayState.id].icons;
+		var categoryIcons:Dynamic = parsed[id].categoryIcons;
 
 		for (i in 0...parsed.length)
 		{
@@ -84,7 +83,12 @@ class FreeplayCategory extends MusicBeatState
 			songText.targetY = i;
 			grpSongs.add(songText);
 
+			var icon:HealthIcon = new HealthIcon(parsed[i].songCharacter);
+			icon.sprTracker = songText;
 
+			// using a FlxGroup is too much fuss!
+			iconArray.push(icon);
+			add(icon);
 
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!

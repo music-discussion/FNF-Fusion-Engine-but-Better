@@ -371,12 +371,10 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		if (FlxG.save.data.freeplayInst) {
-			if (FileSystem.exists('assets/music/'+songs[curSelected].songName+'_Inst'+".ogg")) {
-	//	#if PRELOAD_ALL
-		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
-//		#end
+			if (FileSystem.exists('assets/music/'+songs[curSelected].songName+'_Inst.ogg') { //hold on, just checking if the song exists.
+				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
 			}
-			else {
+			else { //to prevent crashes just play bopeebo.
 				FlxG.sound.playMusic(Paths.inst('Bopeebo_Inst'), 0);
 			}
 		}
@@ -386,6 +384,7 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...iconArray.length)
 			{
 				iconArray[i].alpha = 0.6;
+				iconArray[i].animation.curAnim.curFrame = 0; //thanks to BetaBits for letting me fix this lol.
 			}
 	
 			iconArray[curSelected].alpha = 1;
