@@ -20,11 +20,16 @@ class Alphabet extends FlxSpriteGroup
 	// for menu shit
 	public var targetY:Float = 0;
 	public var isMenuItem:Bool = false;
+	public var yAdd:Float = 0;
+	public var forceX:Float = Math.NEGATIVE_INFINITY;
+	public var yMult:Float = 120;
 
 	public var text:String = "";
 
 	var _finalText:String = "";
 	var _curText:String = "";
+
+	public var finishedText:Bool = false;
 
 	public var widthOfWords:Float = FlxG.width;
 
@@ -42,6 +47,8 @@ class Alphabet extends FlxSpriteGroup
 	var splitWords:Array<String> = [];
 
 	var isBold:Bool = false;
+
+	public var xAdd:Float = 0; //psych engine var lol.
 
 	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = false, typed:Bool = false, stepped:Bool = true, alignX:Float = 90, alignY:Float = 0.48, ?drawHypens:Bool = false)
 	{
@@ -157,6 +164,8 @@ class Alphabet extends FlxSpriteGroup
 
 	public var personTalking:String = 'gf';
 
+	var typeTimer:FlxTimer = null;
+
 	public function startTypedText():Void
 	{
 		_finalText = text;
@@ -263,18 +272,25 @@ class Alphabet extends FlxSpriteGroup
 		if (isMenuItem)
 		{
 			var scaledY = FlxMath.remapToRange(targetY, 0, 1, 0, 1.3);
+			var lerpVal:Float = CoolUtil.boundTo(elapsed * 9.6, 0, 1);
 
-			y = FlxMath.lerp(y, (scaledY * 120) + (FlxG.height * groupY), 0.16);
-			if (isStepped) {
-				x = FlxMath.lerp(x, (targetY * 20) + groupX, 0.16);
+			y = FlxMath.lerp(y, (scaledY * yMult) + (FlxG.height * 0.48) + yAdd, lerpVal);
+			if(isStepped) {
+				x = forceX;
 			} else {
-				// bad no
-				//	x = FlxMath.lerp(x, groupX, 0.16);
+				x = FlxMath.lerp(x, (targetY * 20) + 90 + xAdd, lerpVal);
 			}
 
 		}
-
 		super.update(elapsed);
+	}
+
+	public function killTheTimer() {
+		if(typeTimer != null) {
+			typeTimer.cancel();
+			typeTimer.destroy();
+		}
+		typeTimer = null;
 	}
 }
 

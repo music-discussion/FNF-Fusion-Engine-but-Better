@@ -1,0 +1,9 @@
+basically, for every category option, you justdo like this:
+option1
+option2
+option3
+option4
+option5
+option6
+-- Make sure its in .ogg format!
+-- If no file is found, it defaults to the Main Menu theme.

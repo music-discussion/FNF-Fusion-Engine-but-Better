@@ -7,6 +7,7 @@ import flash.display.BitmapData;
 import lime.utils.Assets;
 import lime.system.System;
 import lime.app.Application;
+import flixel.tweens.FlxTween;
 #if sys
 import sys.io.File;
 import sys.FileSystem;
@@ -17,6 +18,30 @@ import haxe.Json;
 import tjson.TJSON;
 import haxe.format.JsonParser;
 using StringTools;
+
+typedef CharacterFile = {
+	var animations:Array<AnimArray>;
+	var image:String;
+	var scale:Float;
+	var sing_duration:Float;
+	var healthicon:String;
+
+	var position:Array<Float>;
+	var camera_position:Array<Float>;
+
+	var flip_x:Bool;
+	var no_antialiasing:Bool;
+	var healthbar_colors:Array<Int>;
+}
+
+typedef AnimArray = {
+	var anim:String;
+	var name:String;
+	var fps:Int;
+	var loop:Bool;
+	var indices:Array<Int>;
+	var offsets:Array<Int>;
+}
 
 class Character extends FlxSprite
 {
@@ -38,6 +63,34 @@ class Character extends FlxSprite
 	public var like:String = "bf";
 	public var isDie:Bool = false;
 	public var isPixel:Bool = false;
+
+	//extra stuff
+
+	public var colorTween:FlxTween;
+	//public var holdTimer:Float = 0;
+	public var heyTimer:Float = 0;
+	public var specialAnim:Bool = false;
+	public var animationNotes:Array<Dynamic> = [];
+	//public var stunned:Bool = false;
+	public var singDuration:Float = 4; //Multiplier of how long a character holds the sing pose
+	public var idleSuffix:String = '';
+	public var danceIdle:Bool = false; //Character use "danceLeft" and "danceRight" instead of "idle"
+
+	public var healthIcon:String = 'face';
+	public var animationsArray:Array<AnimArray> = [];
+
+	public var positionArray:Array<Float> = [0, 0];
+	public var cameraPosition:Array<Float> = [0, 0];
+
+	//Used on Character Editor
+	public var imageFile:String = '';
+	public var jsonScale:Float = 1;
+	public var noAntialiasing:Bool = false;
+	public var originalFlipX:Bool = false;
+	public var healthColorArray:Array<Int> = [255, 0, 0];
+
+	public static var DEFAULT_CHARACTER:String = 'bf'; //In case a character is missing, it will use BF on its place
+
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		animOffsets = new Map<String, Array<Dynamic>>();
@@ -902,5 +955,10 @@ class Character extends FlxSprite
 		var charJson = CoolUtil.parseJson(Assets.getText('assets/images/custom_chars/custom_chars.jsonc'));
 		var animJson = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/'+Reflect.field(charJson,char).like + '.json'));
 		return animJson;
+	}
+
+	public function quickAnimAdd(name:String, anim:String)
+	{
+		animation.addByPrefix(name, anim, 24, false);
 	}
 }

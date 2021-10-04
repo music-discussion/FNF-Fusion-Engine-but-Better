@@ -7,16 +7,30 @@ import lime.utils.Assets;
 #if sys
 import sys.io.File;
 import haxe.io.Path;
+import sys.FileSystem;
 import openfl.utils.ByteArray;
 import flash.display.BitmapData;
 #end
 import haxe.Json;
 import haxe.format.JsonParser;
 import tjson.TJSON;
+
+typedef MenuCharacterFile = {
+	var image:String;
+	var scale:Float;
+	var position:Array<Int>;
+	var idle_anim:String;
+	var confirm_anim:String;
+}
+
 class MenuCharacter extends FlxSprite
 {
 	public var character:String;
 	public var like:String;
+	var dontPlayAnim:Bool = false;
+//	var visible:Bool = true;
+	private static var DEFAULT_CHARACTER:String = 'bf';
+
 	public function new(x:Float, character:String = 'bf')
 	{
 		super(x);
@@ -41,7 +55,57 @@ class MenuCharacter extends FlxSprite
 			animation.addByPrefix(field, Reflect.field(animJson, field), 24, (field == "idle"));
 		}
 		this.like = Reflect.field(parsedCharJson,character).like;
-		animation.play('idle');
+		if (!dontPlayAnim)
+			animation.play('idle');
 		updateHitbox();
+	//	if (visible)
+	//		character.visible = true;
+	//	else {
+	//		character.visible = false;
+	//	}
+	}
+
+	public function changeCharacter(?character:String = 'bf') {
+		if(character == null) character = '';
+		if(character == this.character) return;
+
+		this.character = character;
+		antialiasing = ClientPrefs.globalAntialiasing;
+		visible = true;
+
+		var dontPlayAnim:Bool = false;
+		scale.set(1, 1);
+		updateHitbox();
+
+		switch(character) {
+			case '':
+				visible = false;
+				dontPlayAnim = true;
+			default:
+				var characterPath:String = 'assets/images/campaign-ui-char/' + character + '.json';
+				var rawJson = null;
+
+				var path:String = Paths.modFolders(characterPath);
+				if (!FileSystem.exists(path)) {
+					path = Paths.getPsychPreloadPath(characterPath);
+				}
+
+				if(!FileSystem.exists(path)) {
+					path = Paths.getPsychPreloadPath('images/campaign-ui-char/' + DEFAULT_CHARACTER + '.json');
+				}
+				rawJson = File.getContent(path);
+				
+				var charFile:MenuCharacterFile = cast Json.parse(rawJson);
+				frames = Paths.getSparrowAtlas('campaign-ui-char/' + charFile.image);
+				animation.addByPrefix('idle', charFile.idle_anim, 24);
+				animation.addByPrefix('confirm', charFile.confirm_anim, 24, false);
+
+				if(charFile.scale != 1) {
+					scale.set(charFile.scale, charFile.scale);
+					updateHitbox();
+				}
+				offset.set(charFile.position[0], charFile.position[1]);
+				animation.play('idle');
+		}
 	}
 }

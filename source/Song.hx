@@ -31,6 +31,8 @@ typedef SwagSong =
 	var uiType:String;
 	var isSpooky:Null<Bool>;
 	var isHey:Null<Bool>;
+
+	var mania:Int;
 }
 
 class Song
@@ -40,6 +42,7 @@ class Song
 	public var bpm:Int;
 	public var needsVoices:Bool = true;
 	public var speed:Float = 1;
+	public var mania:Int = 0;
 	
 	public var player1:String = 'bf';
 	public var player2:String = 'dad';

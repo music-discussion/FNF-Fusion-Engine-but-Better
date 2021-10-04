@@ -4,10 +4,28 @@ import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
+import sys.io.File;
+import sys.FileSystem;
+import flixel.graphics.FlxGraphic;
+import openfl.display.BitmapData;
+
+import flash.media.Sound;
+
+using StringTools;
 
 class Paths
 {
 	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
+
+	#if (haxe >= "4.0.0")
+	public static var ignoreModFolders:Map<String, Bool> = new Map();
+	public static var customImagesLoaded:Map<String, FlxGraphic> = new Map();
+	public static var customSoundsLoaded:Map<String, Sound> = new Map();
+	#else
+	public static var ignoreModFolders:Map<String, Bool> = new Map<String, Bool>();
+	public static var customImagesLoaded:Map<String, FlxGraphic> = new Map<String, FlxGraphic>();
+	public static var customSoundsLoaded:Map<String, Sound> = new Map<String, Sound>();
+	#end
 
 	static var currentLevel:String;
 
@@ -35,6 +53,12 @@ class Paths
 		return getPreloadPath(file);
 	}
 
+	inline static public function formatToSongPath(path:String) {
+		return path.toLowerCase().replace(' ', '-');
+	}
+
+	static public var currentModDirectory:String = null;
+
 	static public function getLibraryPath(file:String, library = "preload")
 	{
 		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
@@ -45,7 +69,7 @@ class Paths
 		return '$library:assets/$library/$file';
 	}
 
-	inline static function getPreloadPath(file:String)
+	inline static public function getPreloadPath(file:String)
 	{
 		return 'assets/$file';
 	}
@@ -131,5 +155,47 @@ class Paths
 	inline static public function getPackerAtlas(key:String, ?library:String)
 	{
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));
+	}
+
+	inline public static function getPsychPreloadPath(file:String = '')
+	{
+		return 'assets/$file'; //only used for psych engine states and thats it.
+	}
+
+	inline public static function getDataPsychPreloadPath(file:String = '') //custom made :)
+		{
+			return 'assets/data/$file'; //only used for psych engine states and thats it.
+		}
+
+	inline static public function mods(key:String = '') {
+		return 'assets/images/' + key;
+	}
+
+//	static var currentLevel:String;
+	static public function getModFolders()
+	{
+	//	#if MODS_ALLOWED
+		ignoreModFolders.set('characters', true);
+		ignoreModFolders.set('custom_events', true);
+		ignoreModFolders.set('custom_notetypes', true);
+		ignoreModFolders.set('data', true);
+		ignoreModFolders.set('songs', true);
+		ignoreModFolders.set('music', true);
+		ignoreModFolders.set('sounds', true);
+		ignoreModFolders.set('videos', true);
+		ignoreModFolders.set('images', true);
+		ignoreModFolders.set('stages', true);
+		ignoreModFolders.set('weeks', true);
+//		#end
+	}
+
+	static public function modFolders(key:String) {
+		if(currentModDirectory != null && currentModDirectory.length > 0) {
+			var fileToCheck:String = mods(currentModDirectory + '/' + key);
+			if(FileSystem.exists(fileToCheck)) {
+				return fileToCheck;
+			}
+		}
+		return 'assets/images/' + key;
 	}
 }

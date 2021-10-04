@@ -23,6 +23,7 @@ class Main extends Sprite
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
 	public static var cirleArrows:Bool = false; // whether to use cirlce arrows
+	public static var fpsVar:FPS;
 
 	public static var watermarks = true; // Whether to put Kade Engine liteartly anywhere
 

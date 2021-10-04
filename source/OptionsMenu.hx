@@ -19,7 +19,8 @@ class OptionsMenu extends MusicBeatState
 	var selector:FlxText;
 	var curSelected:Int = 0;
 
-	var options:Array<OptionCatagory> = [
+	//var options:Array<OptionCatagory> = [
+	var options:Array<Dynamic> = [
 		new OptionCatagory("Gameplay", [
 			new DFJKOption(controls),
 			new NewInputOption("Swaps the input system from New to Week 7 Kinda."),
@@ -51,12 +52,30 @@ class OptionsMenu extends MusicBeatState
 			new WatermarkOption("Turn off all watermarks from the engine."),
 			
 		]),
-		new OptionCatagory("Mod Extras", [
-			new SplashOption("Disable or ReEnable note splashes on notes. (doesnt work ): "),
-			new CpuStrumsOption("Disable or Enable note glows on the CPU's side.(doesnt work ): "),
-			new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
-			new CircleOption("Activate Circle Arrows like Funky Friday!")
+		new OCinOC("Mod Extras", [
+			new OptionCatagory("Splashes", [
+				new SplashOption("Disable or ReEnable note splashes on notes. (doesnt work ): "),
+			]),
+			new OptionCatagory("CPU Sings", [
+				new CpuStrumsOption("Disable or Enable note glows on the CPU's side.(doesnt work ): "),
+			]),
+			new OptionCatagory("Freeplay", [
+				new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
+			]),
+			new OptionCatagory("Arrows", [
+				new CircleOption("Activate Circle Arrows like Funky Friday!")
+			]),
+			new OptionCatagory("Zooming", [
+				new SmallZoomOption("Activate SmallZooming between big zooms. (doesnt work with big zoom)"),
+			//	new BigZoomOption("Activate Big Zoom between Big zooms (doesnt work with small zoom)"),
+				new NoZoomOption("Disable Note Zooms. (cancels small zoom.)"),
+			]),
 		])
+		/*
+			new OptionCatagory("Insert", [
+
+			]),
+		*/
 		
 	];
 

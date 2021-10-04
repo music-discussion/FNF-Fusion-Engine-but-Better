@@ -68,6 +68,7 @@ class ChartingState extends MusicBeatState
 	var amountSteps:Int = 0;
 	var bullshitUI:FlxGroup;
 	var claps:Array<Note> = [];
+	var keyAmmo:Array<Int> = [4, 6, 9, 5, 7, 8, 1, 2, 3];
 
 	var highlight:FlxSprite;
 
@@ -100,6 +101,8 @@ class ChartingState extends MusicBeatState
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
+
+	var selectedType:Int = 0;
 
 	override function create()
 	{
@@ -147,6 +150,7 @@ class ChartingState extends MusicBeatState
 				isMoody: false,
 				cutsceneType: "none",
 				uiType: 'normal',
+				mania: 0,
 				validScore: false
 			};
 		}
@@ -1121,6 +1125,7 @@ class ChartingState extends MusicBeatState
 			var daType = i[3];
 			var note:Note = new Note(daStrumTime, daNoteInfo % 4, null, false, daType);		
 			//var note:Note = new Note(daStrumTime, daNoteInfo % 4);
+			note.noteType = daType;
 			note.rawNoteData = daNoteInfo;
 			note.sustainLength = daSus;
 			note.setGraphicSize(GRID_SIZE, GRID_SIZE);
@@ -1183,7 +1188,7 @@ class ChartingState extends MusicBeatState
 
 	function deleteNote(note:Note):Void
 	{
-		var section = getSectionByTime(note.strumTime);
+		/*var section = getSectionByTime(note.strumTime);
 
 		var found = false;
 
@@ -1212,7 +1217,18 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-		updateGrid();
+		updateGrid();*/
+
+		for (i in _song.notes[curSection].sectionNotes)
+			{
+				if (i[0] == note.strumTime && i[1] % (keyAmmo[_song.mania]) == note.noteData)
+				{
+					FlxG.log.add('FOUND EVIL NUMBER');
+					_song.notes[curSection].sectionNotes.remove(i);
+				}
+			}
+	
+			updateGrid();
 	}
 	public function getSectionByTime(ms:Float, ?changeCurSectionIndex:Bool = false):SwagSection
 		{
@@ -1257,6 +1273,9 @@ class ChartingState extends MusicBeatState
 		var noteStrum = getStrumTime(dummyArrow.y) + sectionStartTime();
 		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE);
 		var noteSus = 0;
+		var noteType = 0;
+		noteType = Std.int(stepperNoteTypes.value);
+
 
 		if (n != null)													
 			_song.notes[curSection].sectionNotes.push([n.strumTime, n.noteData, n.sustainLength, n.noteType]);
@@ -1315,16 +1334,19 @@ class ChartingState extends MusicBeatState
 	}
 
 	function getNotes():Array<Dynamic>
-	{
-		var noteData:Array<Dynamic> = [];
-
-		for (i in _song.notes)
 		{
-			noteData.push(i.sectionNotes);
+			var noteData:Array<Dynamic> = [];
+			//var noteType:Array<Dynamic> = [];
+	
+			for (i in _song.notes)
+			{
+				noteData.push(i.sectionNotes);
+				//noteType.push(i.sectionNotes);
+			}
+	
+			return noteData;
+		//	return noteType;
 		}
-
-		return noteData;
-	}
 
 	function loadJson(song:String):Void
 	{

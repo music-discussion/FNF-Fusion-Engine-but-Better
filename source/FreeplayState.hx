@@ -237,6 +237,9 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
+	private static var vocals:FlxSound = null;
+	var instPlaying:Int = -1;
+
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
@@ -346,6 +349,14 @@ class FreeplayState extends MusicBeatState
 				case 2:
 					diffText.text = "HARD";
 			}
+		}
+
+		public static function destroyFreeplayVocals() {
+			if(vocals != null) {
+				vocals.stop();
+				vocals.destroy();
+			}
+			vocals = null;
 		}
 
 	function changeSelection(change:Int = 0)

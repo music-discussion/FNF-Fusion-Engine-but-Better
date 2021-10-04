@@ -93,6 +93,14 @@ class CoolUtil
 
 		return daList;
 	}
+
+	public static function boundTo(value:Float, min:Float, max:Float):Float {
+		var newValue:Float = value;
+		if(newValue < min) newValue = min;
+		else if(newValue > max) newValue = max;
+		return newValue;
+	}
+	
 	public static function parseJson(json:String):Dynamic {
 		// the reason we do this is to make it easy to swap out json parsers
 

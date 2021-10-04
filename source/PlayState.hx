@@ -12,6 +12,8 @@ import llua.Convert;
 import llua.Lua;
 import llua.State;
 import llua.LuaL;
+import Replay.Ana;
+import Replay.Analysis;
 import lime.app.Application;
 import lime.media.AudioContext;
 import lime.media.AudioManager;
@@ -46,6 +48,7 @@ import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
 import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
+import editors.CharacterEditorState;
 import flixel.util.FlxSort;
 import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
@@ -67,6 +70,9 @@ import Sys;
 import sys.io.File;
 import sys.FileSystem;
 #end
+
+import Achievements;
+import DialogueBoxPsych;
 
 using StringTools;
 
@@ -124,6 +130,10 @@ class PlayState extends MusicBeatState
 	private var dadCameraOffsetY:Int = 0;
 	private var bfCameraOffsetX:Int = 0;
 	private var bfCameraOffsetY:Int = 0;
+
+	private var saveNotes:Array<Dynamic> = [];
+	private var saveJudge:Array<String> = [];
+	private var replayAna:Analysis = new Analysis(); // replay analysis
 	
 	private var dad:Character;
 	private var gf:Character;
@@ -136,6 +146,8 @@ class PlayState extends MusicBeatState
 	private var curSection:Int = 0;
 
 	private var camFollow:FlxObject;
+	
+	var grace:Bool = false;
 
 	private static var prevCamFollow:FlxObject;
 
@@ -174,6 +186,7 @@ class PlayState extends MusicBeatState
 
 	var notesHitArray:Array<Date> = [];
 	var currentFrames:Int = 0;
+	public static var theFunne:Bool = true;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
@@ -232,6 +245,41 @@ class PlayState extends MusicBeatState
 	// LUA SHIT
 		
 	public static var lua:State = null;
+
+	// ALL PYSCH ENGINE VARS AND SHIT
+
+	public var camOther:FlxCamera;
+	//Achievement shit
+	var keysPressed:Array<Bool> = [false, false, false, false];
+	var boyfriendIdleTime:Float = 0.0;
+	var boyfriendIdled:Bool = false;
+	var achievementObj:AchievementObject = null;
+	var limoMetalPole:BGSprite;
+	var limoLight:BGSprite;
+	var limoCorpse:BGSprite;
+	var limoCorpseTwo:BGSprite;
+	var limoKillingState:Int = 0; //oops missed.
+
+	public var ratingString:String;
+	public var ratingPercent:Float;
+	public var songMisses:Int = 0;
+	public var ghostMisses:Int = 0;
+
+	public static var campaignMisses:Int = 0;
+	public static var usedPractice:Bool = false;
+	public static var changedDifficulty:Bool = false;
+	public static var cpuControlled:Bool = false;
+	public static var practiceMode:Bool = false; //did i seriously just group them?
+
+	// ALR THERE, NOW PSYCH FUNCTIONS.
+
+	function achievementEnd():Void
+		{
+			achievementObj = null;
+			if(endingSong && !inCutscene) {
+				endSong();
+			}
+		}
 
 	function callLua(func_name : String, args : Array<Dynamic>, ?type : String) : Dynamic
 	{
@@ -3585,6 +3633,18 @@ class PlayState extends MusicBeatState
 					//trace(daNote.y);
 					// WIP interpolation shit? Need to fix the pause issue
 					// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
+
+					// i am so fucking sorry for this if condition
+					if (daNote.isSustainNote && daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2 && (!daNote.mustPress || (daNote.wasGoodHit || 
+					(daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
+					{
+						var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
+						swagRect.y /= daNote.scale.y;
+						swagRect.height -= swagRect.y;
+
+						daNote.clipRect = swagRect;
+					}
+
 	
 					if ((daNote.mustPress && daNote.tooLate && !FlxG.save.data.downscrol || daNote.mustPress && daNote.tooLate && FlxG.save.data.downscrol) && daNote.mustPress) //ke 1.5.4 code rocks
 					{
@@ -3651,14 +3711,9 @@ class PlayState extends MusicBeatState
 											else
 											{
 												vocals.volume = 0;
+
 												if (theFunne && !daNote.isSustainNote)
 												{
-													if (PlayStateChangeables.botPlay)
-													{
-														daNote.rating = "bad";
-														goodNoteHit(daNote);
-													}
-													else
 														noteMiss(daNote.noteData, daNote);
 												}
 				
@@ -3746,17 +3801,44 @@ class PlayState extends MusicBeatState
 		if (FlxG.keys.justPressed.ONE)
 			endSong();
 		#end
+
+		if (FlxG.keys.justPressed.EIGHT && !endingSong && !inCutscene) 
+		{
+			persistentUpdate = false;
+			paused = true;
+			cancelFadeTween();
+			CustomFadeTransition.nextCamera = camOther;
+			MusicBeatState.switchState(new CharacterEditorState(SONG.player2));
+		}
 	}
+
+	public function cancelFadeTween() {
+		if(FlxG.sound.music.fadeTween != null) {
+			FlxG.sound.music.fadeTween.cancel();
+		}
+		FlxG.sound.music.fadeTween = null;
+	}
+
 
 	function endSong():Void
 	{
 		if (!loadRep)
-			rep.SaveReplay();
+			rep.SaveReplay(saveNotes, saveJudge, replayAna);
 
 		if (executeModchart)
 		{
 			Lua.close(lua);
 			lua = null;
+		}
+
+		if(achievementObj != null) {
+			return;
+		} else {
+			var achieve:Int = checkForAchievement([1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15]);
+			if(achieve > -1) {
+				startAchievement(achieve);
+				return;
+			}
 		}
 
 		canPause = false;
@@ -4236,6 +4318,11 @@ class PlayState extends MusicBeatState
 		// FlxG.watch.addQuick('asdfa', upP);
 		if ((upP || rightP || downP || leftP) && !boyfriend.stunned && generatedMusic)
 			{
+				var achieve:Int = checkForAchievement([11]);
+				if (achieve > -1) {
+					startAchievement(achieve);
+				}
+
 				repPresses++;
 				boyfriend.holdTimer = 0;
 	
@@ -4796,6 +4883,13 @@ class PlayState extends MusicBeatState
 
 		var nps:Int = 0;
 
+		function startAchievement(achieve:Int) {
+			achievementObj = new AchievementObject(achieve, camOther);
+			achievementObj.onFinish = achievementEnd;
+			add(achievementObj);
+			trace('Giving achievement ' + achieve);
+		}
+
 		function goodNoteHit(note:Note, resetMashViolation = true):Void
 			{
 
@@ -4836,15 +4930,6 @@ class PlayState extends MusicBeatState
 							case 0:
 								boyfriend.playAnim('singLEFT', true);
 						}
-
-
-
-
-			
-						#if windows
-						if (luaModchart != null)
-							luaModchart.executeState('playerOneSing', [note.noteData, Conductor.songPosition]);
-						#end
 	
 						if (note.burning) //fire note
 						{
@@ -4878,16 +4963,6 @@ class PlayState extends MusicBeatState
 						{
 							HealthDrain();
 						}
-
-
-					if(!loadRep && note.mustPress)
-					{
-						var array = [note.strumTime,note.sustainLength,note.noteData,noteDiff];
-						if (note.isSustainNote)
-							array[1] = -1;
-						saveNotes.push(array);
-						saveJudge.push(note.rating);
-					}
 					
 					playerStrums.forEach(function(spr:FlxSprite)
 					{
@@ -4923,6 +4998,27 @@ class PlayState extends MusicBeatState
 					}
 			}
 		
+			public function findByTime(time:Float):Array<Dynamic>
+				{
+					for (i in rep.replay.songNotes)
+					{
+						//trace('checking ' + Math.round(i[0]) + ' against ' + Math.round(time));
+						if (i[0] == time)
+							return i;
+					}
+					return null;
+				}
+
+			public function findByTimeIndex(time:Float):Int
+				{
+					for (i in 0...rep.replay.songNotes.length)
+					{
+						//trace('checking ' + Math.round(i[0]) + ' against ' + Math.round(time));
+						if (rep.replay.songNotes[i][0] == time)
+							return i;
+					}
+					return -1;
+				}
 
 	var fastCarCanDrive:Bool = true;
 	function generateFusionStage(){
@@ -5146,6 +5242,95 @@ class PlayState extends MusicBeatState
 		boyfriend.playAnim('scared', true);
 		gf.playAnim('scared', true);
 	}
+
+	private function checkForAchievement(arrayIDs:Array<Int>):Int {
+		for (i in 0...arrayIDs.length) {
+			if(!Achievements.achievementsUnlocked[arrayIDs[i]][1]) {
+				switch(arrayIDs[i]) {
+					case 1 | 2 | 3 | 4 | 5 | 6 | 7:
+						if(isStoryMode && campaignMisses + songMisses < 1 && CoolUtil.difficultyString() == 'HARD' &&
+						storyPlaylist.length <= 1 && WeekData.getWeekFileName() == ('week' + arrayIDs[i]) && !changedDifficulty && !usedPractice) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+					case 8:
+						if(ratingPercent < 0.2 && !practiceMode && !cpuControlled) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+					case 9:
+						if(ratingPercent >= 1 && !usedPractice && !cpuControlled) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+					case 10:
+						if(Achievements.henchmenDeath >= 100) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+					case 11:
+						if(boyfriend.holdTimer >= 20 && !usedPractice) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+					case 12:
+						if(!boyfriendIdled && !usedPractice) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+					case 13:
+						if(!usedPractice) {
+							var howManyPresses:Int = 0;
+							for (j in 0...keysPressed.length) {
+								if(keysPressed[j]) howManyPresses++;
+							}
+
+							if(howManyPresses <= 2) {
+								Achievements.unlockAchievement(arrayIDs[i]);
+								return arrayIDs[i];
+							}
+						}
+					case 14:
+						if(/*ClientPrefs.framerate <= 60 &&*/ ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing && !ClientPrefs.imagesPersist) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+					case 15:
+						if(Paths.formatToSongPath(SONG.song) == 'test' && !usedPractice) {
+							Achievements.unlockAchievement(arrayIDs[i]);
+							return arrayIDs[i];
+						}
+				}
+			}
+		}
+		return -1;
+	}
+
+	function killHenchmen():Void
+		{
+			if(!ClientPrefs.lowQuality && ClientPrefs.violence && curStage == 'limo') {
+				if(limoKillingState < 1) {
+					limoMetalPole.x = -400;
+					limoMetalPole.visible = true;
+					limoLight.visible = true;
+					limoCorpse.visible = false;
+					limoCorpseTwo.visible = false;
+					limoKillingState = 1;
+	
+					#if ACHIEVEMENTS_ALLOWED
+					Achievements.henchmenDeath++;
+					var achieve:Int = checkForAchievement([10]);
+					if(achieve > -1) {
+						startAchievement(achieve);
+					} else {
+						FlxG.save.data.henchmenDeath = Achievements.henchmenDeath;
+						FlxG.save.flush();
+					}
+					FlxG.log.add('Deaths: ' + Achievements.henchmenDeath);
+					#end
+				}
+			}
+		}
 
 	override function stepHit()
 	{

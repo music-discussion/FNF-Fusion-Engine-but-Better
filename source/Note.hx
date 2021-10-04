@@ -70,6 +70,8 @@ class Note extends FlxSprite
 
 	public static var mania:Int = 0; //used for absoulutely shit.
 
+	public var rawNoteData:Int = 0; // for charting shit and thats it LOL
+
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?noteType:Int = 0, ?customImage:Null<BitmapData>, ?customXml:Null<String>, ?customEnds:Null<BitmapData>)
 	{
 		super();

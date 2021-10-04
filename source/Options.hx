@@ -70,6 +70,37 @@ class Option
 	public function right():Bool { return throw "stub!"; }
 }
 
+class OCinOC
+{ // OptionCatagory in OptionCatagory
+	private var _options:Array<Dynamic> = new Array<Dynamic>();
+	public final function getOptions():Array<Dynamic>
+	{
+		return _options;
+	}
+
+	public final function addOption(opt:Dynamic)
+	{
+		_options.push(opt);
+	}
+
+	
+	public final function removeOption(opt:Dynamic)
+	{
+		_options.remove(opt);
+	}
+
+	private var _name:String = "New Catagory";
+	public final function getName() {
+		return _name;
+	}
+
+	public function new (catName:String, options:Array<Dynamic>)
+	{
+		_name = catName;
+		_options = options;
+	}
+}
+
 class DFJKOption extends Option
 {
 	public static var rotation:Array<String> = ["ASWD","DFJK","JKIL","QWOP","ASKL"];
@@ -390,6 +421,49 @@ class NoZoomOption extends Option
 	private override function updateDisplay():String
 	{
 		return "" + (!FlxG.save.data.noZoom ? "No Cam Zooming" : "Cam Zooming On");
+	}
+}
+
+class SmallZoomOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.smallZoom = !FlxG.save.data.smallZoom;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Small Zoom" + (!FlxG.save.data.smallZoom ? "Off sad y tho" : "On");
+	}
+}
+
+class BigZoomOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.bigZoom = !FlxG.save.data.bigZoom;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Big Zoom " + (!FlxG.save.data.bigZoom ? "off" : "on");
 	}
 }
 

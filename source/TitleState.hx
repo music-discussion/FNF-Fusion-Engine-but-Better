@@ -24,6 +24,8 @@ import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
 
+import flixel.input.keyboard.FlxKey; //yessssssssssssss
+
 #if windows
 import Discord.DiscordClient;
 #end
@@ -51,6 +53,10 @@ class TitleState extends MusicBeatState
 	var curWacky:Array<String> = [];
 
 	var wackyImage:FlxSprite;
+
+	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
+	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
+	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
 	override public function create():Void
 	{

@@ -80,6 +80,9 @@ class KadeEngineData
 		if (FlxG.save.data.noZoom == null)
 			FlxG.save.data.noZoom = false;
 
+		if (FlxG.save.data.achievements == null)
+			FlxG.save.data.achievements = false;
+
 		Conductor.recalculateTimings();
 
 		Main.watermarks = FlxG.save.data.watermark;

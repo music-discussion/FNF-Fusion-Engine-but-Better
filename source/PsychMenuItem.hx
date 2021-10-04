@@ -1,35 +1,40 @@
-
 package;
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import lime.system.System;
+
 #if sys
 import sys.io.File;
 import haxe.io.Path;
 import openfl.utils.ByteArray;
 import flash.display.BitmapData;
 #end
+
 import haxe.Json;
 import haxe.format.JsonParser;
 import tjson.TJSON;
 
-class MenuItem extends FlxSpriteGroup
+//class PsychMenuItem extends FlxSprite
+class PsychMenuItem extends FlxSprite
 {
 	public var targetY:Float = 0;
-	public var week:FlxSprite;
+    public var week:FlxSprite;
 	public var flashingInt:Int = 0;
 
-	public function new(x:Float, y:Float, weekNum:Int = 0)
+	public function new(x:Float, y:Float, weekName:String = '') //edited to work for fusion engine.
 	{
 		super(x, y);
+        var weekNum:Int = Std.parseInt(weekName);
 		var parsedWeekJson:Array<Array<String>> = CoolUtil.parseJson(File.getContent("assets/data/storySongList.json")).songs;
 		var rawPic = BitmapData.fromFile('assets/images/campaign-ui-week/week'+weekNum+".png");
 		var rawXml = File.getContent('assets/images/campaign-ui-week/week'+weekNum+".xml");
 		var tex = FlxAtlasFrames.fromSparrow(rawPic, rawXml);
+		//trace('Test added: ' + WeekData.getWeekNumber(weekNum) + ' (' + weekNum + ')');
+		antialiasing = ClientPrefs.globalAntialiasing;
 
 		week = new FlxSprite();
 		week.frames = tex;
@@ -59,14 +64,14 @@ class MenuItem extends FlxSpriteGroup
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		y = FlxMath.lerp(y, (targetY * 120) + 480, 0.17 * (60 / FlxG.save.data.fpsCap));
+		y = FlxMath.lerp(y, (targetY * 120) + 480, CoolUtil.boundTo(elapsed * 10.2, 0, 1));
 
 		if (isFlashing)
 			flashingInt += 1;
 
 		if (flashingInt % fakeFramerate >= Math.floor(fakeFramerate / 2))
-			week.color = 0xFF33ffff;
+			color = 0xFF33ffff;
 		else
-			week.color = FlxColor.WHITE;
+			color = FlxColor.WHITE;
 	}
 }
