@@ -4677,10 +4677,11 @@ class PlayState extends MusicBeatState
 			isError = true;
 		}
 
-		trace(colorJson.colors); //just testing.
+		trace(colorJson.colors); //just testing. 
 
 		if (!isError) { //complex code I know.
-			var parsedColorJson:Dynamic = CoolUtil.parseJson(colorJson);
+			var parsedColorJson:Dynamic = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColors.jsonc'));
+			var barColors:Dynamic = parsedColorJson[Std.parseInt(SONG.player2)/*converts a string into an int. pretty useful. had to look all over for this.*/].colors;
 
 			for (field in Reflect.fields(parsedColorJson.colors)) 
 			{

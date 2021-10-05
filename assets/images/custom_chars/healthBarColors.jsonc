@@ -1,4 +1,5 @@
-{
+[
+    {
     "colors" : 
     {
     "gf": "0xFFA5004D",
@@ -18,3 +19,4 @@
     "defaultBF": "0xFF31B0D1"
     }
 }
+]
