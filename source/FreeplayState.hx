@@ -237,6 +237,36 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
+	/*
+	switch(SONG.player1)
+		{
+			case 'bf' | 'bf-christmas' | 'bf-car':
+				p1Color = 0xFF31B0D1;
+		}
+
+		switch(SONG.player2)
+		{
+			case 'gf':
+				p2Color = 0xFFA5004D;
+			case 'dad':
+				p2Color = 0xFFAF66CE;
+			case 'spooky':
+				p2Color = 0xFFBDA47F;
+			case 'mom' | 'mom-car':
+				p2Color = 0xFFD8558E;
+			case 'monetser' | 'monster-christmas':
+				p2Color = 0xFFF3FF6E;
+			case 'pico':
+				p2Color = 0xFFD57E00;
+			case 'senpai' | 'senpai-angry':
+				p2Color = 0xFFFFAA6F;
+			case 'spirit':
+				p2Color = 0xFFFF3C6E;
+			case 'parents-christmas':
+		//		p2Color = 0xFFD65555;
+		}
+		*/
+
 	private static var vocals:FlxSound = null;
 	var instPlaying:Int = -1;
 

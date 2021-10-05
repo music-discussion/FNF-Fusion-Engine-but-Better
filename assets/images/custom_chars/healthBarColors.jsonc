@@ -1,7 +1,5 @@
 [
     {
-    "colors" : 
-    {
     "gf": "0xFFA5004D",
     "dad": "0xFFAF66CE",
     "spooky": "0xFFBDA47F",
@@ -18,5 +16,4 @@
     "defaultDad": "0xFFAF66CE",
     "defaultBF": "0xFF31B0D1"
     }
-}
 ]

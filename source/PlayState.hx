@@ -3639,7 +3639,7 @@ class PlayState extends MusicBeatState
 					// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
 
 					// i am so fucking sorry for this if condition
-					if (daNote.isSustainNote && daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2 && (!daNote.mustPress || (daNote.wasGoodHit || 
+					/*if (daNote.isSustainNote && daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2 && (!daNote.mustPress || (daNote.wasGoodHit || 
 					(daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
 					{
 						var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
@@ -3647,7 +3647,7 @@ class PlayState extends MusicBeatState
 						swagRect.height -= swagRect.y;
 
 						daNote.clipRect = swagRect;
-					}
+					}*/
 
 	
 					if ((daNote.mustPress && daNote.tooLate && !FlxG.save.data.downscrol || daNote.mustPress && daNote.tooLate && FlxG.save.data.downscrol) && daNote.mustPress) //ke 1.5.4 code rocks
@@ -4680,10 +4680,15 @@ class PlayState extends MusicBeatState
 		trace(colorJson.colors); //just testing. 
 
 		if (!isError) { //complex code I know.
-			var parsedColorJson:Dynamic = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColors.jsonc'));
-			var barColors:Dynamic = parsedColorJson[Std.parseInt(SONG.player2)/*converts a string into an int. pretty useful. had to look all over for this.*/].colors;
 
-			for (field in Reflect.fields(parsedColorJson.colors)) 
+			var id:Int = 1;
+
+			var parsedColorJson:Dynamic = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColors.jsonc'));
+			var barColors2:Dynamic = parsedColorJson[id].SONG.player2;
+			var barColors1:Dynamic = parsedColorJson[id].SONG.player1;
+			var player2 = SONG.player2;
+			var player1 = SONG.player1;
+			for (field in Reflect.fields(parsedColorJson.player1)) 
 			{
 				if (Reflect.hasField(Reflect.field(parsedColorJson.colors,field), "colors")) 
 				{
@@ -4691,7 +4696,7 @@ class PlayState extends MusicBeatState
 						{
 							try {
 							if (Reflect.hasField(Reflect.field(parsedColorJson.colors,field), SONG.player1)) {
-								p1Color = Reflect.field(parsedColorJson.colors,field).colors;
+								p1Color = Reflect.field(parsedColorJson.colors,field).SONG.player1;
 							}
 							} catch (exception) {
 								// uh oh someone messed up their jsonc
@@ -4702,11 +4707,11 @@ class PlayState extends MusicBeatState
 							}
 						}
 
-						for (field in Reflect.fields(parsedColorJson.colors)) 
+						for (field in Reflect.fields(parsedColorJson.player2)) 
 							{
 								try {
 								if (Reflect.hasField(Reflect.field(parsedColorJson.colors,field), SONG.player2)) {
-									p2Color = Reflect.field(parsedColorJson.colors,field).colors;
+									p2Color = Reflect.field(parsedColorJson.colors,field).SONG.player2;
 								}
 								} catch (exception) {
 									// uh oh someone messed up their jsonc
@@ -4718,33 +4723,6 @@ class PlayState extends MusicBeatState
 							}
 				}
 			}
-		switch(SONG.player1)
-		{
-			case 'bf' | 'bf-christmas' | 'bf-car':
-				p1Color = 0xFF31B0D1;
-		}
-
-		switch(SONG.player2)
-		{
-			case 'gf':
-				p2Color = 0xFFA5004D;
-			case 'dad':
-				p2Color = 0xFFAF66CE;
-			case 'spooky':
-				p2Color = 0xFFBDA47F;
-			case 'mom' | 'mom-car':
-				p2Color = 0xFFD8558E;
-			case 'monetser' | 'monster-christmas':
-				p2Color = 0xFFF3FF6E;
-			case 'pico':
-				p2Color = 0xFFD57E00;
-			case 'senpai' | 'senpai-angry':
-				p2Color = 0xFFFFAA6F;
-			case 'spirit':
-				p2Color = 0xFFFF3C6E;
-			case 'parents-christmas':
-				p2Color = 0xFFD65555;
-		}
 	}
 	else if (isError)
 		{
@@ -4753,16 +4731,7 @@ class PlayState extends MusicBeatState
 		}
 	else
 		{
-			try {
-				colorJson = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColorswgr.jsonc')); //has to mess up.
-				//Application.current.window.alert("Hey! IDK what went wrong but their seems to be a problem. Report this to Discussions on Discord if you see this... "+exception, "Alert");
-			}
-			catch (exception) {
-				// uh oh someone messed up their json
-				Application.current.window.alert("Hey! IDK what went wrong but their seems to be a problem. Report this to Discussions on Discord if you see this... The game won't crash, it'll load default colors. "+exception, "Alert");
-				isError = true;
-			}	
-
+			Application.current.window.alert("Hey! IDK what went wrong but their seems to be a problem. Report this to Discussions on Discord if you see this... The game won't crash, it'll load default colors. ");
 			p2Color = 0xFFAF66CE;
 			p1Color = 0xFF31B0D1;
 		}

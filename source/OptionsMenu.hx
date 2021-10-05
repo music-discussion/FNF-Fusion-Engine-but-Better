@@ -227,6 +227,7 @@ class OptionsMenu extends MusicBeatState
 					currentSelectedCat = options[curSelected];
 					isCat = true;
 					grpControls.clear();
+					
 					for (i in 0...currentSelectedCat.getOptions().length)
 						{
 							var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 30, currentSelectedCat.getOptions()[i].getDisplay(), true, false);
