@@ -629,7 +629,7 @@ class Character extends FlxSprite
 					}
 					frames = tex;
 
-					for(field in Reflect.fields(parsedAnimJson.animation) ) {
+					for( field in Reflect.fields(parsedAnimJson.animation) ) {
 						var fps = 24;
 						if (Reflect.hasField(Reflect.field(parsedAnimJson.animation,field), "fps")) {
 							fps = Reflect.field(parsedAnimJson.animation,field).fps;

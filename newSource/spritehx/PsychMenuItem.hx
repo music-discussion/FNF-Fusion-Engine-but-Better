@@ -6,12 +6,6 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import lime.system.System;
-import openfl.utils.AssetType;
-import lime.graphics.Image;
-import flixel.graphics.FlxGraphic;
-import openfl.utils.AssetManifest;
-import openfl.utils.AssetLibrary;
-import flixel.system.FlxAssets;
 
 #if sys
 import sys.io.File;
@@ -47,7 +41,7 @@ class PsychMenuItem extends FlxSprite
 		// TUTORIAL IS WEEK 0
 		trace(parsedWeekJson[weekNum][0]);
 		week.animation.addByPrefix("default", parsedWeekJson[weekNum][0], 24);
-		//add(week);
+		add(week);
 
 		week.animation.play('default');
 		week.animation.pause();

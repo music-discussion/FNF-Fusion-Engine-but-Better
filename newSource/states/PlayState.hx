@@ -76,10 +76,6 @@ import DialogueBoxPsych;
 
 using StringTools;
 
-typedef ColorJson = { //p1Color
-	var colors:Array<String>;
-} //not needed but why not |_|
-
 class PlayState extends MusicBeatState
 {
 	public var hasCreated:Bool = false;
@@ -97,7 +93,7 @@ class PlayState extends MusicBeatState
 	public static var sicks:Int = 0;
 	public static var colors:Int;
 	var id:String;
-	var p1:Int = Std.parseInt(SONG.player1); //why does this work tho
+	var p1:Int = Std.parseInt(SONG.player1);
 	var p2:Int = Std.parseInt(SONG.player2);
 	var p1Color:Int;
 	var p2Color:Int;
@@ -3925,10 +3921,7 @@ class PlayState extends MusicBeatState
 					FlxTransitionableState.skipNextTransOut = true;
 					prevCamFollow = camFollow;
 
-					// healthBarColors
-
-					//PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() , PlayState.storyPlaylist[0],storyDifficulty);
-					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0],storyDifficulty);
+					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() , PlayState.storyPlaylist[0],storyDifficulty);
 					FlxG.sound.music.stop();
 
 					LoadingState.loadAndSwitchState(new PlayState());
@@ -4665,106 +4658,103 @@ class PlayState extends MusicBeatState
 
 	function createFilledBar():Void
 	{
-		var colorJson:Dynamic = null; //safe gard
-		var isError:Bool = false;
-		var doN:Bool = false;
-
-		try {
-			colorJson = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColors.jsonc')); ///new and improved.
-		} catch (exception) {
-			// uh oh someone messed up their jsonc
-			Application.current.window.alert("Hey! You messed up your healthBarColors.jsonc. Your game won't crash but it will load default colors.. "+exception, "Alert");
-			isError = true;
-		}
-
-		trace(colorJson.colors); //just testing.
-
-		if (!isError) { //complex code I know.
-			var parsedColorJson:Dynamic = CoolUtil.parseJson(colorJson);
-
-			for (field in Reflect.fields(parsedColorJson.colors)) 
-			{
-				if (Reflect.hasField(Reflect.field(parsedColorJson.colors,field), "colors")) 
-				{
-					for (field in Reflect.fields(parsedColorJson.colors)) 
-						{
-							try {
-							if (Reflect.hasField(Reflect.field(parsedColorJson.colors,field), SONG.player1)) {
-								p1Color = Reflect.field(parsedColorJson.colors,field).colors;
-							}
-							} catch (exception) {
-								// uh oh someone messed up their jsonc
-								Application.current.window.alert("Hey! You messed up your healthBarColors.jsonc. P1 is wrong. Your game won't crash but it will load default colors.. "+exception, "Alert");
-								doN = true; //useless var.
-								p2Color = 0xFFAF66CE;
-								p1Color = 0xFF31B0D1;
-							}
-						}
-
-						for (field in Reflect.fields(parsedColorJson.colors)) 
-							{
-								try {
-								if (Reflect.hasField(Reflect.field(parsedColorJson.colors,field), SONG.player2)) {
-									p2Color = Reflect.field(parsedColorJson.colors,field).colors;
-								}
-								} catch (exception) {
-									// uh oh someone messed up their jsonc
-									Application.current.window.alert("Hey! You messed up your healthBarColors.jsonc. P2 is wrong. Your game won't crash but it will load default colors.. "+exception, "Alert");
-									doN = true; //useless var.
-									p2Color = 0xFFAF66CE;
-									p1Color = 0xFF31B0D1;
-								}
-							}
-				}
-			}
 		switch(SONG.player1)
 		{
+		/*	"colors" : 
+    		{
+    "gf": "0xFFA5004D",
+    "dad": "0xFFAF66CE",
+    "spooky": "0xFFBDA47F",
+    "mom":  "0xFFD8558E",
+    "mom-car":  "0xFFD8558E",
+    "monster": "0xFFF3FF6E",
+    "monster-christmas": "0xFFF3FF6E",
+    "pico": "0xFFD57E00",
+    "bf": "0xFF31B0D1",
+    "senpai": "0xFFFFAA6F",
+    "senpai-angry": "0xFFFFAA6F",
+    "spirit": "0xFFFF3C6E",
+    "parents-christams": "0xFFD65555",
+    "defaultDad": "0xFFAF66CE",
+    "defaultBF": "0xFF31B0D1"
+    }*/
+
 			case 'bf' | 'bf-christmas' | 'bf-car':
 				p1Color = 0xFF31B0D1;
+			default: 
+				// assuming its a custom character
+				//filesystem.exists
+				if (FileSystem.exists('assets/images/'+SONG.player1+'/healthBarColor.txt')) 
+					{
+						p1Color = Std.parseInt(bfTxTColor[0]);
+					}
+				else if (FileSystem.exists('assets/images/'+SONG.player1+'/color.txt')) 
+					{
+						p1Color = Std.parseInt(bfTxTColor[0]);
+					}
+				else {
+					p1Color = 0xFF31B0D1;
+				}
 		}
 
 		switch(SONG.player2)
 		{
-			case 'gf':
-				p2Color = 0xFFA5004D;
-			case 'dad':
-				p2Color = 0xFFAF66CE;
-			case 'spooky':
-				p2Color = 0xFFBDA47F;
-			case 'mom' | 'mom-car':
-				p2Color = 0xFFD8558E;
-			case 'monetser' | 'monster-christmas':
-				p2Color = 0xFFF3FF6E;
-			case 'pico':
-				p2Color = 0xFFD57E00;
-			case 'senpai' | 'senpai-angry':
-				p2Color = 0xFFFFAA6F;
-			case 'spirit':
-				p2Color = 0xFFFF3C6E;
-			case 'parents-christmas':
-				p2Color = 0xFFD65555;
-		}
-	}
-	else if (isError)
-		{
-			p2Color = 0xFFAF66CE;
-			p1Color = 0xFF31B0D1;
-		}
-	else
-		{
-			try {
-				colorJson = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/healthBarColorswgr.jsonc')); //has to mess up.
-				//Application.current.window.alert("Hey! IDK what went wrong but their seems to be a problem. Report this to Discussions on Discord if you see this... "+exception, "Alert");
-			}
-			catch (exception) {
-				// uh oh someone messed up their json
-				Application.current.window.alert("Hey! IDK what went wrong but their seems to be a problem. Report this to Discussions on Discord if you see this... The game won't crash, it'll load default colors. "+exception, "Alert");
-				isError = true;
-			}	
+		/*	"colors" : 
+    		{
+    "gf": "0xFFA5004D",
+    "dad": "0xFFAF66CE",
+    "spooky": "0xFFBDA47F",
+    "mom":  "0xFFD8558E",
+    "mom-car":  "0xFFD8558E",
+    "monster": "0xFFF3FF6E",
+    "monster-christmas": "0xFFF3FF6E",
+    "pico": "0xFFD57E00",
+    "bf": "0xFF31B0D1",
+    "senpai": "0xFFFFAA6F",
+    "senpai-angry": "0xFFFFAA6F",
+    "spirit": "0xFFFF3C6E",
+    "parents-christams": "0xFFD65555",
+    "defaultDad": "0xFFAF66CE",
+    "defaultBF": "0xFF31B0D1"
+    }*/
 
-			p2Color = 0xFFAF66CE;
-			p1Color = 0xFF31B0D1;
+				case 'gf':
+				p2Color = 0xFFA5004D;
+				case 'dad':
+				p2Color = 0xFFAF66CE;
+				case 'spooky':
+				p2Color = 0xFFBDA47F;
+				case 'mom' | 'mom-car':
+				p2Color = 0xFFD8558E;
+				case 'monetser' | 'monster-christmas':
+				p2Color = 0xFFF3FF6E;
+				case 'pico':
+				p2Color = 0xFFD57E00;
+				case 'senpai' | 'senpai-angry':
+				p2Color = 0xFFFFAA6F;
+				case 'spirit':
+				p2Color = 0xFFFF3C6E;
+				case 'parents-christmas':
+				p2Color = 0xFFD65555;
+			default: 
+				// assuming its a custom character
+				// oh well. i hope i didnt forget someone
+				// filesystem.exists
+				// dialogue
+				// (FileSystem.exists('assets/data/'+SONG.song.toLowerCase()+'/dialogue.txt'))
+				if (FileSystem.exists('assets/images/'+SONG.player2+'/healthBarColor.txt')) 
+					{
+						p2Color = Std.parseInt(dadTxTColor[0]);
+					}
+				else if (FileSystem.exists('assets/images/'+SONG.player2+'/color.txt')) 
+					{
+						p2Color = Std.parseInt(bfTxTColor[0]);
+					}
+				else {
+					p2Color = 0xFFAF66CE;
+				}
 		}
+
 	}
 
 	function badNoteCheck(daNote:Note)

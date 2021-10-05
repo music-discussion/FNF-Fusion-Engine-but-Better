@@ -1,53 +1,42 @@
-package;
 
+package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import lime.system.System;
-import openfl.utils.AssetType;
-import lime.graphics.Image;
-import flixel.graphics.FlxGraphic;
-import openfl.utils.AssetManifest;
-import openfl.utils.AssetLibrary;
-import flixel.system.FlxAssets;
-
 #if sys
 import sys.io.File;
 import haxe.io.Path;
 import openfl.utils.ByteArray;
 import flash.display.BitmapData;
 #end
-
 import haxe.Json;
 import haxe.format.JsonParser;
 import tjson.TJSON;
 
-//class PsychMenuItem extends FlxSprite
-class PsychMenuItem extends FlxSprite
+class MenuItem extends FlxSpriteGroup
 {
 	public var targetY:Float = 0;
-    public var week:FlxSprite;
+	public var week:FlxSprite;
 	public var flashingInt:Int = 0;
 
-	public function new(x:Float, y:Float, weekName:String = '') //edited to work for fusion engine.
+	public function new(x:Float, y:Float, weekNum:Int = 0)
 	{
 		super(x, y);
-        var weekNum:Int = Std.parseInt(weekName);
 		var parsedWeekJson:Array<Array<String>> = CoolUtil.parseJson(File.getContent("assets/data/storySongList.json")).songs;
 		var rawPic = BitmapData.fromFile('assets/images/campaign-ui-week/week'+weekNum+".png");
 		var rawXml = File.getContent('assets/images/campaign-ui-week/week'+weekNum+".xml");
 		var tex = FlxAtlasFrames.fromSparrow(rawPic, rawXml);
-		//trace('Test added: ' + WeekData.getWeekNumber(weekNum) + ' (' + weekNum + ')');
-		antialiasing = ClientPrefs.globalAntialiasing;
 
 		week = new FlxSprite();
 		week.frames = tex;
 		// TUTORIAL IS WEEK 0
 		trace(parsedWeekJson[weekNum][0]);
 		week.animation.addByPrefix("default", parsedWeekJson[weekNum][0], 24);
-		//add(week);
+		add(week);
 
 		week.animation.play('default');
 		week.animation.pause();
@@ -70,14 +59,14 @@ class PsychMenuItem extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		y = FlxMath.lerp(y, (targetY * 120) + 480, CoolUtil.boundTo(elapsed * 10.2, 0, 1));
+		y = FlxMath.lerp(y, (targetY * 120) + 480, 0.17 * (60 / FlxG.save.data.fpsCap));
 
 		if (isFlashing)
 			flashingInt += 1;
 
 		if (flashingInt % fakeFramerate >= Math.floor(fakeFramerate / 2))
-			color = 0xFF33ffff;
+			week.color = 0xFF33ffff;
 		else
-			color = FlxColor.WHITE;
+			week.color = FlxColor.WHITE;
 	}
 }

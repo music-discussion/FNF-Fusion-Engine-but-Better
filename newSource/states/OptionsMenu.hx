@@ -21,6 +21,7 @@ class OptionsMenu extends MusicBeatState
 
 	//var options:Array<OptionCatagory> = [
 	var options:Array<Dynamic> = [
+		new AchievementOption("Replaces Donate Button with Achievements area."),
 		new OptionCatagory("Gameplay", [
 			new DFJKOption(controls),
 			new NewInputOption("Swaps the input system from New to Week 7 Kinda."),
@@ -59,9 +60,8 @@ class OptionsMenu extends MusicBeatState
 			new OptionCatagory("CPU Sings", [
 				new CpuStrumsOption("Disable or Enable note glows on the CPU's side.(doesnt work ): "),
 			]),
-			new OptionCatagory("Menus", [
+			new OptionCatagory("Freeplay", [
 				new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
-				new AchievementOption("Replaces Donate Button with Achievements area.")
 			]),
 			new OptionCatagory("Arrows", [
 				new CircleOption("Activate Circle Arrows like Funky Friday!")
