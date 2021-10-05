@@ -1,6 +1,7 @@
 package;
 
 import flash.display.BitmapData;
+import haxe.Json;
 import lime.utils.Assets;
 import tjson.TJSON;
 import lime.app.Application;
