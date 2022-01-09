@@ -5,12 +5,22 @@ import Controls.KeyboardScheme;
 import flixel.FlxG;
 import openfl.display.FPS;
 import openfl.Lib;
+import flash.text.TextField;
+import flixel.FlxG;
+import flixel.addons.display.FlxGridOverlay;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.input.keyboard.FlxKey;
+import flixel.math.FlxMath;
+import flixel.text.FlxText;
+import flixel.util.FlxColor;
+import lime.utils.Assets;
 
 class OptionCatagory
 {
 	
-	private var _options:Array<Option> = new Array<Dyanmic>();
-	public final function getOptions():Array<Dyanmic>
+	private var _options:Array<Dynamic> = new Array<Dynamic>();
+
+	public final function getOptions():Array<Dynamic>
 	{
 		return _options;
 	}
