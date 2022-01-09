@@ -76,10 +76,6 @@ import DialogueBoxPsych;
 
 using StringTools;
 
-typedef ColorJson = { //p1Color
-	var colors:Array<String>;
-} //not needed but why not |_|
-
 class PlayState extends MusicBeatState
 {
 	public var hasCreated:Bool = false;
@@ -4663,9 +4659,9 @@ class PlayState extends MusicBeatState
 
 		// killNotes();
 
-	function createFilledBar():Void
+	public function createFilledBar():Void
 	{
-		var colorJson:Dynamic = null; //safe gard
+		/*var colorJson:Dynamic = null; //safe gard
 		var isError:Bool = false;
 		var doN:Bool = false;
 
@@ -4734,8 +4730,15 @@ class PlayState extends MusicBeatState
 			Application.current.window.alert("Hey! IDK what went wrong but their seems to be a problem. Report this to Discussions on Discord if you see this... The game won't crash, it'll load default colors. ");
 			p2Color = 0xFFAF66CE;
 			p1Color = 0xFF31B0D1;
-		}
+		}*/
+
+		//created a simplified solution
+		p2Color = dad.healthBarColor;
+		p1Color = boyfriend.healthBarColor;
+		//god i am so dumb.
 	}
+
+	public var colormansucks:Int;
 
 	function badNoteCheck(daNote:Note)
 		{
@@ -5430,8 +5433,6 @@ class PlayState extends MusicBeatState
 				}
 			}
 			
-
-
 		switch (curStage)
 		{
 			case 'school':
