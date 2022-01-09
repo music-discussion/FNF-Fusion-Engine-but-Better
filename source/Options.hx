@@ -9,8 +9,8 @@ import openfl.Lib;
 class OptionCatagory
 {
 	
-	private var _options:Array<Option> = new Array<Option>();
-	public final function getOptions():Array<Option>
+	private var _options:Array<Option> = new Array<Dyanmic>();
+	public final function getOptions():Array<Dyanmic>
 	{
 		return _options;
 	}

@@ -3923,7 +3923,7 @@ class PlayState extends MusicBeatState
 
 					// healthBarColors
 
-					//PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() , PlayState.storyPlaylist[0],storyDifficulty);
+					//PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() , PlayState.storyPlaylist[0],storyDifficulty); -- this was the difficulty bug for the old version.
 					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0],storyDifficulty);
 					FlxG.sound.music.stop();
 

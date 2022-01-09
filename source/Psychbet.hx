@@ -12,7 +12,7 @@ using StringTools;
 /**
  * Loosley based on FlxTypeText lolol
  */
-class Alphabet extends FlxSpriteGroup
+class Psychbet extends FlxSpriteGroup
 {
 	public var delay:Float = 0.05;
 	public var paused:Bool = false;
@@ -20,11 +20,16 @@ class Alphabet extends FlxSpriteGroup
 	// for menu shit
 	public var targetY:Float = 0;
 	public var isMenuItem:Bool = false;
+	public var yAdd:Float = 0;
+	public var forceX:Float = Math.NEGATIVE_INFINITY;
+	public var yMult:Float = 120;
 
 	public var text:String = "";
 
 	var _finalText:String = "";
 	var _curText:String = "";
+
+	public var finishedText:Bool = false;
 
 	public var widthOfWords:Float = FlxG.width;
 
@@ -34,7 +39,7 @@ class Alphabet extends FlxSpriteGroup
 	var groupY:Float = 0.48;
 	// custom shit
 	// amp, backslash, question mark, apostrophy, comma, angry faic, period
-	var lastSprite:AlphaCharacter;
+	var lastSprite:PsychCharacter;
 	var xPosResetted:Bool = false;
 	var lastWasSpace:Bool = false;
 	var lastWasEscape:Bool = false;
@@ -42,6 +47,8 @@ class Alphabet extends FlxSpriteGroup
 	var splitWords:Array<String> = [];
 
 	var isBold:Bool = false;
+
+	public var xAdd:Float = 0; //psych engine var lol.
 
 	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = false, typed:Bool = false, stepped:Bool = true, alignX:Float = 90, alignY:Float = 0.48, ?drawHypens:Bool = false)
 	{
@@ -117,8 +124,8 @@ class Alphabet extends FlxSpriteGroup
 				}
 				lastWasEscape = false;
 			}
-			if ((AlphaCharacter.alphabet.indexOf(dummyCharacter.toLowerCase()) != -1 || AlphaCharacter.numbers.indexOf(dummyCharacter) != -1 || StringTools.contains(AlphaCharacter.symbols,dummyCharacter)) && (dummyCharacter != "-" || drawHypens))
-				// if (AlphaCharacter.alphabet.contains(character.toLowerCase()))
+			if ((PsychCharacter.alphabet.indexOf(dummyCharacter.toLowerCase()) != -1 || PsychCharacter.numbers.indexOf(dummyCharacter) != -1 || StringTools.contains(PsychCharacter.symbols,dummyCharacter)) && (dummyCharacter != "-" || drawHypens))
+				// if (PsychCharacter.alphabet.contains(character.toLowerCase()))
 			{
 				if (lastSprite != null)
 				{
@@ -131,8 +138,8 @@ class Alphabet extends FlxSpriteGroup
 					lastWasSpace = false;
 				}
 
-				// var letter:AlphaCharacter = new AlphaCharacter(30 * loopNum, 0);
-				var letter:AlphaCharacter = new AlphaCharacter(xPos, 0);
+				// var letter:PsychCharacter = new PsychCharacter(30 * loopNum, 0);
+				var letter:PsychCharacter = new PsychCharacter(xPos, 0);
 
 				if (isBold)
 					letter.createBold(dummyCharacter);
@@ -156,6 +163,8 @@ class Alphabet extends FlxSpriteGroup
 	}
 
 	public var personTalking:String = 'gf';
+
+	var typeTimer:FlxTimer = null;
 
 	public function startTypedText():Void
 	{
@@ -186,15 +195,15 @@ class Alphabet extends FlxSpriteGroup
 			}
 
 			#if (haxe >= "4.0.0")
-			var isNumber:Bool = AlphaCharacter.numbers.contains(splitWords[loopNum]);
-			var isSymbol:Bool = AlphaCharacter.symbols.contains(splitWords[loopNum]);
+			var isNumber:Bool = PsychCharacter.numbers.contains(splitWords[loopNum]);
+			var isSymbol:Bool = PsychCharacter.symbols.contains(splitWords[loopNum]);
 			#else
-			var isNumber:Bool = AlphaCharacter.numbers.indexOf(splitWords[loopNum]) != -1;
-			var isSymbol:Bool = AlphaCharacter.symbols.indexOf(splitWords[loopNum]) != -1;
+			var isNumber:Bool = PsychCharacter.numbers.indexOf(splitWords[loopNum]) != -1;
+			var isSymbol:Bool = PsychCharacter.symbols.indexOf(splitWords[loopNum]) != -1;
 			#end
 
-			if (AlphaCharacter.alphabet.indexOf(splitWords[loopNum].toLowerCase()) != -1 || isNumber || isSymbol)
-				// if (AlphaCharacter.alphabet.contains(splitWords[loopNum].toLowerCase()) || isNumber || isSymbol)
+			if (PsychCharacter.alphabet.indexOf(splitWords[loopNum].toLowerCase()) != -1 || isNumber || isSymbol)
+				// if (PsychCharacter.alphabet.contains(splitWords[loopNum].toLowerCase()) || isNumber || isSymbol)
 
 			{
 				if (lastSprite != null && !xPosResetted)
@@ -216,8 +225,8 @@ class Alphabet extends FlxSpriteGroup
 				}
 				// trace(_finalText.fastCodeAt(loopNum) + " " + _finalText.charAt(loopNum));
 
-				// var letter:AlphaCharacter = new AlphaCharacter(30 * loopNum, 0);
-				var letter:AlphaCharacter = new AlphaCharacter(xPos, 55 * yMulti);
+				// var letter:PsychCharacter = new PsychCharacter(30 * loopNum, 0);
+				var letter:PsychCharacter = new PsychCharacter(xPos, 55 * yMulti);
 				letter.row = curRow;
 				if (isBold)
 				{
@@ -263,22 +272,29 @@ class Alphabet extends FlxSpriteGroup
 		if (isMenuItem)
 		{
 			var scaledY = FlxMath.remapToRange(targetY, 0, 1, 0, 1.3);
+			var lerpVal:Float = CoolUtil.boundTo(elapsed * 9.6, 0, 1);
 
-			y = FlxMath.lerp(y, (scaledY * 120) + (FlxG.height * groupY), 0.16);
-			if (isStepped) {
-				x = FlxMath.lerp(x, (targetY * 20) + groupX, 0.16);
+			y = FlxMath.lerp(y, (scaledY * yMult) + (FlxG.height * 0.48) + yAdd, lerpVal);
+			if(isStepped) {
+				x = forceX;
 			} else {
-				// bad no
-				//	x = FlxMath.lerp(x, groupX, 0.16);
+				x = FlxMath.lerp(x, (targetY * 20) + 90 + xAdd, lerpVal);
 			}
 
 		}
-
 		super.update(elapsed);
+	}
+
+	public function killTheTimer() {
+		if(typeTimer != null) {
+			typeTimer.cancel();
+			typeTimer.destroy();
+		}
+		typeTimer = null;
 	}
 }
 
-class AlphaCharacter extends FlxSprite
+class PsychCharacter extends FlxSprite
 {
 	public static var alphabet:String = "abcdefghijklmnopqrstuvwxyz";
 

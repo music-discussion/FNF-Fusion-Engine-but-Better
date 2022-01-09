@@ -158,7 +158,7 @@ class DialogueCharacter extends FlxSprite
 // TO DO: Clean code? Maybe? idk
 class DialogueBoxPsych extends FlxSpriteGroup
 {
-	var dialogue:Alphabet;
+	var dialogue:Psychbet;
 	var dialogueList:DialogueFile = null;
 
 	public var finishThing:Void->Void;
@@ -273,7 +273,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 	public static var DEFAULT_TEXT_X = 90;
 	public static var DEFAULT_TEXT_Y = 430;
 	var scrollSpeed = 4500;
-	var daText:Alphabet = null;
+	var daText:Psychbet = null;
 	override function update(elapsed:Float)
 	{
 		if(!dialogueEnded) {
@@ -288,7 +288,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 						remove(daText);
 						daText.destroy();
 					}
-					daText = new Alphabet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, textToType, false, true, 0.0, 0.7);
+					daText = new Psychbet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, textToType, false, true, 0.0, 0.7);
 					add(daText);
 					
 					if(skipDialogueThing != null) {
@@ -481,7 +481,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		}
 
 		textToType = curDialogue.text;
-		daText = new Alphabet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, textToType, false, true, curDialogue.speed, 0.7);
+		daText = new Psychbet(DEFAULT_TEXT_X, DEFAULT_TEXT_Y, textToType, false, true, curDialogue.speed, 0.7);
 		add(daText);
 
 		var char:DialogueCharacter = arrayCharacters[character];

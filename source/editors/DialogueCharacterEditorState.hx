@@ -38,7 +38,7 @@ using StringTools;
 class DialogueCharacterEditorState extends MusicBeatState
 {
 	var box:FlxSprite;
-	var daText:Alphabet = null;
+	var daText:Psychbet = null;
 
 	private static var TIP_TEXT_MAIN:String =
 	'JKLI - Move camera (Hold Shift to move 4x faster)
@@ -403,7 +403,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			hudGroup.remove(daText);
 			daText.destroy();
 		}
-		daText = new Alphabet(0, 0, DEFAULT_TEXT, false, true, 0.05, 0.7);
+		daText = new Psychbet(0, 0, DEFAULT_TEXT, false, true, 0.05, 0.7);
 		daText.x = DialogueBoxPsych.DEFAULT_TEXT_X;
 		daText.y = DialogueBoxPsych.DEFAULT_TEXT_Y;
 		hudGroup.add(daText);
