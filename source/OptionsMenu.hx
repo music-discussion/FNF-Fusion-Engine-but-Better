@@ -52,7 +52,6 @@ class OptionsMenu extends MusicBeatState
 			new WatermarkOption("Turn off all watermarks from the engine."),
 			
 		]),
-		new OCinOC("Mod Extras", [
 			new OptionCatagory("Splashes", [
 				new SplashOption("Disable or ReEnable note splashes on notes. (doesnt work ): "),
 			]),
@@ -67,11 +66,10 @@ class OptionsMenu extends MusicBeatState
 				new CircleOption("Activate Circle Arrows like Funky Friday!")
 			]),
 			new OptionCatagory("Zooming", [
-				new SmallZoomOption("Activate SmallZooming between big zooms. (doesnt work with big zoom)"),
+				new SmallZoomOption("Activate SmallZooming between big zooms."),
 			//	new BigZoomOption("Activate Big Zoom between Big zooms (doesnt work with small zoom)"),
-				new NoZoomOption("Disable Note Zooms. (cancels small zoom.)"),
+				new NoZoomOption("Disable Cam Zooming on beat. (like tutorial) (cancels small zoom.)"),
 			]),
-		])
 		/*
 			new OptionCatagory("Insert", [
 
@@ -85,6 +83,7 @@ class OptionsMenu extends MusicBeatState
 	public static var versionShit:FlxText;
 
 	var currentSelectedCat:OptionCatagory;
+	var currentSelectedCIC:OCinOC;
 
 	override function create()
 	{
@@ -227,7 +226,7 @@ class OptionsMenu extends MusicBeatState
 					currentSelectedCat = options[curSelected];
 					isCat = true;
 					grpControls.clear();
-					
+
 					for (i in 0...currentSelectedCat.getOptions().length)
 						{
 							var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 30, currentSelectedCat.getOptions()[i].getDisplay(), true, false);
@@ -259,9 +258,11 @@ class OptionsMenu extends MusicBeatState
 		if (curSelected >= grpControls.length)
 			curSelected = 0;
 
-		if (isCat)
-			currentDescription = currentSelectedCat.getOptions()[curSelected].getDescription();
-		else
+		trace(options[curSelected]);
+
+		if (isCat) {
+							currentDescription = currentSelectedCat.getOptions()[curSelected].getDescription();
+		} else
 			currentDescription = "Please select a catagory";
 		versionShit.text = "Offset (Left, Right, Shift for slow): " + truncateFloat(FlxG.save.data.offset,2) + " - Description - " + currentDescription;
 

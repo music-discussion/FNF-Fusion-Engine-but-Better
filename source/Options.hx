@@ -25,13 +25,13 @@ class OptionCatagory
 		return _options;
 	}
 
-	public final function addOption(opt:Option)
+	public final function addOption(opt:Dynamic)
 	{
 		_options.push(opt);
 	}
 
 	
-	public final function removeOption(opt:Option)
+	public final function removeOption(opt:Dynamic)
 	{
 		_options.remove(opt);
 	}
@@ -41,7 +41,7 @@ class OptionCatagory
 		return _name;
 	}
 
-	public function new (catName:String, options:Array<Option>)
+	public function new (catName:String, options:Array<Dynamic>)
 	{
 		_name = catName;
 		_options = options;
@@ -82,8 +82,8 @@ class Option
 
 class OCinOC
 { // OptionCatagory in OptionCatagory
-	private var _options:Array<Dynamic> = new Array<Dynamic>();
-	public final function getOptions():Array<Dynamic>
+	private var _options:Array<OptionCatagory> = new Array<OptionCatagory>();
+	public final function getOptions():Array<OptionCatagory>
 	{
 		return _options;
 	}
@@ -104,7 +104,7 @@ class OCinOC
 		return _name;
 	}
 
-	public function new (catName:String, options:Array<Dynamic>)
+	public function new (catName:String, options:Array<OptionCatagory>)
 	{
 		_name = catName;
 		_options = options;
@@ -472,7 +472,7 @@ class SmallZoomOption extends Option
 
 	private override function updateDisplay():String
 	{
-		return "Small Zoom" + (!FlxG.save.data.smallZoom ? "Off sad y tho" : "On");
+		return "Small Zoom" + (!FlxG.save.data.smallZoom ? " Off sad y tho" : " On");
 	}
 }
 

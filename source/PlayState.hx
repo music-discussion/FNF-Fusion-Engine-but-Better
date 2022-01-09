@@ -153,6 +153,7 @@ class PlayState extends MusicBeatState
 
 	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
 	private var playerStrums:FlxTypedGroup<FlxSprite>;
+	private var cpuStrums:FlxTypedGroup<FlxSprite>;
 
 	private var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -1645,6 +1646,7 @@ class PlayState extends MusicBeatState
 		add(strumLineNotes);
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
+		cpuStrums = new FlxTypedGroup<FlxSprite>();
 
 		// startCountdown();
 
@@ -2908,9 +2910,19 @@ class PlayState extends MusicBeatState
 				playerStrums.add(babyArrow);
 			}
 
+			if (player == 0)
+			{
+				cpuStrums.add(babyArrow);
+			}
+
 			babyArrow.animation.play('static');
 			babyArrow.x += 50;
 			babyArrow.x += ((FlxG.width / 2) * player);
+
+			cpuStrums.forEach(function(spr:FlxSprite)
+				{					
+					spr.centerOffsets(); //CPU arrows start out slightly off-center
+				});
 
 			strumLineNotes.add(babyArrow);
 		}
@@ -3134,7 +3146,8 @@ class PlayState extends MusicBeatState
 
 			for (i in 0...4)
 			{
-				strumLineNotes.members[i].visible = p1;
+				if (i <= cpuStrums.length)
+					cpuStrums.members[i].visible = p1;
 				if (i <= playerStrums.length)
 					playerStrums.members[i].visible = p2;
 			}
@@ -3563,7 +3576,7 @@ class PlayState extends MusicBeatState
 	
 					if (!daNote.mustPress && daNote.wasGoodHit)
 					{
-						if (SONG.song != 'Tutorial')
+						if (SONG.song != 'Tutorial' || !FlxG.save.data.noZoom)
 							camZooming = true;
 
 						var altAnim:String = "";
@@ -3600,6 +3613,14 @@ class PlayState extends MusicBeatState
 						daNote.kill();
 						notes.remove(daNote, true);
 						daNote.destroy();
+
+						cpuStrums.forEach(function(spr:FlxSprite)
+							{
+								if (Math.abs(daNote.noteData) == spr.ID)
+								{
+									spr.animation.play('confirm', true);
+								}
+							});
 					}
 	
 					if (FlxG.save.data.downscroll)
@@ -5405,6 +5426,15 @@ class PlayState extends MusicBeatState
 		{
 			FlxG.camera.zoom += 0.015;
 			camHUD.zoom += 0.03;
+		}
+
+		if (FlxG.save.data.smallZoom && !FlxG.save.data.noZoom)
+		{
+			if (camZooming && FlxG.camera.zoom < 1.35 && curBeat % 2 == 0)
+				{
+					FlxG.camera.zoom += 0.0075;
+					camHUD.zoom += 0.015;
+				}		
 		}
 
 		iconP1.setGraphicSize(Std.int(iconP1.width + 30));
