@@ -26,9 +26,10 @@ class NoteSplash extends FlxSprite
 		y = nY;
 		super(x, y);
 		if (PlayState.SONG.uiType.contains("pixel")) //if it includes pixel in the uiType Name, then switch splashes to pixel. Simple Enough. Maybe Custom Splash Skin soon?
-			frames = Paths.getSparrowAtlas('noteassets/notesplash/Splash_Pixel');
+			frames = Paths.getSparrowAtlas('noteassets/notesplash/Pixel_Splash');
 		else
 			frames = Paths.getSparrowAtlas('noteassets/notesplash/Splash');
+		
 		for (i in 0...colorsThatDontChange.length)
 		{
 			animation.addByPrefix(colorsThatDontChange[i] + ' splash', "splash " + colorsThatDontChange[i], 24, false);
