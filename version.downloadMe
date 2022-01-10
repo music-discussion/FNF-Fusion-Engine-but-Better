@@ -4,5 +4,6 @@
 - Added JSON Scale Changing
 - Added Small Cam Zoom like KAPI as an Option
 - Added No Cam Zoom Option
-- Added ALL of Psych Menu Features (lua note types coming soon.)
-- COMING SOON QUICK!?
+- Fixed Sustains Seperated
+- Fixed NoteSplashes
+- Added Pixel Splash (Only is activated when uiType contains "pixel" in it.)

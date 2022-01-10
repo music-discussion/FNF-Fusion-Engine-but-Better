@@ -25,7 +25,10 @@ class NoteSplash extends FlxSprite
 		x = nX;
 		y = nY;
 		super(x, y);
-		frames = Paths.getSparrowAtlas('noteassets/notesplash/Splash');
+		if (PlayState.SONG.uiType.contains("pixel")) //if it includes pixel in the uiType Name, then switch splashes to pixel. Simple Enough. Maybe Custom Splash Skin soon?
+			frames = Paths.getSparrowAtlas('noteassets/notesplash/Splash_Pixel');
+		else
+			frames = Paths.getSparrowAtlas('noteassets/notesplash/Splash');
 		for (i in 0...colorsThatDontChange.length)
 		{
 			animation.addByPrefix(colorsThatDontChange[i] + ' splash', "splash " + colorsThatDontChange[i], 24, false);
@@ -42,6 +45,7 @@ class NoteSplash extends FlxSprite
 		angle = FlxG.random.int(0, 360);
         alpha = 0.6;
         animation.play(colors[color] + ' splash', true);
+		trace(animation.curAnim);
 		animation.curAnim.frameRate = 24 + FlxG.random.int(-2, 2);
 		//offset.set(500, 200);
         this.updateHitbox();   

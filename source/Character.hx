@@ -31,7 +31,7 @@ typedef CharacterFile = {
 
 	var flip_x:Bool;
 	var no_antialiasing:Bool;
-	var healthbar_color:Int;
+	var healthbar_color:Array<Int>;
 }
 
 typedef AnimArray = {
@@ -661,6 +661,7 @@ class Character extends FlxSprite
 					for( field in Reflect.fields(parsedAnimJson.offset)) {
 						addOffset(field, Reflect.field(parsedAnimJson.offset,field)[0],  Reflect.field(parsedAnimJson.offset,field)[1]);
 					}
+
 					camOffsetX = if (parsedAnimJson.camOffset != null) parsedAnimJson.camOffset[0] else 0;
 					camOffsetY = if (parsedAnimJson.camOffset != null) parsedAnimJson.camOffset[1] else 0;
 					enemyOffsetX = if (parsedAnimJson.enemyOffset != null) parsedAnimJson.enemyOffset[0] else 0;
@@ -670,7 +671,10 @@ class Character extends FlxSprite
 					midpointX = if (parsedAnimJson.midpoint != null) parsedAnimJson.midpoint[0] else 0;
 					midpointY = if (parsedAnimJson.midpoint != null) parsedAnimJson.midpoint[1] else 0;
 					flipX = if (parsedAnimJson.flipx != null) parsedAnimJson.flipx else false;
-					healthBarColor = if (parsedAnimJson.healthbar_color != null) parsedAnimJson.healthbar_color else {if (isPlayer) healthBarColor = 0xFF66FF33 else 0xFFFF0000;} //dumb condition but it works
+
+					healthColorArray[0] = if (parsedAnimJson.healthbar_color[0] != null) parsedAnimJson.healthbar_color[0] else 131;
+					healthColorArray[1] = if (parsedAnimJson.healthbar_color[1] != null) parsedAnimJson.healthbar_color[1] else 234;
+					healthColorArray[2] = if (parsedAnimJson.healthbar_color[2] != null) parsedAnimJson.healthbar_color[2] else 35;
 
 				//	if (isPlayer) healthBarColor = PlayState.colormansucks; //why, why, why
 
@@ -679,6 +683,10 @@ class Character extends FlxSprite
 						// ignore it, this is used for gameover state
 						like = "bf";
 					}
+
+					if (like == "pico")
+						trace('you can be gay right along with him');
+					
 					isPixel = parsedAnimJson.isPixel;
 					if (parsedAnimJson.isPixel) {
 						antialiasing = false;

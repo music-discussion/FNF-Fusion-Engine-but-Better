@@ -72,6 +72,10 @@ class Note extends FlxSprite
 
 	public var rawNoteData:Int = 0; // for charting shit and thats it LOL
 
+	public var noteYOff:Int = 0;
+
+	var stepHeight = (0.45 * Conductor.stepCrochet * FlxMath.roundDecimal(FlxG.save.data.scrollSpeed == 1 ? PlayState.SONG.speed : FlxG.save.data.scrollSpeed, 2));
+
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?noteType:Int = 0, ?customImage:Null<BitmapData>, ?customXml:Null<String>, ?customEnds:Null<BitmapData>)
 	{
 		super();
@@ -479,8 +483,18 @@ class Note extends FlxSprite
 				}
 
 				
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.8 * FlxG.save.data.scrollSpeed;
+			//	prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.8 * FlxG.save.data.scrollSpeed;
 				prevNote.updateHitbox();
+
+				prevNote.scale.y *= (stepHeight + 1) / prevNote.height; // + 1 so that there's no odd gaps as the notes scroll
+				prevNote.updateHitbox();
+				prevNote.noteYOff = Math.round(-prevNote.offset.y);
+
+				// prevNote.setGraphicSize();
+
+				noteYOff = Math.round(-offset.y);
+
+				// prevNote.setGraphicSize();
 				// prevNote.setGraphicSize();
 			}
 		}

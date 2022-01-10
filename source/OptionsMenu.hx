@@ -56,7 +56,7 @@ class OptionsMenu extends MusicBeatState
 				new SplashOption("Disable or ReEnable note splashes on notes. (doesnt work ): "),
 			]),
 			new OptionCatagory("CPU Sings", [
-				new CpuStrumsOption("Disable or Enable note glows on the CPU's side.(doesnt work ): "),
+				new CpuStrumsOption("Disable or Enable cpuStrums lighting up when the opponent sings."),
 			]),
 			new OptionCatagory("Menus", [
 				new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
