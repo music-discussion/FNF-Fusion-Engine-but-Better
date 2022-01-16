@@ -6,4 +6,9 @@
 - Added No Cam Zoom Option
 - Fixed Sustains Seperated
 - Fixed NoteSplashes
-- Added Pixel Splash (Only is activated when uiType contains "pixel" in it.)
+- Added Pixel Splash (Only is activated when stage is classifed as pixel.)
+- Added Extra Keys
+- Added HScript Modding Support
+- Added Shaders
+- Fixed Note Types
+- Added StrumTime note Bug that kills you when the Song Starts
