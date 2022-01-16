@@ -3,7 +3,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin' Fusion Engine but BETTER" file="Better Fusion Engine" packageName="com.ninjamuffin99.funkin" package="com.ninjamuffin99.funkin" main="Main" version="0.2.7.1" company="ninjamuffin99" />
+	<app title="Friday Night Funkin' Fusion Engine but BETTER" file="Better Fusion Engine" packageName="com.discussions.betterfusion" package="com.discussions.betterfusion" main="Main" version="0.2.7.1" company="Discussions" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -42,7 +42,6 @@
 
 	<classpath name="source" />
 
-	
 	<assets path="assets/preload" exclude="*.ogg" if="web"/>
 	<assets path="assets/preload" exclude="*.mp3" unless="web"/>
 
@@ -76,7 +75,6 @@
 
 	<!--In case you want to use the addons package-->
 	<haxelib name="flixel-addons" />
-	<haxelib name="hscript" />
 
 	<!--In case you want to use the ui package-->
 	<haxelib name="flixel-ui" />
@@ -86,6 +84,8 @@
 	<haxelib name="polymod"/>
 	<haxelib name="discord_rpc" if="windows"/>
 	<haxelib name="hxcpp-debug-server" if="desktop"/>
+	<haxelib name="hscript" />
+	<haxelib name="hscript-ex" /> <!--bruhj-->
 
 	<haxelib name="linc_luajit"/>
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->

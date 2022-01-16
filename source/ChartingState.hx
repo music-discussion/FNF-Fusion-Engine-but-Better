@@ -151,7 +151,8 @@ class ChartingState extends MusicBeatState
 				cutsceneType: "none",
 				uiType: 'normal',
 				mania: 0,
-				validScore: false
+				validScore: false,
+				isPixelStage: false
 			};
 		}
 
@@ -627,6 +628,8 @@ class ChartingState extends MusicBeatState
 	override function update(elapsed:Float)
 	{
 		curStep = recalculateSteps();
+
+		typeChangeLabel.text = noteTypes[selectedType] + " notes";
 
 		Conductor.songPosition = FlxG.sound.music.time;
 		_song.song = typingShit.text;

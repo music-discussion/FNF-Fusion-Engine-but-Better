@@ -48,13 +48,10 @@ class Note extends FlxSprite
 	public var noteScore:Float = 1;
 
 	public static var swagWidth:Float;
-	public static var noteScale:Float;
-	public static var pixelnoteScale:Float;
 	public static var PURP_NOTE:Int = 0;
 	public static var GREEN_NOTE:Int = 2;
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
-	public static var tooMuch:Float = 30;
 
 	public var rating:String = "shit";
 	public var modAngle:Float = 0; // The angle set by modcharts
@@ -68,13 +65,74 @@ class Note extends FlxSprite
 
 	public var children:Array<Note> = [];
 
-	public static var mania:Int = 0; //used for absoulutely shit.
-
 	public var rawNoteData:Int = 0; // for charting shit and thats it LOL
 
 	public var noteYOff:Int = 0;
 
 	var stepHeight = (0.45 * Conductor.stepCrochet * FlxMath.roundDecimal(FlxG.save.data.scrollSpeed == 1 ? PlayState.SONG.speed : FlxG.save.data.scrollSpeed, 2));
+
+	/////ek shit i copied
+	public static var mania:Int = 0; 
+	public static var noteScale:Float;
+	public static var pixelnoteScale:Float;
+	public static var tooMuch:Float = 30;
+
+	public static var p1NoteScale:Float;
+	public static var p2NoteScale:Float;
+	public var defaultWidth:Float;
+
+	public static var noteScales:Array<Float> = [0.7, 0.6, 0.5, 0.65, 0.58, 0.55, 0.7, 0.7, 0.7];
+	public static var pixelNoteScales:Array<Float> = [1, 0.83, 0.7, 0.9, 0.8, 0.74, 1, 1, 1];
+	public static var noteWidths:Array<Float> = [112, 84, 66.5, 91, 77, 70, 140, 126, 119];
+	public static var sustainXOffsets:Array<Float> = [97, 84, 70, 91, 77, 78, 97, 97, 97];
+	public static var posRest:Array<Int> = [0, 35, 70, 0, 50, 60, 0, 0, 0];
+
+	public static var frameN:Array<Dynamic> = [
+		['purple', 'blue', 'green', 'red'],
+		['purple', 'green', 'red', 'yellow', 'blue', 'dark'],
+		['purple', 'blue', 'green', 'red', 'white', 'yellow', 'violet', 'darkred', 'dark'],
+		['purple', 'blue', 'white', 'green', 'red'],
+		['purple', 'green', 'red', 'white', 'yellow', 'blue', 'dark'],
+		['purple', 'blue', 'green', 'red', 'yellow', 'violet', 'darkred', 'dark'],
+		['white'],
+		['purple', 'red'],
+		['purple', 'white', 'red']
+	];
+
+	public static var noteTypeAssetPaths:Array<String> = [ //for noteTypes, just cleaning code a bit
+		'noteassets/NOTE_assets', //not exactly needed but who cares
+		'noteassets/notetypes/NOTE_types', //most note types are in a big spritesheet, if youre wondering why tf i did this
+		'noteassets/notetypes/NOTE_types',
+		'noteassets/notetypes/NOTE_types',
+		'noteassets/notetypes/NOTE_types',
+		'noteassets/NOTE_assets', //alt anim notes
+		'noteassets/notetypes/NOTE_types',
+		'noteassets/notetypes/NOTE_types',
+		'noteassets/notetypes/poison',
+		'noteassets/notetypes/drain'
+	];
+	public static var noteTypePrefixes:Array<String> = [
+		"",
+		"fire",
+		"halo",
+		"warning",
+		"angel",
+		"",
+		"bob",
+		"glitch",
+		"poison",
+		"poison" //forgot to change xml when copy pasting drain notes, if youre wondering why theres 2 poison
+	];
+
+	public static var keyAmmo:Array<Int> = [4, 6, 9, 5, 7, 8, 1, 2, 3];
+	public static var ammoToMania:Array<Int> = [0, 6, 7, 8, 0, 3, 1, 4, 5, 2];
+	public var curMania:Int = 0;
+	public var scaleToUse:Float = 1;
+
+	public static var P1MSwitchMap:Array<Dynamic> = [];
+	public static var P2MSwitchMap:Array<Dynamic> = [];
+
+	public var hitByOpponent:Bool = false;
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?noteType:Int = 0, ?customImage:Null<BitmapData>, ?customXml:Null<String>, ?customEnds:Null<BitmapData>)
 	{
@@ -84,6 +142,16 @@ class Note extends FlxSprite
 		noteScale = 0.7;
 		pixelnoteScale = 1;
 		mania = 0;
+		if (PlayState.SONG.mania != 0)
+			{
+				mania = PlayState.SONG.mania;
+				swagWidth = noteWidths[mania];
+				noteScale = noteScales[mania];
+				pixelnoteScale = pixelNoteScales[mania];
+				
+			}
+			p1NoteScale = noteScale;
+			p2NoteScale = noteScale;
 
 		if (prevNote == null)
 			prevNote = this;
@@ -94,12 +162,59 @@ class Note extends FlxSprite
 		x += 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
-		this.strumTime = strumTime;
+		if (Main.editor)
+			this.strumTime = strumTime;
+		else 
+			this.strumTime = Math.round(strumTime);
 
-		if (this.strumTime < 0 )
+		if (this.strumTime < 0)
 			this.strumTime = 0;
-
-		this.noteData = noteData;
+		
+		if (!mustPress)
+			{
+				/*if (strumTime >= PlayState.lastP2mChange)
+					curMania = PlayState.curP2NoteMania;
+				else
+					curMania = PlayState.prevP2NoteMania;*/
+	
+				var highestStrumIdx:Int = 0;
+				for (i in 0...P2MSwitchMap.length)
+				{
+					if (P2MSwitchMap[i][1] < this.strumTime)
+						highestStrumIdx = i;
+				}
+				curMania = P2MSwitchMap[highestStrumIdx][0];
+			}
+			else
+			{
+				/*if (strumTime >= PlayState.lastP1mChange)
+					curMania = PlayState.curP1NoteMania;
+				else
+					curMania = PlayState.prevP1NoteMania;*/
+	
+				var highestStrumIdx:Int = 0;
+				for (i in 0...P1MSwitchMap.length)
+				{
+					if (P1MSwitchMap[i][1] < this.strumTime)
+						highestStrumIdx = i;
+				}
+				curMania = P1MSwitchMap[highestStrumIdx][0];
+			}
+	
+			scaleToUse = noteScales[curMania];
+			if (PlayState.SONG.uiType.contains("pixel"))
+				scaleToUse = pixelNoteScales[curMania];
+	
+			this.noteData = noteData;
+	
+			if(noteData > -1) {
+				x += swagWidth * (noteData % keyAmmo[mania]);
+				if(!isSustainNote) { //Doing this 'if' check to fix the warnings on Senpai songs
+					var animToPlay:String = frameN[mania][noteData % keyAmmo[mania]];
+	
+					animation.play(animToPlay + 'Scroll');
+				}
+			}
 
 		this.noteData = noteData % 9;
 		burning = noteType == 1;
@@ -117,7 +232,7 @@ class Note extends FlxSprite
 			case 'pixel':
 				loadGraphic('assets/images/weeb/pixelUI/arrows-pixels.png', true, 17, 17);
 				isPixel = true;
-				animation.add('greenScroll', [6]);
+				/*animation.add('greenScroll', [6]);
 				animation.add('redScroll', [7]);
 				animation.add('blueScroll', [5]);
 				animation.add('purpleScroll', [4]);
@@ -138,7 +253,27 @@ class Note extends FlxSprite
 				}
 
 				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
-				updateHitbox();
+				updateHitbox();*/
+
+				p1NoteScale = Note.pixelnoteScale;
+				p2NoteScale = Note.pixelnoteScale;
+				defaultWidth = width;
+				setGraphicSize(Std.int(width * PlayState.daPixelZoom * scaleToUse));
+
+				if(isSustainNote) {
+					for (i in 0...9)
+						{
+							animation.add(frameN[2][i] + 'hold', [i]); // Holds
+							animation.add(frameN[2][i] + 'holdend', [i + 9]); // Tails
+						}
+				} else {
+					for (i in 0...9)
+						{
+							animation.add(frameN[2][i] + 'Scroll', [i + 9]); // Normal notes
+						}
+				}
+
+				antialiasing = false;
 			case 'normal':
 				if (!FlxG.save.data.circleShit)
 					frames = FlxAtlasFrames.fromSparrow('assets/images/NOTE_assets.png', 'assets/images/NOTE_assets.xml');
@@ -146,7 +281,7 @@ class Note extends FlxSprite
 					frames = FlxAtlasFrames.fromSparrow('assets/images/noteassets/circle/NOTE_assets.png', 'assets/images/noteassets/circle/NOTE_assets.xml');
 				}
 
-				animation.addByPrefix('greenScroll', 'green0');
+				/*animation.addByPrefix('greenScroll', 'green0');
 				animation.addByPrefix('redScroll', 'red0');
 				animation.addByPrefix('blueScroll', 'blue0');
 				animation.addByPrefix('purpleScroll', 'purple0');
@@ -159,7 +294,13 @@ class Note extends FlxSprite
 				animation.addByPrefix('purplehold', 'purple hold piece');
 				animation.addByPrefix('greenhold', 'green hold piece');
 				animation.addByPrefix('redhold', 'red hold piece');
-				animation.addByPrefix('bluehold', 'blue hold piece');
+				animation.addByPrefix('bluehold', 'blue hold piece');*/
+				for (i in 0...9)
+					{
+						animation.addByPrefix(frameN[2][i] + 'Scroll', frameN[2][i] + '0'); // Normal notes
+						animation.addByPrefix(frameN[2][i] + 'hold', frameN[2][i] + ' hold piece'); // Hold
+						animation.addByPrefix(frameN[2][i] + 'holdend', frameN[2][i] + ' hold end'); // Tails
+					}
 
 				if (burning)
 					{
@@ -221,7 +362,10 @@ class Note extends FlxSprite
 								animation.addByPrefix(noteColors[i] + 'holdend', noteColors[i] + ' hold end'); // Tails
 							}
 					}
-				setGraphicSize(Std.int(width * noteScale));
+				//setGraphicSize(Std.int(width * noteScale));
+				//updateHitbox();
+				defaultWidth = width;
+				setGraphicSize(Std.int(width * scaleToUse));
 				updateHitbox();
 				antialiasing = true;
 			default:

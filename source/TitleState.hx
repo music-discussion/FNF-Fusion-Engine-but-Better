@@ -425,6 +425,10 @@ class TitleState extends MusicBeatState
 			case 1:
 			//	createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
 		//	createCoolText([Std.string(titleStateTXT[2]), Std.string(titleStateTXT[3]), Std.string(titleStateTXT[4]), Std.string(titleStateTXT[5])]);
+			trace(titleStateTXT[2]);
+			trace(titleStateTXT[3]);
+			trace(titleStateTXT[4]);
+			trace(titleStateTXT[5]);
 			createCoolText([Std.string(titleStateTXT[2])]); //this way cause it wouldnt show up
 			addMoreText(Std.string(titleStateTXT[3])); //AND IT STILL DOESNT
 			addMoreText(Std.string(titleStateTXT[4]));
@@ -432,6 +436,7 @@ class TitleState extends MusicBeatState
 			// credTextShit.visible = true;
 			case 3:
 			//	addMoreText('present');
+			trace(titleStateTXT[6]);
 			addMoreText(Std.string(titleStateTXT[6]));
 			// credTextShit.text += '\npresent...';
 			// credTextShit.addText();

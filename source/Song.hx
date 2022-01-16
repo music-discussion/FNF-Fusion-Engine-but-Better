@@ -33,6 +33,8 @@ typedef SwagSong =
 	var isHey:Null<Bool>;
 
 	var mania:Int;
+
+	var isPixelStage:Bool;
 }
 
 class Song
@@ -53,6 +55,8 @@ class Song
 	public var cutsceneType:String = "none";
 	public var uiType:String = 'normal';
 	public var isHey:Null<Bool> = false;
+
+	public var isPixelStage:Bool = false;
 	public function new(song, notes, bpm)
 	{
 		this.song = song;

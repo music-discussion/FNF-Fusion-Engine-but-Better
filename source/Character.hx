@@ -32,6 +32,7 @@ typedef CharacterFile = {
 	var flip_x:Bool;
 	var no_antialiasing:Bool;
 	var healthbar_color:Array<Int>;
+	var hasNoteSkin:Bool;
 }
 
 typedef AnimArray = {
@@ -92,6 +93,8 @@ class Character extends FlxSprite
 	public static var DEFAULT_CHARACTER:String = 'bf'; //In case a character is missing, it will use BF on its place
 
 	public var healthBarColor:Int = 0xFF9271FD;
+
+	public var charHasNoteSkin:Bool = false;
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -675,6 +678,8 @@ class Character extends FlxSprite
 					healthColorArray[0] = if (parsedAnimJson.healthbar_color[0] != null) parsedAnimJson.healthbar_color[0] else 131;
 					healthColorArray[1] = if (parsedAnimJson.healthbar_color[1] != null) parsedAnimJson.healthbar_color[1] else 234;
 					healthColorArray[2] = if (parsedAnimJson.healthbar_color[2] != null) parsedAnimJson.healthbar_color[2] else 35;
+
+					charHasNoteSkin = if (parsedAnimJson.hasNoteSkin != null) parsedAnimJson.hasNoteSkin else false;
 
 				//	if (isPlayer) healthBarColor = PlayState.colormansucks; //why, why, why
 

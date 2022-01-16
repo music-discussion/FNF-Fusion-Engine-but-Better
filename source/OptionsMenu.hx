@@ -55,15 +55,15 @@ class OptionsMenu extends MusicBeatState
 			new OptionCatagory("Splashes", [
 				new SplashOption("Disable or ReEnable note splashes on notes. (doesnt work ): "),
 			]),
-			new OptionCatagory("CPU Sings", [
-				new CpuStrumsOption("Disable or Enable cpuStrums lighting up when the opponent sings."),
-			]),
 			new OptionCatagory("Menus", [
 				new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
+				#if debug
 				new AchievementOption("Replaces Donate Button with Achievements area.")
+				#end
 			]),
-			new OptionCatagory("Arrows", [
-				new CircleOption("Activate Circle Arrows like Funky Friday!")
+			new OptionCatagory("Arrows and Strums", [
+				new CircleOption("Activate Circle Arrows like Funky Friday!"),
+				new CpuStrumsOption("Disable or Enable cpuStrums lighting up when the opponent sings."),
 			]),
 			new OptionCatagory("Zooming", [
 				new SmallZoomOption("Activate SmallZooming between big zooms."),

@@ -12,20 +12,16 @@ using StringTools;
 class NoteSplash extends FlxSprite
 {
 
-	public static var colors:Array<String> = ['purple', 'blue', 'green', 'red'];
+	public static var colors:Array<String> = ['purple', 'blue', 'green', 'red', 'white', 'yellow', 'violet', 'black', 'darkblue'];
 
-	var colorsThatDontChange:Array<String> = ['purple', 'blue', 'green', 'red'];
-
-	var randos:Int = FlxG.random.int(-2, 2); //fuck this
-
-	var SplashFrameRate:Int = 24 + FlxG.random.int(-2, 2);
+	var colorsThatDontChange:Array<String> = ['purple', 'blue', 'green', 'red', 'white', 'yellow', 'violet', 'black', 'darkblue', 'orange', 'darkred'];
 
 	public function new(nX:Float, nY:Float, color:Int)
 	{
 		x = nX;
 		y = nY;
 		super(x, y);
-		if (PlayState.SONG.uiType.contains("pixel")) //if it includes pixel in the uiType Name, then switch splashes to pixel. Simple Enough. Maybe Custom Splash Skin soon?
+		if (PlayState.SONG.uiType.contains('pixel')) //if it includes pixel in the uiType Name, then switch splashes to pixel. Simple Enough. Maybe Custom Splash Skin soon?
 			frames = Paths.getSparrowAtlas('noteassets/notesplash/Pixel_Splash');
 		else
 			frames = Paths.getSparrowAtlas('noteassets/notesplash/Splash');
