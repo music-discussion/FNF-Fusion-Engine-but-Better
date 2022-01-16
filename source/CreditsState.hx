@@ -26,24 +26,25 @@ class CreditsState extends MusicBeatState
 	private static var creditsStuff:Array<Dynamic> = [ //Name - Icon name - Description - Link - BG Color
 		//https://discord.gg/7mHaNysx7c
 		['Developers of Better Fusion'],
-		['Discussions', 		'discussions', 		'Main programmer of Better Fusion Engine', 			'https://gamebanana.com/members/1900848', 0xFF57E88A],
-		['Teu', 				'placeholder', 		'Main Artist/Animator of Better Fusion', 			'https://gamebanana.com/members/1900848', 0xFF57E88A],
-		['TheZoroForce', 		'placeholder', 		'Note Splash Animations and EK Code',				'https://gamebanana.com/members/1900848', 0xFF57E88A],
-		['kidsfree', 			'placeholder', 		'Original Developer for Fusion', 					'https://gamebanana.com/members/1900848',0xFF57E88A],
+		['Discussions', 		'discussions', 		'Main Programmer of Better Fusion Engine', 			'https://gamebanana.com/members/1900848', 			 0xFF57E88A],
+		['Teu', 				'teuxml', 			'Main Artist/Animator of Better Fusion Engine', 	'https://www.youtube.com/channel/UC-Mqu9H63TRNYEzqIt-XUUQ',			 0xFF2ECA5f],
+		['TheZoroForce', 		'thezoroforce', 	'Note Splash Animations and EK Code',				'https://www.youtube.com/user/TheZoroForce240',		 0xFFFF8800],
+		['kidsfreeJ', 			'kidsfreej', 		'Original Developer for Fusion', 					'https://github.com/kidsfreej',						 0xFFE8F115],
 		['Special Thanks'],
-		['BetaBits', 			'placeholder', 		'Fixed a Bug with Icons in Freeplay', 				'https://gamebanana.com/members/1900848',0xFF57E88A],
-		['srPerez', 			'perez', 			'The Idea of More Keys',							'https://twitter.com/NewSrPerez',		0xFFFF9E00],
+		['BetaBits', 			'placeholder', 		'Fixed a Bug with Icons in Freeplay', 				'https://gamebanana.com/members/1792702',			 0xFF54E75F],
+		['srPerez', 			'perez', 			'The Idea of More Keys',							'https://twitter.com/NewSrPerez',					 0xFFFF9E00],
+		['kadeDev', 			'kade', 			'Mastermind of Kade',								'https://twitter.com/NewSrPerez',					 0xFF2ECA5f],
 		['Psych Engine Team'],
-		['Shadow Mario',		'shadowmario',		'Main Programmer of Psych Engine',					'https://twitter.com/Shadow_Mario_',	0xFFFFDD33],
-		['RiverOaken',			'riveroaken',		'Main Artist/Animator of Psych Engine',				'https://twitter.com/river_oaken',		0xFFC30085],
-		['Keoiki',				'keoiki',			'Note Splash Animations',							'https://twitter.com/Keoiki_',			0xFFFFFFFF],
-		['PolybiusProxy',		'polybiusproxy',	'.MP4 Video Loader Extension',						'https://twitter.com/polybiusproxy',	0xFFE01F32],
+		['Shadow Mario',		'shadowmario',		'Main Programmer of Psych Engine',					'https://twitter.com/Shadow_Mario_',				 0xFFFFDD33],
+		['RiverOaken',			'riveroaken',		'Main Artist/Animator of Psych Engine',				'https://twitter.com/river_oaken',					 0xFFC30085],
+		['Keoiki',				'keoiki',			'Note Splash Animations',							'https://twitter.com/Keoiki_',						 0xFFFFFFFF],
+		['PolybiusProxy',		'polybiusproxy',	'.MP4 Video Loader Extension',						'https://twitter.com/polybiusproxy',				 0xFFE01F32],
 		[''],
 		["Funkin' Crew"],
-		['ninjamuffin99',		'ninjamuffin99',	"Programmer of Friday Night Funkin'",				'https://twitter.com/ninja_muffin99',	0xFFF73838],
-		['PhantomArcade',		'phantomarcade',	"Animator of Friday Night Funkin'",					'https://twitter.com/PhantomArcade3K',	0xFFFFBB1B],
-		['evilsk8r',			'evilsk8r',			"Artist of Friday Night Funkin'",					'https://twitter.com/evilsk8r',			0xFF53E52C],
-		['kawaisprite',			'kawaisprite',		"Composer of Friday Night Funkin'",					'https://twitter.com/kawaisprite',		0xFF6475F3]
+		['ninjamuffin99',		'ninjamuffin99',	"Programmer of Friday Night Funkin'",				'https://twitter.com/ninja_muffin99',				 0xFFF73838],
+		['PhantomArcade',		'phantomarcade',	"Animator of Friday Night Funkin'",					'https://twitter.com/PhantomArcade3K',				 0xFFFFBB1B],
+		['evilsk8r',			'evilsk8r',			"Artist of Friday Night Funkin'",					'https://twitter.com/evilsk8r',						 0xFF53E52C],
+		['kawaisprite',			'kawaisprite',		"Composer of Friday Night Funkin'",					'https://twitter.com/kawaisprite',					 0xFF6475F3]
 	];
 
 	var bg:FlxSprite;
@@ -61,7 +62,7 @@ class CreditsState extends MusicBeatState
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		add(bg);
 
-		grpOptions = new FlxTypedGroup<Alphabet>();
+		grpOptions = new FlxTypedGroup<ShaggyAlphabet>();
 		add(grpOptions);
 
 		for (i in 0...creditsStuff.length)
@@ -84,6 +85,8 @@ class CreditsState extends MusicBeatState
 				icon.sprTracker = optionText;
 	
 				// using a FlxGroup is too much fuss!
+				if (creditsStuff[i][1] == 'kidsfreej')
+					icon.scale.set(1.5, 1.5);
 				iconArray.push(icon);
 				add(icon);
 			}
@@ -129,7 +132,13 @@ class CreditsState extends MusicBeatState
 			MusicBeatState.switchState(new MainMenuState());
 		}
 		if(controls.ACCEPT) {
-			fancyOpenURL(creditsStuff[curSelected][3]);
+			//fancyOpenURL(creditsStuff[curSelected][3]);
+
+			#if linux
+			Sys.command('/usr/bin/xdg-open', [creditsStuff[curSelected][3], "&"]);
+			#else
+			FlxG.openURL(creditsStuff[curSelected][3]);
+			#end
 		}
 		super.update(elapsed);
 	}

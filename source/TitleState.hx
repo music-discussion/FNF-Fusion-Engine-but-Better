@@ -251,7 +251,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		var fullText:String = File.getContent("assets/preload/data/introText.txt");
+		var fullText:String = File.getContent("assets/data/introText.txt");
 
 		var firstArray:Array<String> = fullText.split('\n');
 		var swagGoodArray:Array<Array<String>> = [];
@@ -456,7 +456,6 @@ class TitleState extends MusicBeatState
 				else
 				{
 					addMoreText(Std.string(titleStateTXT[19]));
-				//	ngSpr.visible = true;
 					if (Std.string(titleStateTXT[20]).startsWith('false')) // diff way cause haxes wants to be a bitch
 						ngSpr.visible = false;
 					else {

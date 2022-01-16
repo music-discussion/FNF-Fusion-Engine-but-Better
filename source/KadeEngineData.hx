@@ -86,6 +86,9 @@ class KadeEngineData
 		if (FlxG.save.data.smallZoom == null)
 			FlxG.save.data.smallZoom = false;
 
+		if (FlxG.save.data.antialiasing == null)
+			FlxG.save.data.antialiasing = true;
+
 		Conductor.recalculateTimings();
 
 		Main.watermarks = FlxG.save.data.watermark;

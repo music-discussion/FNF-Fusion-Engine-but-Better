@@ -205,18 +205,9 @@ class Note extends FlxSprite
 			if (PlayState.SONG.uiType.contains("pixel"))
 				scaleToUse = pixelNoteScales[curMania];
 	
-			this.noteData = noteData;
-	
-			if(noteData > -1) {
-				x += swagWidth * (noteData % keyAmmo[mania]);
-				if(!isSustainNote) { //Doing this 'if' check to fix the warnings on Senpai songs
-					var animToPlay:String = frameN[mania][noteData % keyAmmo[mania]];
-	
-					animation.play(animToPlay + 'Scroll');
-				}
-			}
+			//this.noteData = noteData;
+			this.noteData = noteData % 9;
 
-		this.noteData = noteData % 9;
 		burning = noteType == 1;
 		death = noteType == 2;
 		warning = noteType == 3;
@@ -562,21 +553,12 @@ class Note extends FlxSprite
 		}
 
 
-		switch (noteData)
-		{
-			case 0:
-				x += swagWidth * 0;
-				animation.play('purpleScroll');
-			case 1:
-				x += swagWidth * 1;
-				animation.play('blueScroll');
-			case 2:
-				x += swagWidth * 2;
-				animation.play('greenScroll');
-			case 3:
-				x += swagWidth * 3;
-				animation.play('redScroll');
-		}
+		x += swagWidth * (noteData % keyAmmo[mania]);
+			if(!isSustainNote) { //Doing this 'if' check to fix the warnings on Senpai songs
+				var animToPlay:String = frameN[mania][noteData % keyAmmo[mania]];
+
+				animation.play(animToPlay + 'Scroll');
+			}
 
 		// trace(prevNote);
 
@@ -592,18 +574,10 @@ class Note extends FlxSprite
 			alpha = 0.6;
 
 			x += width / 2;
+			
+			var animToPlay:String = frameN[mania][noteData % keyAmmo[mania]];
 
-			switch (noteData)
-			{
-				case 2:
-					animation.play('greenholdend');
-				case 3:
-					animation.play('redholdend');
-				case 1:
-					animation.play('blueholdend');
-				case 0:
-					animation.play('purpleholdend');
-			}
+			animation.play(animToPlay + 'holdend');
 
 			updateHitbox();
 
@@ -614,17 +588,9 @@ class Note extends FlxSprite
 
 			if (prevNote.isSustainNote)
 			{
-				switch (prevNote.noteData)
-				{
-					case 0:
-						prevNote.animation.play('purplehold');
-					case 1:
-						prevNote.animation.play('bluehold');
-					case 2:
-						prevNote.animation.play('greenhold');
-					case 3:
-						prevNote.animation.play('redhold');
-				}
+				var animToPlay:String = frameN[mania][noteData % keyAmmo[mania]];
+
+				animation.play(animToPlay + 'hold');
 
 				
 			//	prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.8 * FlxG.save.data.scrollSpeed;

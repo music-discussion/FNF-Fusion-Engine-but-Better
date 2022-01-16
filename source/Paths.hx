@@ -34,7 +34,7 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 
-	static function getPath(file:String, type:AssetType, library:Null<String>)
+	/*static function getPath(file:String, type:AssetType, library:Null<String>)
 	{
 		if (library != null)
 			return getLibraryPath(file, library);
@@ -51,7 +51,7 @@ class Paths
 		}
 
 		return getPreloadPath(file);
-	}
+	}*/
 
 	inline static public function formatToSongPath(path:String) {
 		return path.toLowerCase().replace(' ', '-');
@@ -59,15 +59,42 @@ class Paths
 
 	static public var currentModDirectory:String = null;
 
-	static public function getLibraryPath(file:String, library = "preload")
-	{
-		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
-	}
+//	static public function getLibraryPath(file:String, library = "preload")
+//	{
+//		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+//	}
 
-	inline static function getLibraryPathForce(file:String, library:String)
-	{
-		return '$library:assets/$library/$file';
-	}
+//	inline static function getLibraryPathForce(file:String, library:String)
+//	{
+//		return '$library:assets/$library/$file';
+//	}
+
+	static function getPath(file:String, type:AssetType, library:Null<String>)
+		{
+			if (library != null)
+				return getLibraryPath(file, library);
+			if (currentLevel != null)
+			{
+				var levelPath = getLibraryPathForce(file, currentLevel);
+				if (OpenFlAssets.exists(levelPath, type))
+					return levelPath;
+				levelPath = getLibraryPathForce(file, "shared");
+				if (OpenFlAssets.exists(levelPath, type))
+					return levelPath;
+			}
+	
+			return getPreloadPath(file);
+		}
+	
+		static public function getLibraryPath(file:String, library = "default")
+		{
+			return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+		}
+	
+		inline static function getLibraryPathForce(file:String, library:String)
+		{
+			return '$library:assets/$library/$file';
+		}
 
 	inline static public function getPreloadPath(file:String)
 	{

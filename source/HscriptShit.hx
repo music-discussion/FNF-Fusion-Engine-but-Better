@@ -54,6 +54,7 @@ class HscriptShit //funni modcharts
                 enabled = true;
                 setScriptVars();
                 interp.execute(script);
+                trace('HScript loaded Sucessfully. | ' + path);
             } 
             catch(e) 
             {

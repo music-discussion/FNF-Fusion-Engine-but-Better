@@ -105,9 +105,11 @@ class FreeplayState extends MusicBeatState
 
 		var parsed = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
 	//	var freeplayIcons:Array<String> = CoolUtil.coolTextFile(Paths.txt('freeplayIcons')); // FOR TESTING SHIT, MAY SOON BE ADDED
-		var initSonglist:Dynamic = parsed[id].songs;
-		var initSonglistIcons:Dynamic = parsed[id].icons;
+		var initSonglist:Dynamic = parsed.songs;
+		var initSonglistIcons:Dynamic = parsed.icons;
 	//	var ICONinitSonglist = CoolUtil.coolTextFile(Paths.txt('ICONfreeplaySonglist'));
+
+		trace(initSonglist 	+ ' | ' + initSonglistIcons + ' | ');
 
 		for (i in 0...initSonglist.length)
 		{
