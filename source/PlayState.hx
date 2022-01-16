@@ -1923,26 +1923,47 @@ class PlayState extends MusicBeatState
 				//mania stuff
 				//more soon just too lazy to thing of things right now.
 
+				var noteData:Array<SwagSection>;
+
+				var songData = SONG;
+
+				// NEW SHIT
+				noteData = songData.notes;
+
+				var strum:Float;
+
+				for (section in noteData)
+					{
+						for (songNotes in section.sectionNotes)
+						{
+							var daStrumTime:Float = songNotes[0] + FlxG.save.data.offset + songOffset;
+							if (daStrumTime < 0)
+								daStrumTime = 0;
+
+							strum = daStrumTime;
+						}
+					}
+
 				trace(Lua_helper.add_callback(lua,"getMania", function () { //if you needed the current mania for some reason, there ya go.
 					setVar("mania", mania);
 					return mania;
 				}));
 
 				trace(Lua_helper.add_callback(lua,"setP1Mania", function (newMania:Int) { //if you needed different manias for the characters, here ya go.
-					Note.P1MSwitchMap.push([newMania, pstrum]);
+					Note.P1MSwitchMap.push([newMania,  strum + FlxG.save.data.offset + songOffset]);
 					mania = newMania;
 					call("onManiaChange", [mania]);
 				}));
 
 				trace(Lua_helper.add_callback(lua,"setP2Mania", function (newMania:Int) { 
-					Note.P2MSwitchMap.push([newMania, pstrum]);
+					Note.P2MSwitchMap.push([newMania,  strum + FlxG.save.data.offset + songOffset]);
 					mania = newMania;
 					call("onManiaChange", [mania]);
 				}));
 
-				trace(Lua_helper.add_callback(lua,"resetMaps", function (newMania:Int, strumTime:Float = 0) { //if you ever wanted to reset it lol
-					Note.P1MSwitchMap = [[newMania, strumTime]];
-					Note.P2MSwitchMap = [[newMania, strumTime]];
+				trace(Lua_helper.add_callback(lua,"resetMaps", function (newMania:Int) { //if you ever wanted to reset it lol
+					Note.P1MSwitchMap = [[newMania, strum + FlxG.save.data.offset + songOffset]];
+					Note.P2MSwitchMap = [[newMania, strum + FlxG.save.data.offset + songOffset]];
 					mania = newMania;
 					call("onManiaChange", [mania]);
 				}));
@@ -2715,7 +2736,7 @@ class PlayState extends MusicBeatState
 				if (daStrumTime < 0)
 					daStrumTime = 0;
 
-				daStrumTime = pstrum;
+				//daStrumTime = pstrum; //used for some modchart events. useless though.
 				var daNoteData:Int = Std.int(songNotes[1] % 4);
 
 				var gottaHitNote:Bool = section.mustHitSection;
@@ -3860,7 +3881,7 @@ class PlayState extends MusicBeatState
 	
 					if (!daNote.mustPress && daNote.wasGoodHit)
 					{
-						if (SONG.song != 'Tutorial' || !FlxG.save.data.noZoom)
+						if (SONG.song != 'Tutorial' || FlxG.save.data.noZoom)
 							camZooming = true;
 
 						var altAnim:String = "";

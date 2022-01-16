@@ -200,7 +200,8 @@ class StrumNote extends FlxSprite
 			animation.addByPrefix('static', 'arrow' + nSuf[leData]);
 			animation.addByPrefix('pressed', pPre[leData] + ' press', 24, false);
 			animation.addByPrefix('confirm', pPre[leData] + ' confirm', 24, false);
-
+			trace(pPre[leData]);
+			trace(nSuf[leData]);
 		default:
 			if (FileSystem.exists('assets/images/custom_ui/ui_packs/'+PlayState.SONG.uiType+"/NOTE_assets.xml") && FileSystem.exists('assets/images/custom_ui/ui_packs/'+PlayState.SONG.uiType+"/NOTE_assets.png")) {
 
@@ -217,6 +218,7 @@ class StrumNote extends FlxSprite
 					  animation.addByPrefix('red', 'arrowLEFT');
 					  animation.addByPrefix('purple', 'arrowRIGHT');
 				  }
+
 				  antialiasing = true;
 				  setGraphicSize(Std.int(width * 0.7));
 
@@ -616,13 +618,8 @@ class StrumNote extends FlxSprite
 		centerOffsets();
 		centerOrigin();
 		if(animation.curAnim == null || animation.curAnim.name == 'static') {
-		//	colorSwap.hue = 0;
-		//	colorSwap.saturation = 0;
-		//	colorSwap.brightness = 0;
+			//do nothing k?
 		} else {
-		//	colorSwap.hue = ClientPrefs.arrowHSV[noteData % 4][0] / 360;
-		//	colorSwap.saturation = ClientPrefs.arrowHSV[noteData % 4][1] / 100;
-		//	colorSwap.brightness = ClientPrefs.arrowHSV[noteData % 4][2] / 100;
 
 			if(animation.curAnim.name == 'confirm' && !PlayState.isPixelStage) {
 				centerOrigin();
