@@ -200,7 +200,6 @@ class StrumNote extends FlxSprite
 			animation.addByPrefix('static', 'arrow' + nSuf[leData]);
 			animation.addByPrefix('pressed', pPre[leData] + ' press', 24, false);
 			animation.addByPrefix('confirm', pPre[leData] + ' confirm', 24, false);
-			trace(pPre[leData]);
 			trace(nSuf[leData]);
 		default:
 			if (FileSystem.exists('assets/images/custom_ui/ui_packs/'+PlayState.SONG.uiType+"/NOTE_assets.xml") && FileSystem.exists('assets/images/custom_ui/ui_packs/'+PlayState.SONG.uiType+"/NOTE_assets.png")) {

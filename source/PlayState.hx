@@ -339,8 +339,8 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		var songLowercase = PlayState.SONG.song.toLowerCase();
-		if (FileSystem.exists("assets/data/scripts/" + songLowercase + "/script.hscript")) {
-			modchartScript = new HscriptShit("assets/data/scripts/" + songLowercase + "/script.hscript");
+		if (FileSystem.exists("assets/scripts/" + songLowercase + "/script.hscript")) {
+			modchartScript = new HscriptShit("assets/scripts/" + songLowercase + "/script.hscript");
 		trace ("file loaded = " + modchartScript.enabled);
 		call("loadScript", []);
 		}
