@@ -34,7 +34,7 @@ typedef SwagSong =
 
 	var mania:Int;
 
-	var isPixelStage:Bool;
+	var isPixelStage:Null<Bool>;
 }
 
 class Song
@@ -105,6 +105,23 @@ class Song
 					parsedJson.stage = 'stage';
 				}
 			}
+
+			if (parsedJson.isPixelStage == null) {
+				var pixelornot:Bool;
+				switch (parsedJson.song.toLowerCase())
+				{
+					case 'senpai' | 'roses' | 'thorns':
+						pixelornot = true;
+					default: 
+						pixelornot = false;
+				}
+
+				PlayState.isPixelStage = pixelornot;
+			}
+			else {
+				PlayState.isPixelStage = parsedJson.isPixelStage;
+			}
+
 			if (parsedJson.isHey == null) {
 				parsedJson.isHey = false;
 				if (parsedJson.song.toLowerCase() == 'bopeebo')

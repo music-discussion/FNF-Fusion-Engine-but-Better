@@ -137,6 +137,10 @@ class HscriptShit //funni modcharts
         interp.variables.set("P3NoteNowOnScreen", function (note:Note) {});
         interp.variables.set("characterMade", function (character:Character) {});
         interp.variables.set("onManiaChange", function (mania:Int) {});
+        interp.variables.set("onGameOver", function () {}); 
+        interp.variables.set("exitPauseMenu", function () {}); 
+        interp.variables.set("onGitarooPause", function () {}); 
+        interp.variables.set("onPauseMenu", function () {}); 
       //  interp.variables.set("onStrumsGenerated", function (strums:StrumLineGroup) {});
         //interp.variables.set("StrumOffsets", function (strum:BabyArrow) {});
        // interp.variables.set("NoteOffsets", function (note:Note) {});

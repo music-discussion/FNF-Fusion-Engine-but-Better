@@ -23,7 +23,8 @@ class OptionsMenu extends MusicBeatState
 	var options:Array<Dynamic> = [
 		new OptionCatagory("Gameplay", [
 			new DFJKOption(controls),
-			new NewInputOption("Swaps the input system from New to Week 7 Kinda."),
+			new InputOption("Swaps the input system from Kade to Psych."),
+			new NewInputOption("Swaps the input system from New to one near the Week 7 update."),
 			new ResetKey("Enable or Disable the use of R to kill yourself."),
 			new Judgement("Customize your Hit Timings (LEFT or RIGHT)"),
 			#if desktop

@@ -79,6 +79,10 @@ import hscript.Expr;
 import hscript.Interp;
 import hscript.Parser;
 
+import openfl.ui.Keyboard; //fuck controls.hx
+import openfl.events.KeyboardEvent;
+import flixel.input.keyboard.FlxKey;
+
 using StringTools;
 
 class PlayState extends MusicBeatState
@@ -175,6 +179,7 @@ class PlayState extends MusicBeatState
 
 	public var closestNotes:Array<Note> = [];
 	public var P2closestNotes:Array<Note> = [];
+	public var modchartStorage:Map<String, Dynamic>;
 
 	private static var prevCamFollow:FlxObject;
 
@@ -339,11 +344,11 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		var songLowercase = PlayState.SONG.song.toLowerCase();
-		if (FileSystem.exists("assets/scripts/" + songLowercase + "/script.hscript")) {
+		//if (FileSystem.exists("assets/scripts/" + songLowercase + "/script.hscript")) {
 			modchartScript = new HscriptShit("assets/scripts/" + songLowercase + "/script.hscript");
 		trace ("file loaded = " + modchartScript.enabled);
 		call("loadScript", []);
-		}
+	//}
 
 		isPixelStage = PlayState.SONG.isPixelStage;
 
@@ -502,13 +507,14 @@ class PlayState extends MusicBeatState
 		}
 		call("dialogueGenerated", []); //dk why i added this.
 
+		modchartStorage = new Map<String, Dynamic>();
+
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 		dad = new Character(100, 100, SONG.player2);
 		gf = new Character(400, 130, SONG.gf);
 		call("characterMade", [dad]);
 		call("characterMade", [boyfriend]);
 		call("characterMade", [gf]);
-
 
 	 if (SONG.stage == 'spooky')
 			{
@@ -1747,6 +1753,9 @@ class PlayState extends MusicBeatState
 		else 
 			call("CircleArrows", [true]);
 
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN,handleInput);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, releaseInput);
+
 		super.create();
 	}
 
@@ -2596,6 +2605,206 @@ class PlayState extends MusicBeatState
 				missPress(data, playernum);
 			}
 		}*/
+
+		var keysHeld = [false,false,false,false,false,false,false,false,false];
+		var sustainsHeld = [false,false,false,false,false,false,false,false,false]; //stop keys being jammed with mania switches
+	
+		/////////////////////////////////////////////////////////// input code - fuck controls.hx
+		private function releaseInput(evt:KeyboardEvent):Void
+			{
+				@:privateAccess
+				var key = evt.keyCode;
+	
+				var keysMap = ClientPrefs.keyBinds;
+		
+				var binds:Array<Int> = [keysMap.get('note_left')[0],keysMap.get('note_down')[0], keysMap.get('note_up')[0], keysMap.get('note_right')[0]];
+				var altbinds:Array<Int> = [keysMap.get('note_left')[1],keysMap.get('note_down')[1], keysMap.get('note_up')[1], keysMap.get('note_right')[1]];
+				var data = -1;
+				
+				binds = CoolUtil.bindCheck(mania);
+				altbinds = CoolUtil.altbindCheck(mania);
+	
+				
+		
+				for (i in 0...binds.length)//convert binds to key to data
+					if (binds[i] == key && binds[i] != -1)
+						data = i;
+	
+				if (data == -1) //check alt keys
+					for (i in 0...altbinds.length)
+						if (altbinds[i] == key && altbinds[i] != -1)
+							data = i;
+	
+				if (data == -1)
+					return;
+	
+				keysHeld[data] = false;
+				sustainsHeld[data] = false;
+		
+		}
+		private function handleInput(evt:KeyboardEvent):Void 
+		{
+			if (paused)
+				return;
+	
+			@:privateAccess
+	
+			var keysMap = ClientPrefs.keyBinds;
+			var key = evt.keyCode;
+			var binds:Array<Int> = [keysMap.get('note_left')[0],keysMap.get('note_down')[0], keysMap.get('note_up')[0], keysMap.get('note_right')[0]];
+			var altbinds:Array<Int> = [keysMap.get('note_left')[1],keysMap.get('note_down')[1], keysMap.get('note_up')[1], keysMap.get('note_right')[1]];
+			var data = -1;
+			binds = CoolUtil.bindCheck(mania);
+			altbinds = CoolUtil.altbindCheck(mania);		
+	
+			for (i in 0...binds.length)//convert binds to key to data
+			{
+				//trace(binds[i]);
+				if (binds[i] == key && binds[i] != -1)
+					data = i;
+			}
+	
+	
+			if (data == -1) //check alt keys
+				for (i in 0...altbinds.length)
+					if (altbinds[i] == key && altbinds[i] != -1)
+						data = i;
+	
+	
+			if (keysHeld[data] || data == -1)
+					return;
+	
+			keysHeld[data] = true;
+			sustainsHeld[data] = true;
+			if (FlxG.save.data.input == 'kade')
+				ekInput(data);
+			else
+				psychInput(data);
+		}
+	
+		function psychInput(data:Int) //had to tweak some things
+		{
+			if (!boyfriend.stunned && generatedMusic)
+			{
+				var justPressed = [false,false,false,false,false,false,false,false];
+				justPressed[data] = true;
+				if (keysHeld.contains(true) && !endingSong) {
+					var canMiss:Bool = !ClientPrefs.ghostTapping;
+					if (justPressed.contains(true)) {
+						for (i in 0...justPressed.length) {
+							// heavily based on my own code LOL if it aint broke dont fix it
+							var pressNotes:Array<Note> = [];
+							var notesDatas:Array<Int> = [];
+							var notesStopped:Bool = false;
+		
+							var sortedNotesList:Array<Note> = [];
+							notes.forEachAlive(function(daNote:Note)
+							{
+								if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate 
+								&& !daNote.wasGoodHit && daNote.noteData == i) {
+									sortedNotesList.push(daNote);
+									notesDatas.push(daNote.noteData);
+									canMiss = true;
+								}
+							});
+							sortedNotesList.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
+		
+							if (sortedNotesList.length > 0) {
+								for (epicNote in sortedNotesList)
+								{
+									for (doubleNote in pressNotes) {
+										if (Math.abs(doubleNote.strumTime - epicNote.strumTime) < 10) {
+											doubleNote.kill();
+											notes.remove(doubleNote, true);
+											doubleNote.destroy();
+										} else
+											notesStopped = true;
+									}
+										
+									// eee jack detection before was not super good
+									if (justPressed[epicNote.noteData] && !notesStopped) {
+										goodNoteHit(epicNote);
+										pressNotes.push(epicNote);
+									}
+		
+								}
+							}
+							else if (canMiss) 
+								ghostMiss(justPressed[i], i, true);
+		
+							// I dunno what you need this for but here you go
+							//									- Shubs
+		
+							// Shubs, this is for the "Just the Two of Us" achievement lol
+							//									- Shadow Mario
+							if (!keysPressed[i] && keysHeld[i]) 
+								keysPressed[i] = true;
+						}
+					}
+		
+					#if ACHIEVEMENTS_ALLOWED
+					var achieve:String = checkForAchievement(['oversinging']);
+					if (achieve != null) {
+						startAchievement(achieve);
+					}
+					#end
+				}
+			}
+		}
+	
+		function ekInput(data:Int) //based on kade input
+		{
+			var hittableNotes = [];
+			var closestNotes = [];
+	
+			notes.forEachAlive(function(daNote:Note)
+			{
+				if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate 
+				&& !daNote.wasGoodHit) {
+					closestNotes.push(daNote);
+				}
+			});
+			closestNotes.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
+	
+			for(i in closestNotes)
+				if (i.noteData == data)
+					hittableNotes.push(i);
+	
+			if (hittableNotes.length != 0)
+			{
+				var daNote = null;
+	
+				for (i in hittableNotes)
+					if (!i.isSustainNote)
+					{
+						daNote = i;
+						break;
+					}
+	
+				if (daNote == null)
+					return;
+	
+				if (hittableNotes.length > 1)
+				{
+					for (shitNote in hittableNotes)
+					{
+						if (shitNote.strumTime == daNote.strumTime)
+							goodNoteHit(shitNote);
+						else if ((!shitNote.isSustainNote && (shitNote.strumTime - daNote.strumTime) < 15))
+							goodNoteHit(shitNote);
+	
+						/*if (hittableNotes.length > 2 && SaveData.casual) //literally all you need to allow you to spam though impossiblely hard jacks
+							goodNoteHit(shitNote, playernum);*/
+					}
+	
+				}
+				goodNoteHit(daNote);
+			}
+			else if (!FlxG.save.data.newInput && generatedMusic)
+			{
+				ghostMiss(keysHeld[data], data, true);
+			}
+		}
 
 	function startSong():Void
 	{
@@ -3514,9 +3723,15 @@ class PlayState extends MusicBeatState
 			{
 				// gitaroo man easter egg
 				FlxG.switchState(new GitarooPause());
+				call('onGitarooPause', []);
+				call('endScript', []);
+				FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN,handleInput);
+				FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
 			}
-			else
+			else {
 				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+				call('onPauseMenu', []);
+			}
 		}
 
 		if (FlxG.keys.justPressed.SEVEN)
@@ -3525,6 +3740,8 @@ class PlayState extends MusicBeatState
 			DiscordClient.changePresence("Chart Editor", null, null, true);
 			#end
 			FlxG.switchState(new ChartingState());
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN,handleInput);
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
 			if (lua != null)
 			{
 				Lua.close(lua);
@@ -3573,6 +3790,8 @@ class PlayState extends MusicBeatState
 				lua = null;
 			}
 			call('endScript', []);
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN,handleInput);
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
 		}
 		
 	
@@ -3839,6 +4058,10 @@ class PlayState extends MusicBeatState
 			// Game Over doesn't get his own variable because it's only used here
 			DiscordClient.changePresence("GAME OVER -- " + SONG.song + " (" + storyDifficultyText + ") " + generateRanking(),"\nAcc: " + truncateFloat(accuracy, 2) + "% | Score: " + songScore + " | Misses: " + misses  , iconRPC);
 			#end
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN,handleInput);
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
+
+			call('onGameOver', []);
 
 			// FlxG.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 		}
@@ -4220,6 +4443,8 @@ class PlayState extends MusicBeatState
 			CustomFadeTransition.nextCamera = camOther;
 			MusicBeatState.switchState(new CharacterEditorState(SONG.player2));
 			call('endScript', []);
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN,handleInput);
+			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
 		}
 	}
 
@@ -4233,6 +4458,9 @@ class PlayState extends MusicBeatState
 
 	function endSong():Void
 	{
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN,handleInput);
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, releaseInput);
+
 		if (!loadRep)
 			rep.SaveReplay(saveNotes, saveJudge, replayAna);
 
@@ -4739,7 +4967,7 @@ class PlayState extends MusicBeatState
 		// FlxG.watch.addQuick('asdfa', upP);
 		if ((upP || rightP || downP || leftP) && !boyfriend.stunned && generatedMusic)
 			{
-				var achieve:String = checkForAchievement(['oversinging']);
+				/*var achieve:String = checkForAchievement(['oversinging']);
 				if (achieve != null) {
 					startAchievement(achieve);
 				}
@@ -4868,7 +5096,7 @@ class PlayState extends MusicBeatState
 						switch (daNote.noteData)
 
 						}
-					 */
+					 *//*
 					if (daNote.wasGoodHit)
 					{
 						daNote.kill();
@@ -4878,10 +5106,10 @@ class PlayState extends MusicBeatState
 				}
 				else if(!isNew){
 					badNoteCheck(null);
-				}
+				}*/
 			}
 	
-			if ((up || right || down || left) && generatedMusic || (upHold || downHold || leftHold || rightHold) && loadRep && generatedMusic)
+		/*	if ((up || right || down || left) && generatedMusic || (upHold || downHold || leftHold || rightHold) && loadRep && generatedMusic)
 			{
 				notes.forEachAlive(function(daNote:Note)
 				{
@@ -4905,7 +5133,7 @@ class PlayState extends MusicBeatState
 						}
 					}
 				});
-			}
+			}*/
 	
 			if (boyfriend.holdTimer > Conductor.stepCrochet * 4 * 0.001 && !up && !down && !right && !left)
 			{
@@ -5027,6 +5255,13 @@ class PlayState extends MusicBeatState
 				});
 	}
 
+	function ghostMiss(statement:Bool = false, direction:Int = 0, ?ghostMiss:Bool = false) {
+		if (statement) {
+			noteMissPress(direction, ghostMiss);
+			call('noteMissPress', [direction]);
+		}
+	}
+
 	function noteMiss(direction:Int = 1, daNote:Note, missPress:Bool = false):Void
 	{	
 		if (!boyfriend.stunned)
@@ -5049,20 +5284,6 @@ class PlayState extends MusicBeatState
 			songScore -= 10;
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
-			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
-			// FlxG.log.add('played imss note');
-
-			/*switch (direction)
-			{
-				case 0:
-					boyfriend.playAnim('singLEFTmiss', true);
-				case 1:
-					boyfriend.playAnim('singDOWNmiss', true);
-				case 2:
-					boyfriend.playAnim('singUPmiss', true);
-				case 3:
-					boyfriend.playAnim('singRIGHTmiss', true);
-			}*/
 
 			var animToPlay:String = '';
 			animToPlay = "sing" + sDir[mania][Std.int(Math.abs(daNote.noteData % Note.keyAmmo[mania]))] + "miss";
@@ -5072,14 +5293,37 @@ class PlayState extends MusicBeatState
 
 			boyfriend.playAnim(animToPlay + daAlt, true);
 
-			if (!missPress)
-				call('P1NoteMiss', [daNote]);
-			else 
-				call('P1MissPress', [direction]);
-
 			updateAccuracy();
 		}
 	}
+
+	function noteMissPress(direction:Int = 1, ?ghostMiss:Bool = false):Void //You pressed a key when there was no notes to press for this key
+		{
+			if (!boyfriend.stunned)
+			{
+				health -= 0.04;
+				if (combo > 5 && gf.animOffsets.exists('sad'))
+				{
+					gf.playAnim('sad');
+				}
+				combo = 0;
+	
+				if(!practiceMode) songScore -= 10;
+
+				if(!endingSong) {
+					if(ghostMiss) ghostMisses++;
+					songMisses++;
+					misses++;
+				}
+
+				updateAccuracy();
+	
+				FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+	
+				boyfriend.playAnim("sing" + sDir[mania][direction] + "miss", true);
+				vocals.volume = 0;
+			}
+		}
 
 	function killNotes(daNote:Note):Void //dumbest/easiet function ever
 		{

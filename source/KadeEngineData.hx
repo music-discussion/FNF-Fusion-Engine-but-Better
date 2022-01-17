@@ -89,6 +89,9 @@ class KadeEngineData
 		if (FlxG.save.data.antialiasing == null)
 			FlxG.save.data.antialiasing = true;
 
+		if (FlxG.save.data.input == null)
+			FlxG.save.data.input = "kade";
+
 		Conductor.recalculateTimings();
 
 		Main.watermarks = FlxG.save.data.watermark;

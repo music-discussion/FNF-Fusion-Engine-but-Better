@@ -126,18 +126,22 @@ class DFJKOption extends Option
 
 	public override function press():Bool
 	{
-		FlxG.save.data.controls =(FlxG.save.data.controls+1)%rotation.length;
-		
+		FlxG.save.data.controls = (FlxG.save.data.controls + 1) % rotation.length;
 
 		controls.setKeyboardScheme(KeyboardScheme.Solo, true,rotation[FlxG.save.data.controls]);
 
-
 		display = updateDisplay();
+
 		return true;
 	}
 
 	private override function updateDisplay():String
 	{
+		trace(rotation[FlxG.save.data.controls]);
+		trace(FlxG.save.data.controls);
+
+		ClientPrefs.changeControls(FlxG.save.data.controls, 0); //used for extra keys. houses your 4k shit as well as your multikey.
+
 		return  visualRotation[FlxG.save.data.controls];
 	}
 }
@@ -182,6 +186,35 @@ class NewInputOption extends Option{
 				display = updateDisplay();
 				return true;
 			}
+}
+
+class InputOption extends Option{
+
+	public function new(desc:String){
+		super();
+		description = desc;
+		updateDisplay();
+	}
+
+	private function change()
+	{
+		if (FlxG.save.data.input == 'kade')
+			FlxG.save.data.input = 'psych';
+		else 
+			FlxG.save.data.input = 'kade';
+	}
+
+	private override function updateDisplay():String //get this function outta here.
+	{
+		return FlxG.save.data.input == 'kade' ? "Kade Input" : "Psych Input";
+	}
+	
+	public override function press():Bool
+	{
+		change();
+		display = updateDisplay();
+		return true;
+	}
 }
 
 class ResetKey extends Option{

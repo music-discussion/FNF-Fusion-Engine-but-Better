@@ -31,6 +31,7 @@ class ClientPrefs {
 	public static var scoreZoom:Bool = true;
 	public static var noReset:Bool = false;
 	public static var healthBarAlpha:Float = 1;
+	
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
 		'songspeed' => 1.0,
@@ -52,41 +53,105 @@ class ClientPrefs {
 	public static var safeFrames:Float = 10;
 
 	//Every key has two binds, add your key bind down here and then add your control on options/ControlsSubState.hx and Controls.hx
-	public static var keyBinds:Map<String, Array<FlxKey>> = [
-		//Key Bind, Name for ControlsSubState
-		'note_left'		=> [A, LEFT],
-		'note_down'		=> [S, DOWN],
-		'note_up'		=> [W, UP],
-		'note_right'	=> [D, RIGHT],
-		
-		'ui_left'		=> [A, LEFT],
-		'ui_down'		=> [S, DOWN],
-		'ui_up'			=> [W, UP],
-		'ui_right'		=> [D, RIGHT],
+	
+	public static var keyBinds:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public static var defaultKeys:Map<String, Dynamic>;
 
-		'p1_note_left'	=> [A, Z],
-		'p1_note_down'	=> [S, X],
-		'p1_note_up'	=> [W, C],
-		'p1_note_right'	=> [D, V],
+	public static function setControls() //sets ur controls for mania stuff.
+	{
+		trace('save controls attempt.');
+		if (FlxG.save.data.p_InSet_reset == null) {
+		keyBinds.set('note_left', [A, LEFT]);
+		keyBinds.set('note_down', [S, DOWN]);
+		keyBinds.set('note_up', [W, UP]);
+		keyBinds.set('note_right', [D, RIGHT]);
+		
+		keyBinds.set('6k0', [S, W]);
+		keyBinds.set('6k1', [D, E]);
+		keyBinds.set('6k2', [F, R]);
+		keyBinds.set('6k3', [SPACE, G]);
+		keyBinds.set('6k4', [J, U]);
+		keyBinds.set('6k5', [K, I]);
+		keyBinds.set('6k6', [L, O]);
 
-		'p2_note_left'	=> [J, U],
-		'p2_note_down'	=> [K, I],
-		'p2_note_up'	=> [I, O],
-		'p2_note_right'	=> [L, P],
-		
-		'accept'		=> [SPACE, ENTER],
-		'back'			=> [BACKSPACE, ESCAPE],
-		'pause'			=> [ENTER, ESCAPE],
-		'reset'			=> [R, NONE],
-		
-		'volume_mute'	=> [ZERO, NONE],
-		'volume_up'		=> [NUMPADPLUS, PLUS],
-		'volume_down'	=> [NUMPADMINUS, MINUS],
-		
-		'debug_1'		=> [SEVEN, NONE],
-		'debug_2'		=> [EIGHT, NONE]
-	];
-	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
+		keyBinds.set('9k0', [A, Q]);
+		keyBinds.set('9k1', [S, W]);
+		keyBinds.set('9k2', [D, E]);
+		keyBinds.set('9k3', [F, R]);
+		keyBinds.set('9k4', [SPACE, G]);
+		keyBinds.set('9k5', [H, Y]);
+		keyBinds.set('9k6', [J, U]);
+		keyBinds.set('9k7', [K, I]);
+		keyBinds.set('9k8', [L, O]);
+
+		// Don't delete this
+		defaultKeys = keyBinds.copy();
+		FlxG.save.data.rcontrols = keyBinds.copy();
+		FlxG.save.data.p_InSet_reset = true;
+		trace('controls saved.');
+		}
+		else  {
+			trace('coming back player detected. controls not reset.');
+			defaultKeys = FlxG.save.data.rcontrols;
+		}
+
+		trace(defaultKeys);
+	}
+
+	public static function changeControls(number:Int, mania:Int) {
+		//keyBinds = null; //there was a bug that had multiple keybinds and caused the game to crash.
+		trace(mania + ' | ' + number);
+		var keyOne:Array<Array<Dynamic>> = [	[A, D, J, Q, A], []]; //doing it this way makes it so when i finally add it so you can change ek binds, I can use the same function and save space.
+		var keyTwo:Array<Dynamic> = [			[S, F, K, W, S], []];
+		var keyThree:Array<Dynamic> = [			[W, J, I, O, K], []];
+		var keyFour:Array<Dynamic> = [			[D, K, L, P, L], []];
+		//this system takes ten times less space.
+		keyBinds.set('note_left',  [keyOne[mania][number],   LEFT]); //im starting to see why shadowmario has so many functions over the littlest things.
+		keyBinds.set('note_down',  [keyTwo[mania][number],   DOWN]); //im too lazy to copy and paste.
+		keyBinds.set('note_up',	   [keyThree[mania][number], UP]);
+		keyBinds.set('note_right', [keyFour[mania][number],  RIGHT]);
+		//now 6k/7k. this should be simple.
+		var keyOne:Array<Array<Dynamic>> = [[], 	[S, W], []]; 
+		var keyTwo:Array<Dynamic> = [[], 			[D, E], []];
+		var keyThree:Array<Dynamic> = [[], 			[F, R], []];
+		var keyFour:Array<Dynamic> = [[], 			[SPACE, G], []];
+		var keyFive:Array<Array<Dynamic>> = [[], 	[J, U], []]; 
+		var keySix:Array<Dynamic> = [[],		    [K, I], []];
+		var keySeven:Array<Dynamic> = [[], 			[L, O,], []];
+		//don't mind me just converting save over to keybinds.
+		keyBinds.set('6k0', [S, W]);
+		keyBinds.set('6k1', [D, E]);
+		keyBinds.set('6k2', [F, R]);
+		keyBinds.set('6k3', [SPACE, G]);
+		keyBinds.set('6k4', [J, U]);
+		keyBinds.set('6k5', [K, I]);
+		keyBinds.set('6k6', [L, O]);
+		//now 9k. just the same thing over.
+		var keyOne:Array<Array<Dynamic>> = [[], [],  [A, Q]]; 
+		var keyTwo:Array<Dynamic> = [[], [], 		 [S, W]];
+		var keyThree:Array<Dynamic> = [[], [],		 [D, E,]];
+		var keyFour:Array<Dynamic> = [[], [],		 [F, R]];
+		var keyFive:Array<Array<Dynamic>> = [[], [], [SPACE, G]]; 
+		var keySix:Array<Dynamic> = [[], [], 		 [H, Y,]];
+		var keySeven:Array<Dynamic> = [[], [], 		 [J, U]];
+		var keyEight:Array<Dynamic> = [[], [],		 [K, I]];
+		var keyNine:Array<Dynamic> = [[], [], 		 [L, O]];
+		//don't mind me just converting save over to keybinds.
+		keyBinds.set('9k0', [A, Q]);
+		keyBinds.set('9k1', [S, W]);
+		keyBinds.set('9k2', [D, E]);
+		keyBinds.set('9k3', [F, R]);
+		keyBinds.set('9k4', [SPACE, G]);
+		keyBinds.set('9k5', [H, Y]);
+		keyBinds.set('9k6', [J, U]);
+		keyBinds.set('9k7', [K, I]);
+		keyBinds.set('9k8', [L, O]);
+
+		// Don't delete this styf.
+		defaultKeys = keyBinds.copy();
+		FlxG.save.data.rcontrols = defaultKeys.copy();
+		trace(defaultKeys);
+	}
 
 	public static function loadDefaultKeys() {
 		defaultKeys = keyBinds.copy();
