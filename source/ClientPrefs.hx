@@ -93,6 +93,7 @@ class ClientPrefs {
 		else  {
 			trace('coming back player detected. controls not reset.');
 			defaultKeys = FlxG.save.data.rcontrols;
+			keyBinds = defaultKeys.copy(); //so you don't have to continuously do this.
 		}
 
 		trace(defaultKeys);

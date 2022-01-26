@@ -1,0 +1,100 @@
+var camZooming:Bool = false;
+var defaultCamZoom:Float = 1.05;
+
+function update(elasped)
+{
+    if (camZooming)
+    {
+        FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);\
+		TitleState.call("onCamZoom", []); //dk what this would be used for.
+    }
+}
+
+function beatHit(beat)
+{
+    if (camZooming && FlxG.camera.zoom < 1.35 && curBeat % 4 == 0)
+    {
+        FlxG.camera.zoom += 0.015;
+    }
+
+    trace(beat); //helps me debug.
+
+    switch (beat) //if you don't know what you are doing. just delete this file or don't mess with it.
+    { //this is just an example of what you can do with this. documentation soon.
+        case 1:
+			TitleState.instance.createCoolText(['Better Fusion Team']); 
+        case 2:
+			TitleState.instance.addMoreText("Psych Engine Team"); 
+        case 3:
+			TitleState.instance.addMoreText("srPerez");
+        case 4:
+			TitleState.instance.addMoreText('And Other People.');
+			
+		case 6:
+				TitleState.instance.addMoreText('present');
+			
+		case 8:
+			TitleState.instance.deleteCoolText();
+			
+		case 9:
+				if (Main.watermarks)
+					TitleState.instance.createCoolText(['Fusion Engine Originally', 'by Kidsfreej']);
+				else
+					TitleState.instance.createCoolText(['In Partnership', 'with']);
+			case 11:
+				if (Main.watermarks)
+					TitleState.instance.addMoreText('thanks very cool man');
+				else
+				{
+					TitleState.instance.addMoreText('Newgrounds');
+					TitleState.instance.ngSpr.visible = true;
+				}
+			
+			case 13:
+				TitleState.instance.deleteCoolText();
+				TitleState.instance.ngSpr.visible = false; 
+
+			case 14:
+				TitleState.instance.createCoolText([TitleState.instance.curWacky[0]]);
+
+			case 15:
+		//		if (TitleState.instance.curWacky[2] != null) //it used to null when having 3 lines. this fixes it.
+		//			TitleState.instance.addMoreText(TitleState.instance.curWacky[2]);
+		//		else 
+					TitleState.instance.addMoreText(TitleState.instance.curWacky[1]);
+
+			case 16:
+				TitleState.instance.deleteCoolText();
+               // TitleState.instance.redoCurWack(); //didn't work out. kept crashing so nvm
+                TitleState.instance.createCoolText(['A lot of NEW Features']);
+            
+            case 17:
+               // TitleState.instance.addMoreText(TitleState.curWacky[1]);
+	//		   if (TitleState.instance.curWacky[2] != null)
+	//			TitleState.instance.addMoreText(TitleState.instance.curWacky[2]);
+	//		else 
+				TitleState.instance.addMoreText('i\'m garbage at coding. help');
+
+            case 19:
+                TitleState.instance.deleteCoolText();
+                TitleState.instance.redoCurWack();
+
+            case 20:
+                TitleState.instance.addMoreText("You are");
+            case 22:
+                TitleState.instance.addMoreText("trespassing.");
+
+			case 24:
+                TitleState.instance.deleteCoolText();
+				TitleState.instance.addMoreText("Better");
+
+			case 25:
+				TitleState.instance.addMoreText("Fusion");
+
+			case 26:
+				TitleState.instance.addMoreText("Engine");
+
+			case 27:
+				TitleState.instance.skipIntro();
+    }
+}

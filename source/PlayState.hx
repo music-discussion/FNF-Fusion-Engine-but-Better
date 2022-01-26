@@ -344,11 +344,9 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 
 		var songLowercase = PlayState.SONG.song.toLowerCase();
-		//if (FileSystem.exists("assets/scripts/" + songLowercase + "/script.hscript")) {
-			modchartScript = new HscriptShit("assets/scripts/" + songLowercase + "/script.hscript");
+			modchartScript = new HscriptShit(Paths.hScript(songLowercase));
 		trace ("file loaded = " + modchartScript.enabled);
 		call("loadScript", []);
-	//}
 
 		isPixelStage = PlayState.SONG.isPixelStage;
 
@@ -2640,8 +2638,8 @@ class PlayState extends MusicBeatState
 	
 				keysHeld[data] = false;
 				sustainsHeld[data] = false;
-		
 		}
+
 		private function handleInput(evt:KeyboardEvent):Void 
 		{
 			if (paused)
@@ -4315,7 +4313,7 @@ class PlayState extends MusicBeatState
 														if (!daNote.wasGoodHit
 															&& daNote.isSustainNote
 															&& daNote.sustainActive
-															&& daNote.spotInLine != daNote.parent.children.length)
+														/*	&& daNote.spotInLine != daNote.parent.children.length*/)
 														{
 															health -= 0.2; // give a health punishment for failing a LN
 															trace("hold fell over at " + daNote.spotInLine);
@@ -4363,7 +4361,7 @@ class PlayState extends MusicBeatState
 													if (!daNote.wasGoodHit
 														&& daNote.isSustainNote
 														&& daNote.sustainActive
-														&& daNote.spotInLine != daNote.parent.children.length)
+														/*&& daNote.spotInLine != daNote.parent.children.length*/)
 													{
 														health -= 0.25; // give a health punishment for failing a LN
 														trace("hold fell over at " + daNote.spotInLine);

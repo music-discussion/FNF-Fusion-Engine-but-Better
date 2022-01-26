@@ -11,6 +11,7 @@ import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
+import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.system.FlxSound;
@@ -30,7 +31,10 @@ import flixel.input.keyboard.FlxKey; //yessssssssssssss
 import Discord.DiscordClient;
 #end
 #if sys
+
+import Sys;
 import sys.io.File;
+import sys.FileSystem;
 
 #end
 #if desktop
@@ -58,11 +62,25 @@ class TitleState extends MusicBeatState
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
+	public var modchartScript:HscriptShit;
+	public static var instance:TitleState = null; //to access in other places
+
+	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
+	{
+		if (modchartScript.enabled)
+			modchartScript.call(tfisthis, shitToGoIn); //because
+	}
+
 	override public function create():Void
 	{
+		instance = this;
+
 		#if polymod
 		polymod.Polymod.init({modRoot: "mods", dirs: ['introMod']});
 		#end
+
+		modchartScript = new HscriptShit(Paths.hScript('titlemenu'));
+		trace ("file loaded = " + modchartScript.enabled);
 		
 		#if sys
 		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
@@ -133,8 +151,10 @@ class TitleState extends MusicBeatState
 		}else{
 			FlxG.switchState(new FreeplayCategory());
 		}
+		call('endScript', []);
 		#elseif CHARTING
 		FlxG.switchState(new ChartingState());
+		call('endScript', []);
 		#else
 		new FlxTimer().start(1, function(tmr:FlxTimer)
 		{
@@ -274,6 +294,8 @@ class TitleState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		call("update", [elapsed]);
+		
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
@@ -357,6 +379,8 @@ class TitleState extends MusicBeatState
 				}
 				
 				http.request();
+				call('endScript', []);
+				
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
@@ -410,10 +434,7 @@ class TitleState extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
-
-		bottomText = Std.string(titleStateTXT[26]); // if (Std.string(titleStateTXT[26]).startsWith('false'))
-		topText = Std.string(titleStateTXT[25]);  // if (Std.string(titleStateTXT[25]).startsWith('false'))
-	//	txtVis = Std.string(titleStateTXT[20]); // ok so had a bit of trouble but back on track
+		call("beatHit", [curBeat]);
 
 		logoBl.animation.play('bump');
 		danceLeft = !danceLeft;
@@ -425,25 +446,17 @@ class TitleState extends MusicBeatState
 
 		FlxG.log.add(curBeat);
 
+		if (!FileSystem.exists(Paths.hScript('titlemenu'))) {
 		switch (curBeat)
 		{
-			//  Std.string(titleStateTXT[0]);
 			case 1:
-			//	createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
-		//	createCoolText([Std.string(titleStateTXT[2]), Std.string(titleStateTXT[3]), Std.string(titleStateTXT[4]), Std.string(titleStateTXT[5])]);
-			trace(titleStateTXT[2]);
-			trace(titleStateTXT[3]);
-			trace(titleStateTXT[4]);
-			trace(titleStateTXT[5]);
-			createCoolText([Std.string(titleStateTXT[2])]); //this way cause it wouldnt show up
-			addMoreText(Std.string(titleStateTXT[3])); //AND IT STILL DOESNT
-			addMoreText(Std.string(titleStateTXT[4]));
-			addMoreText(Std.string(titleStateTXT[5]));
+			createCoolText(["Better Fusion Team"]); //this way cause it wouldnt show up
+			addMoreText("Psych Engine Team"); //AND IT STILL DOESNT
+			addMoreText("srPerez");
+			addMoreText('other');
 			// credTextShit.visible = true;
 			case 3:
-			//	addMoreText('present');
-			trace(titleStateTXT[6]);
-			addMoreText(Std.string(titleStateTXT[6]));
+				addMoreText('present');
 			// credTextShit.text += '\npresent...';
 			// credTextShit.addText();
 			case 4:
@@ -453,20 +466,16 @@ class TitleState extends MusicBeatState
 			// credTextShit.screenCenter();
 			case 5:
 				if (Main.watermarks)
-					createCoolText([Std.string(titleStateTXT[9]), Std.string(titleStateTXT[10])]); //god so much copy and paste, but its worth it
+					createCoolText(['Fusion Engine Originally', 'by Kidsfreej']); //god so much copy and paste, but its worth it
 				else
-					createCoolText([Std.string(titleStateTXT[12]), Std.string(titleStateTXT[13])]);
+					createCoolText(['In Partnership', 'with']);
 			case 7:
 				if (Main.watermarks)
-					addMoreText(Std.string(titleStateTXT[16]));
+					addMoreText('thanks very cool man');
 				else
 				{
-					addMoreText(Std.string(titleStateTXT[19]));
-					if (Std.string(titleStateTXT[20]).startsWith('false')) // diff way cause haxes wants to be a bitch
-						ngSpr.visible = false;
-					else {
-						ngSpr.visible = true;
-					}
+					addMoreText('Newgrounds');
+					ngSpr.visible = true;
 				}
 			// credTextShit.text += '\nNewgrounds';
 			case 8:
@@ -477,15 +486,9 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = 'Shoutouts Tom Fulp';
 			// credTextShit.screenCenter();
 			case 9:
-				if (topText.startsWith('false'))
-					createCoolText([Std.string(titleStateTXT[29])]);
-				else
 					createCoolText([curWacky[0]]);
 			// credTextShit.visible = true;
 			case 11:
-				if (bottomText.startsWith('false'))
-					addMoreText(Std.string(titleStateTXT[30]));
-				else
 					addMoreText(curWacky[1]);
 			// credTextShit.text += '\nlmao';
 			case 12:
@@ -494,17 +497,18 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = "Friday";
 			// credTextShit.screenCenter();
 			case 13:
-				addMoreText(Std.string(titleStateTXT[32]));
+				addMoreText("Better");
 			// credTextShit.visible = true;
 			case 14:
-				addMoreText(Std.string(titleStateTXT[33]));
+				addMoreText("Fusion");
 			// credTextShit.text += '\nNight';
 			case 15:
-				addMoreText(Std.string(titleStateTXT[34])); // credTextShit.text += '\nFunkin';
+				addMoreText("Engine"); // credTextShit.text += '\nFunkin';
 				// finally its over, only to get a billlion errors. hopefully not
 				// I was right but they are fixed :)
 			case 16:
 				skipIntro();
+		} 
 		}
 	}
 
@@ -520,5 +524,10 @@ class TitleState extends MusicBeatState
 			remove(credGroup);
 			skippedIntro = true;
 		}
+	}
+
+	function redoCurWack():Void
+	{
+		curWacky = FlxG.random.getObject(getIntroTextShit());
 	}
 }
