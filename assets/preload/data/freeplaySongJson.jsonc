@@ -1,0 +1,75 @@
+[
+  {
+    "name": "Base Game",
+    "songs": [
+      // we use tjson so we can do comments and do some incorrect things
+      // the reason we use tjson is because json is hard
+      // The category screen won't show up unless there are more than 1 categories
+      "Tutorial",
+      "Bopeebo",
+      "Fresh",
+      "Dadbattle",
+      "Spookeez",
+      "South",
+      "Sauce",
+      "Monster",
+      "Pico",
+      "Philly",
+      "Blammed",
+      "Satin-Panties",
+      "High",
+      "Milf",
+      "Cocoa",
+      "Eggnog",
+      "Winter-Horrorland",
+      "Senpai",
+      "Roses",
+      "Thorns"
+    ],
+      "icons": [
+        // might add support for category icons
+        "gf",
+        "dad",
+        "dad",
+        "dad",
+        "spooky",
+        "spooky",
+        "spooky",
+        "monster",
+        "pico",
+        "pico",
+        "pico",
+        "mom",
+        "mom",
+        "mom",
+        "parents-christmas",
+        "parents-christmas",
+        "monster-christmas",
+        "senpai",
+        "senpai",
+        "spirit"
+      ],
+      "categoryIcons": [
+        // just testing some shit.
+        "gf",
+        "dad",
+        "spooky",
+        "pico",
+        "mom",
+        "parents-christmas",
+        "senpai"
+      ]
+  },
+  // trailing commas don't matter with tjson
+  // visual studio code is just pissy
+  /*
+  uncomment this for an example
+   {
+    "name": "Custom 1",
+    "songs": [
+    "Bopeebo",
+    "Fresh",
+   ]
+   },
+  */
+]

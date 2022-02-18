@@ -1,0 +1,37 @@
+-- Welcome to the Title State TXT where you can edit anything when the game launches. Pretty easy to get a grasp off so I won't be explaining everything. : Line 0
+-- Below is the Game credits. Change them to whatever and they will change in game. : Line 1 | also sorry for line # just helping me with code :)
+ninjamuffin99
+phantomArcade
+kawaisprite
+evilsk8er
+present
+-- Now time for credits. You can change the partner with text but also the Fusion engine credits. : Line 7
+if (Main.watermarks) -- this text shows up if you have watermarks on : 8
+Fusion Engine Originally
+by Kidsfreej
+else -- this text will show up if water marks are off. : Line 11
+In Partnership
+with
+Line 14
+if (Main.watermarks) -- text that shows under 1st one
+thanks very cool man
+else
+{
+Newgrounds
+true
+} -- the "true" is telling the game whether to show the Newgrounds button. Maybe in a futute update I will allow you to customize the path?
+
+-- Now you get to choose for whether the game uses random intro text or set intro text.
+-- The first true is for random Top, and 2nd true is for random bottom.
+true
+true
+-- Now if one is set to false. We need to have an intro text set for it.
+-- Here is just a concept that won't be seen.
+Fusion Better by
+Discussions
+-- Now thats basically everything. All that is left is the beginning FNF text which can be set here~
+Better
+Fusion
+Engine
+-- Thanks for using Fusion but Better.
+-- I hope some people use this cause I don't even fucking care.
