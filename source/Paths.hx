@@ -50,6 +50,7 @@ class Paths
 				return levelPath;
 		}
 
+		trace(getPreloadPath(file));
 		return getPreloadPath(file);
 	}
 
@@ -68,7 +69,6 @@ class Paths
 				if (OpenFlAssets.exists(levelPath, type))
 					return levelPath;
 			}
-	
 			return getPreloadPath(file);
 		}
 
