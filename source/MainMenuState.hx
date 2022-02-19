@@ -54,11 +54,13 @@ class MainMenuState extends MusicBeatState
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
-	#if !switch
-	var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', 'options'];
-	#else
-	var optionShit:Array<String> = ['story mode', 'freeplay'];
-	#end
+	//#if !switch
+//	var optionShit:Array<String> = ['story mode', 'freeplay', 'donate', 'options'];
+//	#else
+//	var optionShit:Array<String> = ['story mode', 'freeplay'];
+//	#end
+
+	var optionShit:Array<String> = ['story_mode', 'freeplay', 'credits', #if !switch 'donate', #end 'options'];
 
 	var newGaming:FlxText;
 	var newGaming2:FlxText;
@@ -66,7 +68,7 @@ class MainMenuState extends MusicBeatState
 
 	public static var nightly:String = "";
 
-	public static var kadeEngineVer:String = "1.5.4 EK" + nightly;
+	public static var kadeEngineVer:String = "1.5.4 EK | Better Fusion Engine" + nightly;
 	public static var gameVer:String = "0.2.7.1";
 
 	var magenta:FlxSprite;
@@ -121,7 +123,7 @@ class MainMenuState extends MusicBeatState
 
 		var tex = Paths.getSparrowAtlas('FNF_main_menu_assets');
 
-		for (i in 0...optionShit.length)
+		/*for (i in 0...optionShit.length)
 		{
 			var menuItem:FlxSprite = new FlxSprite(0, FlxG.height * 1.6);
 			menuItem.frames = tex;
@@ -141,7 +143,25 @@ class MainMenuState extends MusicBeatState
 					}});
 			else
 				menuItem.y = 60 + (i * 160);
-		}
+		}*/
+		for (i in 0...optionShit.length)
+			{
+				var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
+				var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
+				menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
+				menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
+				menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
+				menuItem.animation.play('idle');
+				menuItem.ID = i;
+				menuItem.screenCenter(X);
+				menuItems.add(menuItem);
+				var scr:Float = (optionShit.length - 4) * 0.135;
+				if(optionShit.length < 6) scr = 0;
+				menuItem.scrollFactor.set(0, scr);
+				menuItem.antialiasing = FlxG.save.data.antialiasing;
+				//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
+				menuItem.updateHitbox();
+			}
 
 		firstStart = false;
 
@@ -236,51 +256,51 @@ class MainMenuState extends MusicBeatState
 			}
 
 			if (controls.ACCEPT)
-			{
-				if (optionShit[curSelected] == 'donate')
 				{
-					fancyOpenURL("https://ninja-muffin24.itch.io/funkin");
-				}
-				else
-				{
-					selectedSomethin = true;
-					FlxG.sound.play(Paths.sound('confirmMenu'));
-					
-					if (FlxG.save.data.flashing)
-						FlxFlicker.flicker(magenta, 1.1, 0.15, false);
-
-					menuItems.forEach(function(spr:FlxSprite)
+					if (optionShit[curSelected] == 'donate')
 					{
-						if (curSelected != spr.ID)
+						fancyOpenURL("https://ninja-muffin24.itch.io/funkin");
+					}
+					else
+					{
+						selectedSomethin = true;
+						FlxG.sound.play(Paths.sound('confirmMenu'));
+						
+						if (FlxG.save.data.flashing)
+							FlxFlicker.flicker(magenta, 1.1, 0.15, false);
+	
+						menuItems.forEach(function(spr:FlxSprite)
 						{
-							FlxTween.tween(spr, {alpha: 0}, 1.3, {
-								ease: FlxEase.quadOut,
-								onComplete: function(twn:FlxTween)
-								{
-									spr.kill();
-								}
-							});
-						}
-						else
-						{
-							if (FlxG.save.data.flashing)
+							if (curSelected != spr.ID)
 							{
-								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
-								{
-									goToState();
+								FlxTween.tween(spr, {alpha: 0}, 1.3, {
+									ease: FlxEase.quadOut,
+									onComplete: function(twn:FlxTween)
+									{
+										spr.kill();
+									}
 								});
 							}
 							else
 							{
-								new FlxTimer().start(1, function(tmr:FlxTimer)
+								if (FlxG.save.data.flashing)
 								{
-									goToState();
-								});
+									FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
+									{
+										goToState();
+									});
+								}
+								else
+								{
+									new FlxTimer().start(1, function(tmr:FlxTimer)
+									{
+										goToState();
+									});
+								}
 							}
-						}
-					});
+						});
+					}
 				}
-			}
 		}
 
 		super.update(elapsed);
@@ -289,6 +309,14 @@ class MainMenuState extends MusicBeatState
 		{
 			spr.screenCenter(X);
 		});
+	}
+
+	override function beatHit()
+	{
+		super.beatHit();
+
+		if (TitleState.camZooming)
+			FlxTween.tween(FlxG.camera, {zoom:1.05}, 0.3, {ease: FlxEase.quadOut, type: BACKWARD});
 	}
 	
 	function goToState()
@@ -301,39 +329,50 @@ class MainMenuState extends MusicBeatState
 				FlxG.switchState(new StoryMenuState());
 				trace("Story Menu Selected");
 			case 'freeplay':
-				FlxG.switchState(new FreeplayState());
+				//FlxG.switchState(new FreeplayState());
+				var parsed:Dynamic = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
 
+				if(parsed.length==1){
+					FreeplayState.id = 0;
+					FlxG.switchState(new FreeplayState());
+				}else{
+					FlxG.switchState(new FreeplayCategory());
+				}
 				trace("Freeplay Menu Selected");
-
+			case 'credits':
+				FlxG.switchState(new CreditsState());
+				trace("Credits Menu Selected");
 			case 'options':
 				FlxG.switchState(new OptionsMenu());
+				trace("Options Menu Selected");
 		}
 	}
 
 	function changeItem(huh:Int = 0)
-	{
-		if (finishedFunnyMove)
 		{
 			curSelected += huh;
-
+	
 			if (curSelected >= menuItems.length)
 				curSelected = 0;
 			if (curSelected < 0)
 				curSelected = menuItems.length - 1;
-		}
-		menuItems.forEach(function(spr:FlxSprite)
-		{
-			spr.animation.play('idle');
-
-			if (spr.ID == curSelected && finishedFunnyMove)
+	
+			menuItems.forEach(function(spr:FlxSprite)
 			{
-				spr.animation.play('selected');
-				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
-			}
-
-			spr.updateHitbox();
-		});
-	}
+				spr.animation.play('idle');
+				spr.offset.y = 0;
+				spr.updateHitbox();
+	
+				if (spr.ID == curSelected)
+				{
+					spr.animation.play('selected');
+					camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
+					spr.offset.x = 0.15 * (spr.frameWidth / 2 + 180);
+					spr.offset.y = 0.15 * spr.frameHeight;
+					FlxG.log.add(spr.frameWidth);
+				}
+			});
+		}
 
 	public static function musicShit():Void
 		{

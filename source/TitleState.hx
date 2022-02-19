@@ -85,6 +85,8 @@ class TitleState extends MusicBeatState
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
+	public static var camZooming:Bool = false;
+
 	public var modchartScript:HscriptShit;
 	public static var instance:TitleState = null; //to access in other places
 	var easterEggEnabled:Bool = true; //Disable this to hide the easter egg
@@ -115,8 +117,7 @@ class TitleState extends MusicBeatState
 		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
 			sys.FileSystem.createDirectory(Sys.getCwd() + "/assets/replays");
 		#end
-
-		trace(Paths.hScript('titlemenu'));
+		
 		modchartScript = new HscriptShit(Paths.hScript('titlemenu'));
 		trace ("file loaded = " + modchartScript.enabled);
 
@@ -285,7 +286,7 @@ class TitleState extends MusicBeatState
 		}*/
 
 		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
-		var path = "assets/betterfusion_customize/titlemenu/logoBumpin.png"; //I really do hope no one just gets rid of the file.
+		var path = "assets/images/betterfusion_customize/titlemenu/logoBumpin.png"; //I really do hope no one just gets rid of the file.
 		logoBl.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
 		logoBl.antialiasing = true;
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
@@ -299,7 +300,7 @@ class TitleState extends MusicBeatState
 		gfDance.antialiasing = true;*/
 
 		gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
-		var path = "assets/betterfusion_customize/titlemenu/gfDanceTitle.png"; //I really do hope no one just gets rid of the file.
+		var path = "assets/images/betterfusion_customize/titlemenu/gfDanceTitle.png"; //I really do hope no one just gets rid of the file.
 		gfDance.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
 		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
@@ -317,7 +318,8 @@ class TitleState extends MusicBeatState
 		// titleText.screenCenter(X);
 		add(titleText);*/
 		titleText = new FlxSprite(titleJSON.startx, titleJSON.starty);
-		var path = "assets/betterfusion_customize/titlemenu/titleEnter.png"; //I really do hope no one just gets rid of the file.
+		var path = "assets/images/betterfusion_customize/titlemenu/titleEnter.png"; //I really do hope no one just gets rid of the file.
+		titleText.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
 		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
 		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		titleText.antialiasing = ClientPrefs.globalAntialiasing;
@@ -510,6 +512,9 @@ class TitleState extends MusicBeatState
 	{
 		super.beatHit();
 		call("beatHit", [curBeat]);
+
+		if (camZooming)
+			FlxTween.tween(FlxG.camera, {zoom:1.05}, 0.3, {ease: FlxEase.quadOut, type: BACKWARD});
 
 		logoBl.animation.play('bump');
 		danceLeft = !danceLeft;

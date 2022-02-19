@@ -18,43 +18,65 @@ import lime.net.curl.CURLCode;
 import Discord.DiscordClient;
 #end
 
+#if sys
+import sys.io.File;
+import sys.FileSystem;
+#end
+
 using StringTools;
+
+typedef StorySongsJson = 
+{
+	var songs: Array<Array<String>>;
+	var weekGreyText: Array<String>;
+	var weekNames: Array<String>;
+	var characters: Array<Array<String>>;
+	var weekUnlocked:Array<Bool>;
+}
+
+typedef DifficultysJson = 
+{
+	var difficulties:Array<Dynamic>;
+	var defaultDiff:Int;
+}
 
 class StoryMenuState extends MusicBeatState
 {
 	var scoreText:FlxText;
 
 	var weekData:Array<Dynamic> = [
-		['Tutorial'],
+		/*['Tutorial'],
 		['Bopeebo', 'Fresh', 'Dad Battle'],
 		['Spookeez', 'South', "Monster"],
 		['Pico', 'Philly Nice', "Blammed"],
 		['Satin Panties', "High", "Milf"],
 		['Cocoa', 'Eggnog', 'Winter Horrorland'],
-		['Senpai', 'Roses', 'Thorns']
+		// ['Senpai', 'Roses', 'Thorns']*/
 	];
 	var curDifficulty:Int = 1;
 
-	public static var weekUnlocked:Array<Bool> = [true, true, true, true, true, true, true];
+	public static var weekUnlocked:Array<Bool> = [/*true, true, true, true, true, true, true*/];
 
 	var weekCharacters:Array<Dynamic> = [
-		['', 'bf', 'gf'],
+		/*['', 'bf', 'gf'],
 		['dad', 'bf', 'gf'],
 		['spooky', 'bf', 'gf'],
 		['pico', 'bf', 'gf'],
 		['mom', 'bf', 'gf'],
 		['parents-christmas', 'bf', 'gf'],
-		['senpai', 'bf', 'gf']
+		['senpai', 'bf', 'gf']*/
 	];
 
+	var weekGreyText:Array<String> = [];
+
 	var weekNames:Array<String> = [
-		"",
+		/*"",
 		"Daddy Dearest",
 		"Spooky Month",
 		"PICO",
 		"MOMMY MUST MURDER",
 		"RED SNOW",
-		"Hating Simulator ft. Moawling"
+		"Hating Simulator ft. Moawling"*/
 	];
 
 	var txtWeekTitle:FlxText;
@@ -87,6 +109,47 @@ class StoryMenuState extends MusicBeatState
 		{
 			if (!FlxG.sound.music.playing)
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+		}
+
+		var storySongJson:StorySongsJson = CoolUtil.parseJson(File.getContent('assets/data/storySonglist.json'));
+
+		for (storySongList in storySongJson.songs) 
+		{
+			var weekSongs = [];
+			for (song in storySongList) 
+			{
+				if (storySongList[0] == song) 
+				{
+					weekNames.push(song);
+			} else 
+				{
+						weekSongs.push(song);
+				}
+			}
+			weekData.push(weekSongs);
+		}
+	
+		for (i in storySongJson.weekGreyText) 
+		{
+			weekNames.push(i);
+		}
+	
+		for (storyCharList in storySongJson.characters) 
+		{
+			var weekChars = [];
+			for (char in storyCharList) 
+			{
+				weekChars.push(char);
+			}
+			weekCharacters.push(weekChars);
+		}
+
+		for (i in storySongJson.weekUnlocked)
+		{
+			if(i == false)
+				weekUnlocked.push(false);
+			else 
+				weekUnlocked.push(true);
 		}
 
 		persistentUpdate = persistentDraw = true;

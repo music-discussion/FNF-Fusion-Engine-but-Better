@@ -579,861 +579,899 @@ class PlayState extends MusicBeatState
 		if (!PlayStateChangeables.Optimize)
 		{
 
-		switch(stageCheck)
-		{
-			case 'halloween': 
-				curStage = 'spooky';
-				halloweenLevel = true;
-
-				var hallowTex = Paths.getSparrowAtlas('halloween_bg','week2');
-
-				halloweenBG = new FlxSprite(-200, -100);
-				halloweenBG.frames = hallowTex;
-				halloweenBG.animation.addByPrefix('idle', 'halloweem bg0');
-				halloweenBG.animation.addByPrefix('lightning', 'halloweem bg lightning strike', 24, false);
-				halloweenBG.animation.play('idle');
-				halloweenBG.antialiasing = FlxG.save.data.antialiasing;
-				add(halloweenBG);
-
-				isHalloween = true;
-			case 'philly': 
+			if (SONG.stage == 'spooky')
+				{
+					curStage = "spooky";
+					halloweenLevel = true;
+		
+					var hallowTex = FlxAtlasFrames.fromSparrow('assets/images/halloween_bg.png', 'assets/images/halloween_bg.xml');
+		
+					halloweenBG = new FlxSprite(-200, -100);
+					halloweenBG.frames = hallowTex;
+					halloweenBG.animation.addByPrefix('idle', 'halloweem bg0');
+					halloweenBG.animation.addByPrefix('lightning', 'halloweem bg lightning strike', 24, false);
+					halloweenBG.animation.play('idle');
+					halloweenBG.antialiasing = true;
+					add(halloweenBG);
+		
+					isHalloween = true;
+				}
+				else if (SONG.stage == 'philly')
+				{
 					curStage = 'philly';
-
-					var bg:FlxSprite = new FlxSprite(-100).loadGraphic(Paths.image('philly/sky', 'week3'));
+		
+					var bg:FlxSprite = new FlxSprite(-100).loadGraphic('assets/images/philly/sky.png');
 					bg.scrollFactor.set(0.1, 0.1);
 					add(bg);
-
-					var city:FlxSprite = new FlxSprite(-10).loadGraphic(Paths.image('philly/city', 'week3'));
+		
+					var city:FlxSprite = new FlxSprite(-10).loadGraphic('assets/images/philly/city.png');
 					city.scrollFactor.set(0.3, 0.3);
 					city.setGraphicSize(Std.int(city.width * 0.85));
 					city.updateHitbox();
 					add(city);
-
+		
 					phillyCityLights = new FlxTypedGroup<FlxSprite>();
-					if(FlxG.save.data.distractions){
-						add(phillyCityLights);
-					}
-
+					add(phillyCityLights);
+		
 					for (i in 0...5)
 					{
-							var light:FlxSprite = new FlxSprite(city.x).loadGraphic(Paths.image('philly/win' + i, 'week3'));
-							light.scrollFactor.set(0.3, 0.3);
-							light.visible = false;
-							light.setGraphicSize(Std.int(light.width * 0.85));
-							light.updateHitbox();
-							light.antialiasing = FlxG.save.data.antialiasing;
-							phillyCityLights.add(light);
+						var light:FlxSprite = new FlxSprite(city.x).loadGraphic('assets/images/philly/win' + i + '.png');
+						light.scrollFactor.set(0.3, 0.3);
+						light.visible = false;
+						light.setGraphicSize(Std.int(light.width * 0.85));
+						light.updateHitbox();
+						light.antialiasing = true;
+						phillyCityLights.add(light);
 					}
-
-					var streetBehind:FlxSprite = new FlxSprite(-40, 50).loadGraphic(Paths.image('philly/behindTrain','week3'));
+		
+					var streetBehind:FlxSprite = new FlxSprite(-40, 50).loadGraphic('assets/images/philly/behindTrain.png');
 					add(streetBehind);
-
-					phillyTrain = new FlxSprite(2000, 360).loadGraphic(Paths.image('philly/train','week3'));
-					if(FlxG.save.data.distractions){
-						add(phillyTrain);
-					}
-
-					trainSound = new FlxSound().loadEmbedded(Paths.sound('train_passes','week3'));
+		
+					phillyTrain = new FlxSprite(2000, 360).loadGraphic('assets/images/philly/train.png');
+					add(phillyTrain);
+		
+					trainSound = new FlxSound().loadEmbedded('assets/sounds/train_passes' + TitleState.soundExt);
 					FlxG.sound.list.add(trainSound);
-
+		
 					// var cityLights:FlxSprite = new FlxSprite().loadGraphic(AssetPaths.win0.png);
-
-					var street:FlxSprite = new FlxSprite(-40, streetBehind.y).loadGraphic(Paths.image('philly/street','week3'));
+		
+					var street:FlxSprite = new FlxSprite(-40, streetBehind.y).loadGraphic('assets/images/philly/street.png');
 					add(street);
-			case 'limo':
+				}
+				else if (SONG.stage == 'limo')
+				{
 					curStage = 'limo';
 					defaultCamZoom = 0.90;
-
-					var skyBG:FlxSprite = new FlxSprite(-120, -50).loadGraphic(Paths.image('limo/limoSunset','week4'));
+		
+					var skyBG:FlxSprite = new FlxSprite(-120, -50).loadGraphic('assets/images/limo/limoSunset.png');
 					skyBG.scrollFactor.set(0.1, 0.1);
-					skyBG.antialiasing = FlxG.save.data.antialiasing;
 					add(skyBG);
-
+		
 					var bgLimo:FlxSprite = new FlxSprite(-200, 480);
-					bgLimo.frames = Paths.getSparrowAtlas('limo/bgLimo','week4');
+					bgLimo.frames = FlxAtlasFrames.fromSparrow('assets/images/limo/bgLimo.png', 'assets/images/limo/bgLimo.xml');
 					bgLimo.animation.addByPrefix('drive', "background limo pink", 24);
 					bgLimo.animation.play('drive');
 					bgLimo.scrollFactor.set(0.4, 0.4);
-					bgLimo.antialiasing = FlxG.save.data.antialiasing;
 					add(bgLimo);
-					if(FlxG.save.data.distractions){
-						grpLimoDancers = new FlxTypedGroup<BackgroundDancer>();
-						add(grpLimoDancers);
-	
-						for (i in 0...5)
-						{
-								var dancer:BackgroundDancer = new BackgroundDancer((370 * i) + 130, bgLimo.y - 400);
-								dancer.scrollFactor.set(0.4, 0.4);
-								grpLimoDancers.add(dancer);
-						}
+		
+					grpLimoDancers = new FlxTypedGroup<BackgroundDancer>();
+					add(grpLimoDancers);
+		
+					for (i in 0...5)
+					{
+						var dancer:BackgroundDancer = new BackgroundDancer((370 * i) + 130, bgLimo.y - 400);
+						dancer.scrollFactor.set(0.4, 0.4);
+						grpLimoDancers.add(dancer);
 					}
-
-					var overlayShit:FlxSprite = new FlxSprite(-500, -600).loadGraphic(Paths.image('limo/limoOverlay','week4'));
+		
+					var overlayShit:FlxSprite = new FlxSprite(-500, -600).loadGraphic('assets/images/limo/limoOverlay.png');
 					overlayShit.alpha = 0.5;
 					// add(overlayShit);
-
+		
 					// var shaderBullshit = new BlendModeEffect(new OverlayShader(), FlxColor.RED);
-
+		
 					// FlxG.camera.setFilters([new ShaderFilter(cast shaderBullshit.shader)]);
-
+		
 					// overlayShit.shader = shaderBullshit;
-
-					var limoTex = Paths.getSparrowAtlas('limo/limoDrive','week4');
-
+		
+					var limoTex = FlxAtlasFrames.fromSparrow('assets/images/limo/limoDrive.png', 'assets/images/limo/limoDrive.xml');
+		
 					limo = new FlxSprite(-120, 550);
 					limo.frames = limoTex;
 					limo.animation.addByPrefix('drive', "Limo stage", 24);
 					limo.animation.play('drive');
-					limo.antialiasing = FlxG.save.data.antialiasing;
-
-					fastCar = new FlxSprite(-300, 160).loadGraphic(Paths.image('limo/fastCarLol','week4'));
-					fastCar.antialiasing = FlxG.save.data.antialiasing;
-			case 'mall':
+					limo.antialiasing = true;
+		
+					fastCar = new FlxSprite(-300, 160).loadGraphic('assets/images/limo/fastCarLol.png');
+					// add(limo);
+				}
+				else if (SONG.stage == 'mall')
+				{
 					curStage = 'mall';
-
+		
 					defaultCamZoom = 0.80;
-
-					var bg:FlxSprite = new FlxSprite(-1000, -500).loadGraphic(Paths.image('christmas/bgWalls','week5'));
-					bg.antialiasing = FlxG.save.data.antialiasing;
+		
+					var bg:FlxSprite = new FlxSprite(-1000, -500).loadGraphic('assets/images/christmas/bgWalls.png');
+					bg.antialiasing = true;
 					bg.scrollFactor.set(0.2, 0.2);
 					bg.active = false;
 					bg.setGraphicSize(Std.int(bg.width * 0.8));
 					bg.updateHitbox();
 					add(bg);
-
+		
 					upperBoppers = new FlxSprite(-240, -90);
-					upperBoppers.frames = Paths.getSparrowAtlas('christmas/upperBop','week5');
+					upperBoppers.frames = FlxAtlasFrames.fromSparrow('assets/images/christmas/upperBop.png', 'assets/images/christmas/upperBop.xml');
 					upperBoppers.animation.addByPrefix('bop', "Upper Crowd Bob", 24, false);
-					upperBoppers.antialiasing = FlxG.save.data.antialiasing;
+					upperBoppers.antialiasing = true;
 					upperBoppers.scrollFactor.set(0.33, 0.33);
 					upperBoppers.setGraphicSize(Std.int(upperBoppers.width * 0.85));
 					upperBoppers.updateHitbox();
-					if(FlxG.save.data.distractions){
-						add(upperBoppers);
-					}
-
-
-					var bgEscalator:FlxSprite = new FlxSprite(-1100, -600).loadGraphic(Paths.image('christmas/bgEscalator','week5'));
-					bgEscalator.antialiasing = FlxG.save.data.antialiasing;
+					add(upperBoppers);
+		
+					var bgEscalator:FlxSprite = new FlxSprite(-1100, -600).loadGraphic('assets/images/christmas/bgEscalator.png');
+					bgEscalator.antialiasing = true;
 					bgEscalator.scrollFactor.set(0.3, 0.3);
 					bgEscalator.active = false;
 					bgEscalator.setGraphicSize(Std.int(bgEscalator.width * 0.9));
 					bgEscalator.updateHitbox();
 					add(bgEscalator);
-
-					var tree:FlxSprite = new FlxSprite(370, -250).loadGraphic(Paths.image('christmas/christmasTree','week5'));
-					tree.antialiasing = FlxG.save.data.antialiasing;
+		
+					var tree:FlxSprite = new FlxSprite(370, -250).loadGraphic('assets/images/christmas/christmasTree.png');
+					tree.antialiasing = true;
 					tree.scrollFactor.set(0.40, 0.40);
 					add(tree);
-
+		
 					bottomBoppers = new FlxSprite(-300, 140);
-					bottomBoppers.frames = Paths.getSparrowAtlas('christmas/bottomBop','week5');
+					bottomBoppers.frames = FlxAtlasFrames.fromSparrow('assets/images/christmas/bottomBop.png', 'assets/images/christmas/bottomBop.xml');
 					bottomBoppers.animation.addByPrefix('bop', 'Bottom Level Boppers', 24, false);
-					bottomBoppers.antialiasing = FlxG.save.data.antialiasing;
+					bottomBoppers.antialiasing = true;
 					bottomBoppers.scrollFactor.set(0.9, 0.9);
 					bottomBoppers.setGraphicSize(Std.int(bottomBoppers.width * 1));
 					bottomBoppers.updateHitbox();
-					if(FlxG.save.data.distractions){
-						add(bottomBoppers);
-					}
-
-
-					var fgSnow:FlxSprite = new FlxSprite(-600, 700).loadGraphic(Paths.image('christmas/fgSnow','week5'));
+					add(bottomBoppers);
+		
+					var fgSnow:FlxSprite = new FlxSprite(-600, 700).loadGraphic('assets/images/christmas/fgSnow.png');
 					fgSnow.active = false;
-					fgSnow.antialiasing = FlxG.save.data.antialiasing;
+					fgSnow.antialiasing = true;
 					add(fgSnow);
-
+		
 					santa = new FlxSprite(-840, 150);
-					santa.frames = Paths.getSparrowAtlas('christmas/santa','week5');
+					santa.frames = FlxAtlasFrames.fromSparrow('assets/images/christmas/santa.png', 'assets/images/christmas/santa.xml');
 					santa.animation.addByPrefix('idle', 'santa idle in fear', 24, false);
-					santa.antialiasing = FlxG.save.data.antialiasing;
-					if(FlxG.save.data.distractions)
-						add(santa);
-			case 'mallEvil':
+					santa.antialiasing = true;
+					add(santa);
+				}
+				else if (SONG.stage == 'mallEvil')
+				{
 					curStage = 'mallEvil';
-					var bg:FlxSprite = new FlxSprite(-400, -500).loadGraphic(Paths.image('christmas/evilBG','week5'));
-					bg.antialiasing = FlxG.save.data.antialiasing;
+					var bg:FlxSprite = new FlxSprite(-400, -500).loadGraphic('assets/images/christmas/evilBG.png');
+					bg.antialiasing = true;
 					bg.scrollFactor.set(0.2, 0.2);
 					bg.active = false;
 					bg.setGraphicSize(Std.int(bg.width * 0.8));
 					bg.updateHitbox();
 					add(bg);
-
-					var evilTree:FlxSprite = new FlxSprite(300, -300).loadGraphic(Paths.image('christmas/evilTree','week5'));
-					evilTree.antialiasing = FlxG.save.data.antialiasing;
+		
+					var evilTree:FlxSprite = new FlxSprite(300, -300).loadGraphic('assets/images/christmas/evilTree.png');
+					evilTree.antialiasing = true;
 					evilTree.scrollFactor.set(0.2, 0.2);
 					add(evilTree);
-
-					var evilSnow:FlxSprite = new FlxSprite(-200, 700).loadGraphic(Paths.image("christmas/evilSnow",'week5'));
-						evilSnow.antialiasing = FlxG.save.data.antialiasing;
+		
+					var evilSnow:FlxSprite = new FlxSprite(-200, 700).loadGraphic("assets/images/christmas/evilSnow.png");
+					evilSnow.antialiasing = true;
 					add(evilSnow);
-			case 'school':
+				}
+				else if (SONG.stage == 'school')
+				{
 					curStage = 'school';
-
-					var bgSky = new FlxSprite().loadGraphic(Paths.image('weeb/weebSky','week6'));
+					// defaultCamZoom = 0.9;
+		
+					var bgSky = new FlxSprite().loadGraphic('assets/images/weeb/weebSky.png');
 					bgSky.scrollFactor.set(0.1, 0.1);
 					add(bgSky);
-
+		
 					var repositionShit = -200;
-
-					var bgSchool:FlxSprite = new FlxSprite(repositionShit, 0).loadGraphic(Paths.image('weeb/weebSchool','week6'));
+		
+					var bgSchool:FlxSprite = new FlxSprite(repositionShit, 0).loadGraphic('assets/images/weeb/weebSchool.png');
 					bgSchool.scrollFactor.set(0.6, 0.90);
 					add(bgSchool);
-
-					var bgStreet:FlxSprite = new FlxSprite(repositionShit).loadGraphic(Paths.image('weeb/weebStreet','week6'));
+		
+					var bgStreet:FlxSprite = new FlxSprite(repositionShit).loadGraphic('assets/images/weeb/weebStreet.png');
 					bgStreet.scrollFactor.set(0.95, 0.95);
 					add(bgStreet);
-
-					var fgTrees:FlxSprite = new FlxSprite(repositionShit + 170, 130).loadGraphic(Paths.image('weeb/weebTreesBack','week6'));
+		
+					var fgTrees:FlxSprite = new FlxSprite(repositionShit + 170, 130).loadGraphic('assets/images/weeb/weebTreesBack.png');
 					fgTrees.scrollFactor.set(0.9, 0.9);
 					add(fgTrees);
-
+		
 					var bgTrees:FlxSprite = new FlxSprite(repositionShit - 380, -800);
-					var treetex = Paths.getPackerAtlas('weeb/weebTrees','week6');
+					var treetex = FlxAtlasFrames.fromSpriteSheetPacker('assets/images/weeb/weebTrees.png', 'assets/images/weeb/weebTrees.txt');
 					bgTrees.frames = treetex;
 					bgTrees.animation.add('treeLoop', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 12);
 					bgTrees.animation.play('treeLoop');
 					bgTrees.scrollFactor.set(0.85, 0.85);
 					add(bgTrees);
-
+		
 					var treeLeaves:FlxSprite = new FlxSprite(repositionShit, -40);
-					treeLeaves.frames = Paths.getSparrowAtlas('weeb/petals','week6');
+					treeLeaves.frames = FlxAtlasFrames.fromSparrow('assets/images/weeb/petals.png', 'assets/images/weeb/petals.xml');
 					treeLeaves.animation.addByPrefix('leaves', 'PETALS ALL', 24, true);
 					treeLeaves.animation.play('leaves');
 					treeLeaves.scrollFactor.set(0.85, 0.85);
 					add(treeLeaves);
-
+		
 					var widShit = Std.int(bgSky.width * 6);
-
+		
 					bgSky.setGraphicSize(widShit);
 					bgSchool.setGraphicSize(widShit);
 					bgStreet.setGraphicSize(widShit);
 					bgTrees.setGraphicSize(Std.int(widShit * 1.4));
 					fgTrees.setGraphicSize(Std.int(widShit * 0.8));
 					treeLeaves.setGraphicSize(widShit);
-
+		
 					fgTrees.updateHitbox();
 					bgSky.updateHitbox();
 					bgSchool.updateHitbox();
 					bgStreet.updateHitbox();
 					bgTrees.updateHitbox();
 					treeLeaves.updateHitbox();
-
+		
 					bgGirls = new BackgroundGirls(-100, 190);
 					bgGirls.scrollFactor.set(0.9, 0.9);
-
-					if (songLowercase == 'roses')
-						{
-							if(FlxG.save.data.distractions){
-								bgGirls.getScared();
-							}
-						}
-
+		
+					if (SONG.isMoody)
+					{
+						bgGirls.getScared();
+					}
+		
 					bgGirls.setGraphicSize(Std.int(bgGirls.width * daPixelZoom));
 					bgGirls.updateHitbox();
-					if(FlxG.save.data.distractions)
-						add(bgGirls);
-			case 'schoolEvil':
+					add(bgGirls);
+				}
+				else if (SONG.stage == 'schoolEvil')
+				{
 					curStage = 'schoolEvil';
-
-					if (!PlayStateChangeables.Optimize)
-						{
-							var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
-							var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
-						}
-
+		
+					var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
+					var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
+		
 					var posX = 400;
 					var posY = 200;
-
+		
 					var bg:FlxSprite = new FlxSprite(posX, posY);
-					bg.frames = Paths.getSparrowAtlas('weeb/animatedEvilSchool','week6');
+					bg.frames = FlxAtlasFrames.fromSparrow('assets/images/weeb/animatedEvilSchool.png', 'assets/images/weeb/animatedEvilSchool.xml');
 					bg.animation.addByPrefix('idle', 'background 2', 24);
 					bg.animation.play('idle');
 					bg.scrollFactor.set(0.8, 0.9);
 					bg.scale.set(6, 6);
 					add(bg);
-			case 'stage':
-						defaultCamZoom = 0.9;
-						curStage = 'stage';
-						var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
-						bg.antialiasing = FlxG.save.data.antialiasing;
-						bg.scrollFactor.set(0.9, 0.9);
-						bg.active = false;
-						add(bg);
-	
-						var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(Paths.image('stagefront'));
-						stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
-						stageFront.updateHitbox();
-						stageFront.antialiasing = FlxG.save.data.antialiasing;
-						stageFront.scrollFactor.set(0.9, 0.9);
-						stageFront.active = false;
-						add(stageFront);
-	
-						var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(Paths.image('stagecurtains'));
-						stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
-						stageCurtains.updateHitbox();
-						stageCurtains.antialiasing = FlxG.save.data.antialiasing;
-						stageCurtains.scrollFactor.set(1.3, 1.3);
-						stageCurtains.active = false;
-	
-						add(stageCurtains);
-			default:
-				// use assets
-				var parsedStageJson = CoolUtil.parseJson(File.getContent("assets/images/custom_stages/custom_stages.json"));
-				switch (Reflect.field(parsedStageJson, SONG.stage)) {
-					case 'stage':
-						defaultCamZoom = 0.9;
-						// pretend it's stage, it doesn't check for correct images
-						curStage = 'stage';
-						// peck it no one is gonna build this for html5 so who cares if it doesn't compile
-						var bgPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/stageback.png")) {
-							bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/stageback.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							bgPic = BitmapData.fromImage(Assets.getImage("assets/images/stageback.png"));
-						}
-	
-						var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(bgPic);
-						// bg.setGraphicSize(Std.int(bg.width * 2.5));
+					trace("schoolEvilComplete");
+					/*
+						var bg:FlxSprite = new FlxSprite(posX, posY).loadGraphic('assets/images/weeb/evilSchoolBG.png');
+						bg.scale.set(6, 6);
+						// bg.setGraphicSize(Std.int(bg.width * 6));
 						// bg.updateHitbox();
-						bg.antialiasing = true;
-						bg.scrollFactor.set(0.9, 0.9);
-						bg.active = false;
 						add(bg);
-						var frontPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/stagefront.png")) {
-							frontPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/stagefront.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							frontPic = BitmapData.fromImage(Assets.getImage("assets/images/stagefront.png"));
-						}
-	
-						var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(frontPic);
-						stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
-						stageFront.updateHitbox();
-						stageFront.antialiasing = true;
-						stageFront.scrollFactor.set(0.9, 0.9);
-						stageFront.active = false;
-						add(stageFront);
-						var curtainPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/stagecurtains.png")) {
-							curtainPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/stagecurtains.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							curtainPic = BitmapData.fromImage(Assets.getImage("assets/images/stagecurtains.png"));
-						}
-						var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(curtainPic);
-						stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
-						stageCurtains.updateHitbox();
-						stageCurtains.antialiasing = true;
-						stageCurtains.scrollFactor.set(1.3, 1.3);
-						stageCurtains.active = false;
-	
-						add(stageCurtains);
-					case 'spooky':
-						curStage = "spooky";
-						halloweenLevel = true;
-						var bgPic:BitmapData;
-						var bgXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.png")) {
-							bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							bgPic = BitmapData.fromImage(Assets.getImage("assets/images/halloween_bg.png"));
-						}
-							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.xml")) {
-						   bgXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 bgXml = Assets.getText("assets/images/halloween_bg.xml");
-						}
-						var hallowTex = FlxAtlasFrames.fromSparrow(bgPic, bgXml);
-						
-						halloweenBG = new FlxSprite(-200, -100);
-						halloweenBG.frames = hallowTex;
-						halloweenBG.animation.addByPrefix('idle', 'halloweem bg0');
-						halloweenBG.animation.addByPrefix('lightning', 'halloweem bg lightning strike', 24, false);
-						halloweenBG.animation.play('idle');
-						halloweenBG.antialiasing = true;
-						add(halloweenBG);
-	
-						isHalloween = true;
-					case 'philly':
-						curStage = 'philly';
-						var bgPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/sky.png")) {
-							bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/sky.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							bgPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/sky.png"));
-						}
-						var bg:FlxSprite = new FlxSprite(-100).loadGraphic(bgPic);
-						bg.scrollFactor.set(0.1, 0.1);
-						add(bg);
-						var cityPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/city.png")) {
-							cityPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/city.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							cityPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/city.png"));
-						}
-						var city:FlxSprite = new FlxSprite(-10).loadGraphic(cityPic);
-						city.scrollFactor.set(0.3, 0.3);
-						city.setGraphicSize(Std.int(city.width * 0.85));
-						city.updateHitbox();
-						add(city);
-	
-						phillyCityLights = new FlxTypedGroup<FlxSprite>();
-						add(phillyCityLights);
-	
-						for (i in 0...5)
-						{
-							var lightPic:BitmapData;
-							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/win"+i+".png")) {
-								lightPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/win"+i+".png");
+		
+						var fg:FlxSprite = new FlxSprite(posX, posY).loadGraphic('assets/images/weeb/evilSchoolFG.png');
+						fg.scale.set(6, 6);
+						// fg.setGraphicSize(Std.int(fg.width * 6));
+						// fg.updateHitbox();
+						add(fg);
+		
+						wiggleShit.effectType = WiggleEffectType.DREAMY;
+						wiggleShit.waveAmplitude = 0.01;
+						wiggleShit.waveFrequency = 60;
+						wiggleShit.waveSpeed = 0.8;
+					 */
+		
+					// bg.shader = wiggleShit.shader;
+					// fg.shader = wiggleShit.shader;
+		
+					/*
+						var waveSprite = new FlxEffectSprite(bg, [waveEffectBG]);
+						var waveSpriteFG = new FlxEffectSprite(fg, [waveEffectFG]);
+		
+						// Using scale since setGraphicSize() doesnt work???
+						waveSprite.scale.set(6, 6);
+						waveSpriteFG.scale.set(6, 6);
+						waveSprite.setPosition(posX, posY);
+						waveSpriteFG.setPosition(posX, posY);
+		
+						waveSprite.scrollFactor.set(0.7, 0.8);
+						waveSpriteFG.scrollFactor.set(0.9, 0.8);
+		
+						// waveSprite.setGraphicSize(Std.int(waveSprite.width * 6));
+						// waveSprite.updateHitbox();
+						// waveSpriteFG.setGraphicSize(Std.int(fg.width * 6));
+						// waveSpriteFG.updateHitbox();
+		
+						add(waveSprite);
+						add(waveSpriteFG);
+					 */
+				}
+				else if (SONG.stage == "stage")
+				{
+					defaultCamZoom = 0.9;
+					curStage = 'stage';
+					var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic('assets/images/stageback.png');
+					bg.antialiasing = true;
+					bg.scrollFactor.set(0.9, 0.9);
+					bg.active = false;
+					add(bg);
+		
+					var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic('assets/images/stagefront.png');
+					stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
+					stageFront.updateHitbox();
+					stageFront.antialiasing = true;
+					stageFront.scrollFactor.set(0.9, 0.9);
+					stageFront.active = false;
+					add(stageFront);
+		
+					var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic('assets/images/stagecurtains.png');
+					stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
+					stageCurtains.updateHitbox();
+					stageCurtains.antialiasing = true;
+					stageCurtains.scrollFactor.set(1.3, 1.3);
+					stageCurtains.active = false;
+		
+					add(stageCurtains);
+				} else {
+					// use assets
+					var parsedStageJson = CoolUtil.parseJson(File.getContent("assets/images/custom_stages/custom_stages.json"));
+					switch (Reflect.field(parsedStageJson, SONG.stage)) {
+						case 'stage':
+							defaultCamZoom = 0.9;
+							// pretend it's stage, it doesn't check for correct images
+							curStage = 'stage';
+							// peck it no one is gonna build this for html5 so who cares if it doesn't compile
+							var bgPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/stageback.png")) {
+								bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/stageback.png");
 							} else {
 								// fall back on base game file to avoid crashes
-								lightPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/win"+i+".png"));
+								bgPic = BitmapData.fromImage(Assets.getImage("assets/images/stageback.png"));
 							}
-							var light:FlxSprite = new FlxSprite(city.x).loadGraphic(lightPic);
-							light.scrollFactor.set(0.3, 0.3);
-							light.visible = false;
-							light.setGraphicSize(Std.int(light.width * 0.85));
-							light.updateHitbox();
-							phillyCityLights.add(light);
-						}
-						var backstreetPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/behindTrain.png")) {
-							backstreetPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/behindTrain.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							backstreetPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/behindTrain.png"));
-						}
-						var streetBehind:FlxSprite = new FlxSprite(-40, 50).loadGraphic(backstreetPic);
-						add(streetBehind);
-						var trainPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/train.png")) {
-							trainPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/train.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							trainPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/train.png"));
-						}
-						phillyTrain = new FlxSprite(2000, 360).loadGraphic(trainPic);
-						add(phillyTrain);
-	
-						trainSound = new FlxSound().loadEmbedded('assets/sounds/train_passes' + TitleState.soundExt);
-						FlxG.sound.list.add(trainSound);
-	
-	
-						var streetPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/street.png")) {
-							streetPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/street.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							streetPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/street.png"));
-						}
-						var street:FlxSprite = new FlxSprite(-40, streetBehind.y).loadGraphic(streetPic);
-						add(street);
-					case 'limo':
-						curStage = 'limo';
-						defaultCamZoom = 0.90;
-						var bgPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoSunset.png")) {
-							bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/limoSunset.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							bgPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/limoSunset.png"));
-						}
-						var skyBG:FlxSprite = new FlxSprite(-120, -50).loadGraphic(bgPic);
-						skyBG.scrollFactor.set(0.1, 0.1);
-						add(skyBG);
-						var bgLimoPic:BitmapData;
-						var bgLimoXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgLimo.png")) {
-							bgLimoPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgLimo.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							bgLimoPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/bgLimo.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgLimo.xml")) {
-						   bgLimoXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/bgLimo.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 bgLimoXml = Assets.getText("assets/images/limo/bgLimo.xml");
-						}
-						var bgLimo:FlxSprite = new FlxSprite(-200, 480);
-						bgLimo.frames = FlxAtlasFrames.fromSparrow(bgLimoPic, bgLimoXml);
-						bgLimo.animation.addByPrefix('drive', "background limo pink", 24);
-						bgLimo.animation.play('drive');
-						bgLimo.scrollFactor.set(0.4, 0.4);
-						add(bgLimo);
-	
-						grpLimoDancers = new FlxTypedGroup<BackgroundDancer>();
-						add(grpLimoDancers);
-	
-						for (i in 0...5)
-						{
-							var dancer:BackgroundDancer = new BackgroundDancer((370 * i) + 130, bgLimo.y - 400, SONG.stage);
-							dancer.scrollFactor.set(0.4, 0.4);
-							grpLimoDancers.add(dancer);
-						}
-						var limoOverlayPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoOverlay.png")) {
-							limoOverlayPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/limoOverlay.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							limoOverlayPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/limoOverlay.png"));
-						}
-						var overlayShit:FlxSprite = new FlxSprite(-500, -600).loadGraphic(limoOverlayPic);
-						overlayShit.alpha = 0.5;
-						// add(overlayShit);
-	
-						// var shaderBullshit = new BlendModeEffect(new OverlayShader(), FlxColor.RED);
-	
-						// FlxG.camera.setFilters([new ShaderFilter(cast shaderBullshit.shader)]);
-	
-						// overlayShit.shader = shaderBullshit;
-						var limoPic:BitmapData;
-						var limoXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoDrive.png")) {
-							limoPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/limoDrive.png");
-						} else {
-							// fall back on base game file to avoid crashes
-							limoPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/limoDrive.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoDrive.xml")) {
-						   limoXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/limoDrive.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 limoXml = Assets.getText("assets/images/limo/limoDrive.xml");
-						}
-						var limoTex = FlxAtlasFrames.fromSparrow(limoPic, limoXml);
-	
-						limo = new FlxSprite(-120, 550);
-						limo.frames = limoTex;
-						limo.animation.addByPrefix('drive', "Limo stage", 24);
-						limo.animation.play('drive');
-						limo.antialiasing = true;
-						var fastCarPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"_fastcar.png");
-						fastCar = new FlxSprite(-300, 160).loadGraphic(fastCarPic);
-						// add(limo);
-					case 'mall':
-						curStage = 'mall';
-	
-						defaultCamZoom = 0.80;
-						var bgPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgWalls.png")) {
-						   bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgWalls.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 bgPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/bgWalls.png"));
-						}
-						var bg:FlxSprite = new FlxSprite(-1000, -500).loadGraphic(bgPic);
-						bg.antialiasing = true;
-						bg.scrollFactor.set(0.2, 0.2);
-						bg.active = false;
-						bg.setGraphicSize(Std.int(bg.width * 0.8));
-						bg.updateHitbox();
-						add(bg);
-						var standsPic:BitmapData;
-						var standsXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/upperBop.png")) {
-						   standsPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/upperBop.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 standsPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/upperBop.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/upperBop.xml")) {
-						   standsXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/upperBop.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 standsXml = Assets.getText("assets/images/christmas/upperBop.xml");
-						}
-						upperBoppers = new FlxSprite(-240, -90);
-						upperBoppers.frames = FlxAtlasFrames.fromSparrow(standsPic, standsXml);
-						upperBoppers.animation.addByPrefix('bop', "Upper Crowd Bob", 24, false);
-						upperBoppers.antialiasing = true;
-						upperBoppers.scrollFactor.set(0.33, 0.33);
-						upperBoppers.setGraphicSize(Std.int(upperBoppers.width * 0.85));
-						upperBoppers.updateHitbox();
-						add(upperBoppers);
-						var escalatorPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgEscalator.png")) {
-						   escalatorPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgEscalator.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 escalatorPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/bgEscalator.png"));
-						}
-						var bgEscalator:FlxSprite = new FlxSprite(-1100, -600).loadGraphic(escalatorPic);
-						bgEscalator.antialiasing = true;
-						bgEscalator.scrollFactor.set(0.3, 0.3);
-						bgEscalator.active = false;
-						bgEscalator.setGraphicSize(Std.int(bgEscalator.width * 0.9));
-						bgEscalator.updateHitbox();
-						add(bgEscalator);
-						var treePic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/christmasTree.png")) {
-						   treePic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/christmasTree.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 treePic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/christmasTree.png"));
-						}
-						var tree:FlxSprite = new FlxSprite(370, -250).loadGraphic(treePic);
-						tree.antialiasing = true;
-						tree.scrollFactor.set(0.40, 0.40);
-						add(tree);
-						var crowdPic:BitmapData;
-						var crowdXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bottomBop.png")) {
-						   crowdPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bottomBop.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 crowdPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/bottomBop.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bottomBop.xml")) {
-						   crowdXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/bottomBop.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 crowdXml = Assets.getText("assets/images/christmas/bottomBop.xml");
-						}
-						bottomBoppers = new FlxSprite(-300, 140);
-						bottomBoppers.frames = FlxAtlasFrames.fromSparrow(crowdPic, crowdXml);
-						bottomBoppers.animation.addByPrefix('bop', 'Bottom Level Boppers', 24, false);
-						bottomBoppers.antialiasing = true;
-						bottomBoppers.scrollFactor.set(0.9, 0.9);
-						bottomBoppers.setGraphicSize(Std.int(bottomBoppers.width * 1));
-						bottomBoppers.updateHitbox();
-						add(bottomBoppers);
-						var snowPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/fgSnow.png")) {
-						   snowPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/fgSnow.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 snowPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/fgSnow.png"));
-						}
-						var fgSnow:FlxSprite = new FlxSprite(-600, 700).loadGraphic(snowPic);
-						fgSnow.active = false;
-						fgSnow.antialiasing = true;
-						add(fgSnow);
-						var santaPic:BitmapData;
-						var santaXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/santa.png")) {
-						   santaPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/santa.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 santaPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/santa.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/santa.xml")) {
-						   santaXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/santa.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 santaXml = Assets.getText("assets/images/christmas/santa.xml");
-						}
-						santa = new FlxSprite(-840, 150);
-						santa.frames = FlxAtlasFrames.fromSparrow(santaPic, santaXml);
-						santa.animation.addByPrefix('idle', 'santa idle in fear', 24, false);
-						santa.antialiasing = true;
-						add(santa);
-					case 'mallEvil':
-						curStage = 'mallEvil';
-						var bgPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/evilBG.png")) {
-						   bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/evilBG.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 bgPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/evilBG.png"));
-						}
-	
-						var bg:FlxSprite = new FlxSprite(-400, -500).loadGraphic(bgPic);
-						bg.antialiasing = true;
-						bg.scrollFactor.set(0.2, 0.2);
-						bg.active = false;
-						bg.setGraphicSize(Std.int(bg.width * 0.8));
-						bg.updateHitbox();
-						add(bg);
-						var evilTreePic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/evilTree.png")) {
-						   evilTreePic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/evilTree.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 evilTreePic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/evilTree.png"));
-						}
-						var evilTree:FlxSprite = new FlxSprite(300, -300).loadGraphic(evilTreePic);
-						evilTree.antialiasing = true;
-						evilTree.scrollFactor.set(0.2, 0.2);
-						add(evilTree);
-						var evilSnowPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/evilSnow.png")) {
-						   evilSnowPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/evilSnow.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 evilSnowPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/evilSnow.png"));
-						}
-						var evilSnow:FlxSprite = new FlxSprite(-200, 700).loadGraphic(evilSnowPic);
-						evilSnow.antialiasing = true;
-						add(evilSnow);
-					case 'school':
-						curStage = 'school';
-						// school moody is just the girls are upset
-						// defaultCamZoom = 0.9;
-						var bgPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebSky.png")) {
-						   bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebSky.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 bgPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebSky.png"));
-						}
-						var bgSky = new FlxSprite().loadGraphic(bgPic);
-						bgSky.scrollFactor.set(0.1, 0.1);
-						add(bgSky);
-	
-						var repositionShit = -200;
-						var schoolPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebSchool.png")) {
-						   schoolPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebSchool.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 schoolPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebSchool.png"));
-						}
-						var bgSchool:FlxSprite = new FlxSprite(repositionShit, 0).loadGraphic(schoolPic);
-						bgSchool.scrollFactor.set(0.6, 0.90);
-						add(bgSchool);
-						var streetPic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebStreet.png")) {
-						   streetPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebStreet.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 streetPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebStreet.png"));
-						}
-						var bgStreet:FlxSprite = new FlxSprite(repositionShit).loadGraphic(streetPic);
-						bgStreet.scrollFactor.set(0.95, 0.95);
-						add(bgStreet);
-						var fgTreePic:BitmapData;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebTreesBack.png")) {
-						   fgTreePic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebTreesBack.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 fgTreePic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebTreesBack.png"));
-						}
-						var fgTrees:FlxSprite = new FlxSprite(repositionShit + 170, 130).loadGraphic(fgTreePic);
-						fgTrees.scrollFactor.set(0.9, 0.9);
-						add(fgTrees);
-						var treesPic:BitmapData;
-						var treesTxt:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebTrees.png")) {
-						   treesPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebTrees.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 treesPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebTrees.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebTrees.txt")) {
-						   treesTxt = File.getContent('assets/images/custom_stages/'+SONG.stage+"/weebTrees.txt");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 treesTxt = Assets.getText("assets/images/weeb/weebTrees.txt");
-						}
-						var bgTrees:FlxSprite = new FlxSprite(repositionShit - 380, -800);
-						var treetex = FlxAtlasFrames.fromSpriteSheetPacker(treesPic, treesTxt);
-						bgTrees.frames = treetex;
-						bgTrees.animation.add('treeLoop', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 12);
-						bgTrees.animation.play('treeLoop');
-						bgTrees.scrollFactor.set(0.85, 0.85);
-						add(bgTrees);
-						var petalsPic:BitmapData;
-						var petalsXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/petals.png")) {
-						   petalsPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/petals.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 petalsPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/petals.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/petals.xml")) {
-						   petalsXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/petals.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 petalsXml = Assets.getText("assets/images/weeb/petals.xml");
-						}
-						var treeLeaves:FlxSprite = new FlxSprite(repositionShit, -40);
-						treeLeaves.frames = FlxAtlasFrames.fromSparrow(petalsPic, petalsXml);
-						treeLeaves.animation.addByPrefix('leaves', 'PETALS ALL', 24, true);
-						treeLeaves.animation.play('leaves');
-						treeLeaves.scrollFactor.set(0.85, 0.85);
-						add(treeLeaves);
-	
-						var widShit = Std.int(bgSky.width * 6);
-	
-						bgSky.setGraphicSize(widShit);
-						bgSchool.setGraphicSize(widShit);
-						bgStreet.setGraphicSize(widShit);
-						bgTrees.setGraphicSize(Std.int(widShit * 1.4));
-						fgTrees.setGraphicSize(Std.int(widShit * 0.8));
-						treeLeaves.setGraphicSize(widShit);
-	
-						fgTrees.updateHitbox();
-						bgSky.updateHitbox();
-						bgSchool.updateHitbox();
-						bgStreet.updateHitbox();
-						bgTrees.updateHitbox();
-						treeLeaves.updateHitbox();
-						var gorlsPic:BitmapData;
-						var gorlsXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.png")) {
-						   gorlsPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 gorlsPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/bgFreaks.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.xml")) {
-						   gorlsXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 gorlsXml = Assets.getText("assets/images/weeb/bgFreaks.xml");
-						}
-						bgGirls = new BackgroundGirls(-100, 190, gorlsPic, gorlsXml);
-						bgGirls.scrollFactor.set(0.9, 0.9);
-	
-						if (SONG.isMoody)
-						{
-							bgGirls.getScared();
-						}
-	
-						bgGirls.setGraphicSize(Std.int(bgGirls.width * daPixelZoom));
-						bgGirls.updateHitbox();
-						add(bgGirls);
-					case 'schoolEvil':
-						curStage = 'schoolEvil';
-	
-						var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
-						var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
-	
-						var posX = 400;
-						var posY = 200;
-	
-						var bg:FlxSprite = new FlxSprite(posX, posY);
-						var evilSchoolPic:BitmapData;
-						var evilSchoolXml:String;
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.png")) {
-						   evilSchoolPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.png");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 evilSchoolPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/animatedEvilSchool.png"));
-						}
-						if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.xml")) {
-						   evilSchoolXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.xml");
-						} else {
-						   // fall back on base game file to avoid crashes
-							 evilSchoolXml = Assets.getText("assets/images/weeb/animatedEvilSchool.xml");
-						}
-						bg.frames = FlxAtlasFrames.fromSparrow(evilSchoolPic, evilSchoolXml);
-						bg.animation.addByPrefix('idle', 'background 2', 24);
-						bg.animation.play('idle');
-						bg.scrollFactor.set(0.8, 0.9);
-						bg.scale.set(6, 6);
-						add(bg);
-					default:
-						generateFusionStage();
-				}
+		
+							var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(bgPic);
+							// bg.setGraphicSize(Std.int(bg.width * 2.5));
+							// bg.updateHitbox();
+							bg.antialiasing = true;
+							bg.scrollFactor.set(0.9, 0.9);
+							bg.active = false;
+							add(bg);
+							var frontPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/stagefront.png")) {
+								frontPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/stagefront.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								frontPic = BitmapData.fromImage(Assets.getImage("assets/images/stagefront.png"));
+							}
+		
+							var stageFront:FlxSprite = new FlxSprite(-650, 600).loadGraphic(frontPic);
+							stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
+							stageFront.updateHitbox();
+							stageFront.antialiasing = true;
+							stageFront.scrollFactor.set(0.9, 0.9);
+							stageFront.active = false;
+							add(stageFront);
+							var curtainPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/stagecurtains.png")) {
+								curtainPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/stagecurtains.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								curtainPic = BitmapData.fromImage(Assets.getImage("assets/images/stagecurtains.png"));
+							}
+							var stageCurtains:FlxSprite = new FlxSprite(-500, -300).loadGraphic(curtainPic);
+							stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
+							stageCurtains.updateHitbox();
+							stageCurtains.antialiasing = true;
+							stageCurtains.scrollFactor.set(1.3, 1.3);
+							stageCurtains.active = false;
+		
+							add(stageCurtains);
+						case 'spooky':
+							curStage = "spooky";
+							halloweenLevel = true;
+							var bgPic:BitmapData;
+							var bgXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.png")) {
+								bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								bgPic = BitmapData.fromImage(Assets.getImage("assets/images/halloween_bg.png"));
+							}
+								if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.xml")) {
+							   bgXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/halloween_bg.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 bgXml = Assets.getText("assets/images/halloween_bg.xml");
+							}
+							var hallowTex = FlxAtlasFrames.fromSparrow(bgPic, bgXml);
+							
+							halloweenBG = new FlxSprite(-200, -100);
+							halloweenBG.frames = hallowTex;
+							halloweenBG.animation.addByPrefix('idle', 'halloweem bg0');
+							halloweenBG.animation.addByPrefix('lightning', 'halloweem bg lightning strike', 24, false);
+							halloweenBG.animation.play('idle');
+							halloweenBG.antialiasing = true;
+							add(halloweenBG);
+		
+							isHalloween = true;
+						case 'philly':
+							curStage = 'philly';
+							var bgPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/sky.png")) {
+								bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/sky.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								bgPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/sky.png"));
+							}
+							var bg:FlxSprite = new FlxSprite(-100).loadGraphic(bgPic);
+							bg.scrollFactor.set(0.1, 0.1);
+							add(bg);
+							var cityPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/city.png")) {
+								cityPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/city.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								cityPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/city.png"));
+							}
+							var city:FlxSprite = new FlxSprite(-10).loadGraphic(cityPic);
+							city.scrollFactor.set(0.3, 0.3);
+							city.setGraphicSize(Std.int(city.width * 0.85));
+							city.updateHitbox();
+							add(city);
+		
+							phillyCityLights = new FlxTypedGroup<FlxSprite>();
+							add(phillyCityLights);
+		
+							for (i in 0...5)
+							{
+								var lightPic:BitmapData;
+								if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/win"+i+".png")) {
+									lightPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/win"+i+".png");
+								} else {
+									// fall back on base game file to avoid crashes
+									lightPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/win"+i+".png"));
+								}
+								var light:FlxSprite = new FlxSprite(city.x).loadGraphic(lightPic);
+								light.scrollFactor.set(0.3, 0.3);
+								light.visible = false;
+								light.setGraphicSize(Std.int(light.width * 0.85));
+								light.updateHitbox();
+								phillyCityLights.add(light);
+							}
+							var backstreetPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/behindTrain.png")) {
+								backstreetPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/behindTrain.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								backstreetPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/behindTrain.png"));
+							}
+							var streetBehind:FlxSprite = new FlxSprite(-40, 50).loadGraphic(backstreetPic);
+							add(streetBehind);
+							var trainPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/train.png")) {
+								trainPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/train.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								trainPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/train.png"));
+							}
+							phillyTrain = new FlxSprite(2000, 360).loadGraphic(trainPic);
+							add(phillyTrain);
+		
+							trainSound = new FlxSound().loadEmbedded('assets/sounds/train_passes' + TitleState.soundExt);
+							FlxG.sound.list.add(trainSound);
+		
+		
+							var streetPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/street.png")) {
+								streetPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/street.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								streetPic = BitmapData.fromImage(Assets.getImage("assets/images/philly/street.png"));
+							}
+							var street:FlxSprite = new FlxSprite(-40, streetBehind.y).loadGraphic(streetPic);
+							add(street);
+						case 'limo':
+							curStage = 'limo';
+							defaultCamZoom = 0.90;
+							var bgPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoSunset.png")) {
+								bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/limoSunset.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								bgPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/limoSunset.png"));
+							}
+							var skyBG:FlxSprite = new FlxSprite(-120, -50).loadGraphic(bgPic);
+							skyBG.scrollFactor.set(0.1, 0.1);
+							add(skyBG);
+							var bgLimoPic:BitmapData;
+							var bgLimoXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgLimo.png")) {
+								bgLimoPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgLimo.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								bgLimoPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/bgLimo.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgLimo.xml")) {
+							   bgLimoXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/bgLimo.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 bgLimoXml = Assets.getText("assets/images/limo/bgLimo.xml");
+							}
+							var bgLimo:FlxSprite = new FlxSprite(-200, 480);
+							bgLimo.frames = FlxAtlasFrames.fromSparrow(bgLimoPic, bgLimoXml);
+							bgLimo.animation.addByPrefix('drive', "background limo pink", 24);
+							bgLimo.animation.play('drive');
+							bgLimo.scrollFactor.set(0.4, 0.4);
+							add(bgLimo);
+		
+							grpLimoDancers = new FlxTypedGroup<BackgroundDancer>();
+							add(grpLimoDancers);
+		
+							for (i in 0...5)
+							{
+								var dancer:BackgroundDancer = new BackgroundDancer((370 * i) + 130, bgLimo.y - 400, SONG.stage);
+								dancer.scrollFactor.set(0.4, 0.4);
+								grpLimoDancers.add(dancer);
+							}
+							var limoOverlayPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoOverlay.png")) {
+								limoOverlayPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/limoOverlay.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								limoOverlayPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/limoOverlay.png"));
+							}
+							var overlayShit:FlxSprite = new FlxSprite(-500, -600).loadGraphic(limoOverlayPic);
+							overlayShit.alpha = 0.5;
+							// add(overlayShit);
+		
+							// var shaderBullshit = new BlendModeEffect(new OverlayShader(), FlxColor.RED);
+		
+							// FlxG.camera.setFilters([new ShaderFilter(cast shaderBullshit.shader)]);
+		
+							// overlayShit.shader = shaderBullshit;
+							var limoPic:BitmapData;
+							var limoXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoDrive.png")) {
+								limoPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/limoDrive.png");
+							} else {
+								// fall back on base game file to avoid crashes
+								limoPic = BitmapData.fromImage(Assets.getImage("assets/images/limo/limoDrive.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/limoDrive.xml")) {
+							   limoXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/limoDrive.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 limoXml = Assets.getText("assets/images/limo/limoDrive.xml");
+							}
+							var limoTex = FlxAtlasFrames.fromSparrow(limoPic, limoXml);
+		
+							limo = new FlxSprite(-120, 550);
+							limo.frames = limoTex;
+							limo.animation.addByPrefix('drive', "Limo stage", 24);
+							limo.animation.play('drive');
+							limo.antialiasing = true;
+							var fastCarPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"_fastcar.png");
+							fastCar = new FlxSprite(-300, 160).loadGraphic(fastCarPic);
+							// add(limo);
+						case 'mall':
+							curStage = 'mall';
+		
+							defaultCamZoom = 0.80;
+							var bgPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgWalls.png")) {
+							   bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgWalls.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 bgPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/bgWalls.png"));
+							}
+							var bg:FlxSprite = new FlxSprite(-1000, -500).loadGraphic(bgPic);
+							bg.antialiasing = true;
+							bg.scrollFactor.set(0.2, 0.2);
+							bg.active = false;
+							bg.setGraphicSize(Std.int(bg.width * 0.8));
+							bg.updateHitbox();
+							add(bg);
+							var standsPic:BitmapData;
+							var standsXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/upperBop.png")) {
+							   standsPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/upperBop.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 standsPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/upperBop.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/upperBop.xml")) {
+							   standsXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/upperBop.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 standsXml = Assets.getText("assets/images/christmas/upperBop.xml");
+							}
+							upperBoppers = new FlxSprite(-240, -90);
+							upperBoppers.frames = FlxAtlasFrames.fromSparrow(standsPic, standsXml);
+							upperBoppers.animation.addByPrefix('bop', "Upper Crowd Bob", 24, false);
+							upperBoppers.antialiasing = true;
+							upperBoppers.scrollFactor.set(0.33, 0.33);
+							upperBoppers.setGraphicSize(Std.int(upperBoppers.width * 0.85));
+							upperBoppers.updateHitbox();
+							add(upperBoppers);
+							var escalatorPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgEscalator.png")) {
+							   escalatorPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgEscalator.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 escalatorPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/bgEscalator.png"));
+							}
+							var bgEscalator:FlxSprite = new FlxSprite(-1100, -600).loadGraphic(escalatorPic);
+							bgEscalator.antialiasing = true;
+							bgEscalator.scrollFactor.set(0.3, 0.3);
+							bgEscalator.active = false;
+							bgEscalator.setGraphicSize(Std.int(bgEscalator.width * 0.9));
+							bgEscalator.updateHitbox();
+							add(bgEscalator);
+							var treePic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/christmasTree.png")) {
+							   treePic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/christmasTree.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 treePic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/christmasTree.png"));
+							}
+							var tree:FlxSprite = new FlxSprite(370, -250).loadGraphic(treePic);
+							tree.antialiasing = true;
+							tree.scrollFactor.set(0.40, 0.40);
+							add(tree);
+							var crowdPic:BitmapData;
+							var crowdXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bottomBop.png")) {
+							   crowdPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bottomBop.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 crowdPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/bottomBop.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bottomBop.xml")) {
+							   crowdXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/bottomBop.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 crowdXml = Assets.getText("assets/images/christmas/bottomBop.xml");
+							}
+							bottomBoppers = new FlxSprite(-300, 140);
+							bottomBoppers.frames = FlxAtlasFrames.fromSparrow(crowdPic, crowdXml);
+							bottomBoppers.animation.addByPrefix('bop', 'Bottom Level Boppers', 24, false);
+							bottomBoppers.antialiasing = true;
+							bottomBoppers.scrollFactor.set(0.9, 0.9);
+							bottomBoppers.setGraphicSize(Std.int(bottomBoppers.width * 1));
+							bottomBoppers.updateHitbox();
+							add(bottomBoppers);
+							var snowPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/fgSnow.png")) {
+							   snowPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/fgSnow.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 snowPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/fgSnow.png"));
+							}
+							var fgSnow:FlxSprite = new FlxSprite(-600, 700).loadGraphic(snowPic);
+							fgSnow.active = false;
+							fgSnow.antialiasing = true;
+							add(fgSnow);
+							var santaPic:BitmapData;
+							var santaXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/santa.png")) {
+							   santaPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/santa.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 santaPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/santa.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/santa.xml")) {
+							   santaXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/santa.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 santaXml = Assets.getText("assets/images/christmas/santa.xml");
+							}
+							santa = new FlxSprite(-840, 150);
+							santa.frames = FlxAtlasFrames.fromSparrow(santaPic, santaXml);
+							santa.animation.addByPrefix('idle', 'santa idle in fear', 24, false);
+							santa.antialiasing = true;
+							add(santa);
+						case 'mallEvil':
+							curStage = 'mallEvil';
+							var bgPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/evilBG.png")) {
+							   bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/evilBG.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 bgPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/evilBG.png"));
+							}
+		
+							var bg:FlxSprite = new FlxSprite(-400, -500).loadGraphic(bgPic);
+							bg.antialiasing = true;
+							bg.scrollFactor.set(0.2, 0.2);
+							bg.active = false;
+							bg.setGraphicSize(Std.int(bg.width * 0.8));
+							bg.updateHitbox();
+							add(bg);
+							var evilTreePic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/evilTree.png")) {
+							   evilTreePic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/evilTree.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 evilTreePic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/evilTree.png"));
+							}
+							var evilTree:FlxSprite = new FlxSprite(300, -300).loadGraphic(evilTreePic);
+							evilTree.antialiasing = true;
+							evilTree.scrollFactor.set(0.2, 0.2);
+							add(evilTree);
+							var evilSnowPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/evilSnow.png")) {
+							   evilSnowPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/evilSnow.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 evilSnowPic = BitmapData.fromImage(Assets.getImage("assets/images/christmas/evilSnow.png"));
+							}
+							var evilSnow:FlxSprite = new FlxSprite(-200, 700).loadGraphic(evilSnowPic);
+							evilSnow.antialiasing = true;
+							add(evilSnow);
+						case 'school':
+							curStage = 'school';
+							// school moody is just the girls are upset
+							// defaultCamZoom = 0.9;
+							var bgPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebSky.png")) {
+							   bgPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebSky.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 bgPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebSky.png"));
+							}
+							var bgSky = new FlxSprite().loadGraphic(bgPic);
+							bgSky.scrollFactor.set(0.1, 0.1);
+							add(bgSky);
+		
+							var repositionShit = -200;
+							var schoolPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebSchool.png")) {
+							   schoolPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebSchool.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 schoolPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebSchool.png"));
+							}
+							var bgSchool:FlxSprite = new FlxSprite(repositionShit, 0).loadGraphic(schoolPic);
+							bgSchool.scrollFactor.set(0.6, 0.90);
+							add(bgSchool);
+							var streetPic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebStreet.png")) {
+							   streetPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebStreet.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 streetPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebStreet.png"));
+							}
+							var bgStreet:FlxSprite = new FlxSprite(repositionShit).loadGraphic(streetPic);
+							bgStreet.scrollFactor.set(0.95, 0.95);
+							add(bgStreet);
+							var fgTreePic:BitmapData;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebTreesBack.png")) {
+							   fgTreePic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebTreesBack.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 fgTreePic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebTreesBack.png"));
+							}
+							var fgTrees:FlxSprite = new FlxSprite(repositionShit + 170, 130).loadGraphic(fgTreePic);
+							fgTrees.scrollFactor.set(0.9, 0.9);
+							add(fgTrees);
+							var treesPic:BitmapData;
+							var treesTxt:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebTrees.png")) {
+							   treesPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/weebTrees.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 treesPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/weebTrees.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/weebTrees.txt")) {
+							   treesTxt = File.getContent('assets/images/custom_stages/'+SONG.stage+"/weebTrees.txt");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 treesTxt = Assets.getText("assets/images/weeb/weebTrees.txt");
+							}
+							var bgTrees:FlxSprite = new FlxSprite(repositionShit - 380, -800);
+							var treetex = FlxAtlasFrames.fromSpriteSheetPacker(treesPic, treesTxt);
+							bgTrees.frames = treetex;
+							bgTrees.animation.add('treeLoop', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 12);
+							bgTrees.animation.play('treeLoop');
+							bgTrees.scrollFactor.set(0.85, 0.85);
+							add(bgTrees);
+							var petalsPic:BitmapData;
+							var petalsXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/petals.png")) {
+							   petalsPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/petals.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 petalsPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/petals.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/petals.xml")) {
+							   petalsXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/petals.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 petalsXml = Assets.getText("assets/images/weeb/petals.xml");
+							}
+							var treeLeaves:FlxSprite = new FlxSprite(repositionShit, -40);
+							treeLeaves.frames = FlxAtlasFrames.fromSparrow(petalsPic, petalsXml);
+							treeLeaves.animation.addByPrefix('leaves', 'PETALS ALL', 24, true);
+							treeLeaves.animation.play('leaves');
+							treeLeaves.scrollFactor.set(0.85, 0.85);
+							add(treeLeaves);
+		
+							var widShit = Std.int(bgSky.width * 6);
+		
+							bgSky.setGraphicSize(widShit);
+							bgSchool.setGraphicSize(widShit);
+							bgStreet.setGraphicSize(widShit);
+							bgTrees.setGraphicSize(Std.int(widShit * 1.4));
+							fgTrees.setGraphicSize(Std.int(widShit * 0.8));
+							treeLeaves.setGraphicSize(widShit);
+		
+							fgTrees.updateHitbox();
+							bgSky.updateHitbox();
+							bgSchool.updateHitbox();
+							bgStreet.updateHitbox();
+							bgTrees.updateHitbox();
+							treeLeaves.updateHitbox();
+							var gorlsPic:BitmapData;
+							var gorlsXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.png")) {
+							   gorlsPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 gorlsPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/bgFreaks.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.xml")) {
+							   gorlsXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/bgFreaks.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 gorlsXml = Assets.getText("assets/images/weeb/bgFreaks.xml");
+							}
+							bgGirls = new BackgroundGirls(-100, 190, gorlsPic, gorlsXml);
+							bgGirls.scrollFactor.set(0.9, 0.9);
+		
+							if (SONG.isMoody)
+							{
+								bgGirls.getScared();
+							}
+		
+							bgGirls.setGraphicSize(Std.int(bgGirls.width * daPixelZoom));
+							bgGirls.updateHitbox();
+							add(bgGirls);
+						case 'schoolEvil':
+							curStage = 'schoolEvil';
+		
+							var waveEffectBG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 3, 2);
+							var waveEffectFG = new FlxWaveEffect(FlxWaveMode.ALL, 2, -1, 5, 2);
+		
+							var posX = 400;
+							var posY = 200;
+		
+							var bg:FlxSprite = new FlxSprite(posX, posY);
+							var evilSchoolPic:BitmapData;
+							var evilSchoolXml:String;
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.png")) {
+							   evilSchoolPic = BitmapData.fromFile('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.png");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 evilSchoolPic = BitmapData.fromImage(Assets.getImage("assets/images/weeb/animatedEvilSchool.png"));
+							}
+							if (FileSystem.exists('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.xml")) {
+							   evilSchoolXml = File.getContent('assets/images/custom_stages/'+SONG.stage+"/animatedEvilSchool.xml");
+							} else {
+							   // fall back on base game file to avoid crashes
+								 evilSchoolXml = Assets.getText("assets/images/weeb/animatedEvilSchool.xml");
+							}
+							bg.frames = FlxAtlasFrames.fromSparrow(evilSchoolPic, evilSchoolXml);
+							bg.animation.addByPrefix('idle', 'background 2', 24);
+							bg.animation.play('idle');
+							bg.scrollFactor.set(0.8, 0.9);
+							bg.scale.set(6, 6);
+							add(bg);
+						default:
+							generateFusionStage();
+					}
 		}}
 		//defaults if no gf was found in chart
 		var gfCheck:String = 'gf';
@@ -3465,7 +3503,12 @@ class PlayState extends MusicBeatState
 				
 					case 'normal':
 						{
-							babyArrow.frames = Paths.getSparrowAtlas('noteassets/NOTE_assets');
+							//babyArrow.frames = Paths.getSparrowAtlas('noteassets/NOTE_assets');
+							if (!FlxG.save.data.circleShit)
+								babyArrow.frames = FlxAtlasFrames.fromSparrow('assets/images/NOTE_assets.png', 'assets/images/NOTE_assets.xml');
+							else {
+								babyArrow.frames = FlxAtlasFrames.fromSparrow('assets/images/noteassets/circle/NOTE_assets.png', 'assets/images/noteassets/circle/NOTE_assets.xml');
+							}
 							babyArrow.animation.addByPrefix('green', 'arrowUP');
 							babyArrow.animation.addByPrefix('blue', 'arrowDOWN');
 							babyArrow.animation.addByPrefix('purple', 'arrowLEFT');

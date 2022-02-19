@@ -50,7 +50,7 @@ class Paths
 				return levelPath;
 		}
 
-		trace(getPreloadPath(file));
+	//	trace(getPreloadPath(file));
 		return getPreloadPath(file);
 	}
 
@@ -141,7 +141,7 @@ class Paths
 
 	inline static public function hScript(file:String)
 	{
-		return getPath('scripts/$file.hscript', TEXT, null);
+		return getPath('scripts/$file/script.hscript', TEXT, null);
 		//return 'assets/scripts/$file/script.hscript';
 	}
 
@@ -207,8 +207,13 @@ class Paths
 				case 'dad-battle': songLowercase = 'dadbattle';
 				case 'philly-nice': songLowercase = 'philly';
 			}
-		if (FileSystem.exists('assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT'))
-			return 'songs:assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT';
+
+		//trace(FileSystem.exists('assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT'));
+	//	trace('assets/songs/' + songLowercase + '/Inst' + prefix.toLowerCase() + '.$SOUND_EXT');
+
+		if (FileSystem.exists('assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT')) {
+			trace('ke song or fusion switch');
+			return 'songs:assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT';}
 		else 
 			return 'assets/music/${song}_Inst${prefix.toLowerCase()}.$SOUND_EXT'; //saving old fusion people.
 	}
