@@ -3510,7 +3510,7 @@ class PlayState extends MusicBeatState
 							else {
 								tex = Paths.getSparrowAtlas('noteassets/circle/NOTE_assets');
 							}
-							babyArrow.frames = tex;*
+							babyArrow.frames = tex;*/
 							babyArrow.animation.addByPrefix('green', 'arrowUP');
 							babyArrow.animation.addByPrefix('blue', 'arrowDOWN');
 							babyArrow.animation.addByPrefix('purple', 'arrowLEFT');
