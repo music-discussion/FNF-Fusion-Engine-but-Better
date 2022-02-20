@@ -151,11 +151,8 @@ class KadeEngineData
 		if (FlxG.save.data.freeplayInst == null)
 			FlxG.save.data.freeplayInst = true;
 
-<<<<<<< Updated upstream
 	//	if (FlxG.save.data.circleShit == null)
-=======
 		//if (FlxG.save.data.circleShit == null)
->>>>>>> Stashed changes
 			FlxG.save.data.circleShit = false;
 
 		if (FlxG.save.data.zoom == null)
