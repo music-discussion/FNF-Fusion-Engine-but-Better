@@ -1,5 +1,9 @@
 package;
 
+#if sys
+import smTools.SMFile;
+#end
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -11,7 +15,6 @@ import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
-import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.system.FlxSound;
@@ -24,31 +27,50 @@ import flixel.util.FlxTimer;
 import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
-
-import flixel.input.keyboard.FlxKey; //yessssssssssssss
+import haxe.Json;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
 
 #if windows
 import Discord.DiscordClient;
 #end
-#if sys
 
+#if cpp
+import sys.thread.Thread;
+#end
+
+import flixel.input.keyboard.FlxKey; //yessssssssssssss
+
+#if sys
 import Sys;
 import sys.io.File;
 import sys.FileSystem;
-
 #end
+
 #if desktop
 import sys.thread.Thread;
 #end
 
 using StringTools;
 
+typedef TitleData =
+{
+	titlex:Float,
+	titley:Float,
+	startx:Float,
+	starty:Float,
+	gfx:Float,
+	gfy:Float,
+	backgroundSprite:String,
+	newgroundsLogo:String,
+	bpm:Int
+}
+
 class TitleState extends MusicBeatState
 {
 	static var initialized:Bool = false;
 
 	var blackScreen:FlxSprite;
-	static public var soundExt:String = ".ogg";
 	var credGroup:FlxGroup;
 	var credTextShit:Alphabet;
 	var textGroup:FlxGroup;
@@ -57,19 +79,31 @@ class TitleState extends MusicBeatState
 	var curWacky:Array<String> = [];
 
 	var wackyImage:FlxSprite;
+	static public var soundExt:String = ".ogg";
 
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
+	public static var camZooming:Bool = false;
+
 	public var modchartScript:HscriptShit;
 	public static var instance:TitleState = null; //to access in other places
+	var easterEggEnabled:Bool = true; //Disable this to hide the easter egg
+	var easterEggKeyCombination:Array<FlxKey> = [FlxKey.B, FlxKey.B]; //bb stands for bbpanzu cuz he wanted this lmao
+	var lastKeysPressed:Array<FlxKey> = [];
+
+	var mustUpdate:Bool = false;
+	
+	var titleJSON:TitleData;
 
 	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
 	{
 		if (modchartScript.enabled)
 			modchartScript.call(tfisthis, shitToGoIn); //because
 	}
+
+	public var autoCorrect:Bool = false;
 
 	override public function create():Void
 	{
@@ -78,21 +112,34 @@ class TitleState extends MusicBeatState
 		#if polymod
 		polymod.Polymod.init({modRoot: "mods", dirs: ['introMod']});
 		#end
-
-		modchartScript = new HscriptShit(Paths.hScript('titlemenu'));
-		trace ("file loaded = " + modchartScript.enabled);
 		
 		#if sys
 		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
 			sys.FileSystem.createDirectory(Sys.getCwd() + "/assets/replays");
 		#end
+		
+		modchartScript = new HscriptShit(Paths.hScript('titlemenu'));
+		trace ("file loaded = " + modchartScript.enabled);
+
+		var path = "assets/images/betterfusion_customize/titlemenu/titlemenu.json"; //I really do hope no one just gets rid of the file.
+		if (!FileSystem.exists(path))
+			autoCorrect = true;
+
+		titleJSON = Json.parse(File.getContent(path));
 
 		@:privateAccess
 		{
 			trace("Loaded " + openfl.Assets.getLibrary("default").assetsLoaded + " assets (DEFAULT)");
 		}
-		
+
+		FlxG.game.focusLostFramerate = 60;
+		FlxG.sound.muteKeys = muteKeys;
+		FlxG.sound.volumeDownKeys = volumeDownKeys;
+		FlxG.sound.volumeUpKeys = volumeUpKeys;
+		FlxG.keys.preventDefaultKeys = [TAB];
+
 		PlayerSettings.init();
+		
 
 		#if windows
 		DiscordClient.initialize();
@@ -104,6 +151,8 @@ class TitleState extends MusicBeatState
 		#end
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
+
+		trace('hello');
 
 		// DEBUG BULLSHIT
 
@@ -118,15 +167,12 @@ class TitleState extends MusicBeatState
 
 		FlxG.save.bind('funkin', 'ninjamuffin99');
 
-		//////////////////////////////////////////////////////////////////////
-
-		//the hole squad lmfao
-
 		KadeEngineData.initSave();
-		ClientPrefs.setControls();
-		Highscore.load();
 
-		//////////////////////////////////////////////////////////////////////
+		// var file:SMFile = SMFile.loadFile("file.sm");
+		// this was testing things
+		
+		Highscore.load();
 
 		if (FlxG.save.data.weekUnlocked != null)
 		{
@@ -197,37 +243,86 @@ class TitleState extends MusicBeatState
 			FlxG.sound.music.fadeIn(4, 0, 0.7);
 		}
 
-		Conductor.changeBPM(102);
+		Conductor.changeBPM(titleJSON.bpm);
 		persistentUpdate = true;
 
-		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		//var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		// bg.antialiasing = true;
 		// bg.setGraphicSize(Std.int(bg.width * 0.6));
 		// bg.updateHitbox();
+	//	add(bg);
+
+		var bg:FlxSprite = new FlxSprite();
+
+		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none"){
+			bg.loadGraphic(Paths.image(titleJSON.backgroundSprite));
+		}else{
+			bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		}
+
+		bg.antialiasing = true;
+		bg.setGraphicSize(Std.int(bg.width * 0.6));
+		bg.updateHitbox();
 		add(bg);
 
-		logoBl = new FlxSprite(-150, -100);
-		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+		/*if(Main.watermarks) {
+			logoBl = new FlxSprite(-150, -100);
+			logoBl.frames = Paths.getSparrowAtlas('KadeEngineLogoBumpin');
+			logoBl.antialiasing = true;
+			logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
+			logoBl.animation.play('bump');
+			logoBl.updateHitbox();
+			// logoBl.screenCenter();
+			// logoBl.color = FlxColor.BLACK;
+		} else {
+			logoBl = new FlxSprite(-150, -100);
+			logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+			logoBl.antialiasing = true;
+			logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
+			logoBl.animation.play('bump');
+			logoBl.updateHitbox();
+			// logoBl.screenCenter();
+			// logoBl.color = FlxColor.BLACK;
+		}*/
+
+		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
+		var path = "assets/images/betterfusion_customize/titlemenu/logoBumpin.png"; //I really do hope no one just gets rid of the file.
+		logoBl.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
 		logoBl.antialiasing = true;
-		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
+		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24, false);
 		logoBl.animation.play('bump');
 		logoBl.updateHitbox();
-		// logoBl.screenCenter();
-		// logoBl.color = FlxColor.BLACK;
 
-		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
+	/*	gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
 		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
+		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
+		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+		gfDance.antialiasing = true;*/
+
+		gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
+		var path = "assets/images/betterfusion_customize/titlemenu/gfDanceTitle.png"; //I really do hope no one just gets rid of the file.
+		gfDance.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
 		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
 		gfDance.antialiasing = true;
 		add(gfDance);
 		add(logoBl);
 
-		titleText = new FlxSprite(100, FlxG.height * 0.8);
+	/*	titleText = new FlxSprite(100, FlxG.height * 0.8);
 		titleText.frames = Paths.getSparrowAtlas('titleEnter');
 		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
 		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		titleText.antialiasing = true;
+		titleText.animation.play('idle');
+		titleText.updateHitbox();
+		// titleText.screenCenter(X);
+		add(titleText);*/
+		titleText = new FlxSprite(titleJSON.startx, titleJSON.starty);
+		var path = "assets/images/betterfusion_customize/titlemenu/titleEnter.png"; //I really do hope no one just gets rid of the file.
+		titleText.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
+		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
+		titleText.antialiasing = ClientPrefs.globalAntialiasing;
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
 		// titleText.screenCenter(X);
@@ -248,14 +343,17 @@ class TitleState extends MusicBeatState
 		blackScreen = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		credGroup.add(blackScreen);
 
-		credTextShit = new Alphabet(0, 0, "ninjamuffin99\nPhantomArcade\nkawaisprite\nevilsk8er", true);
+		credTextShit = new Alphabet(0, 0, "", true);
 		credTextShit.screenCenter();
 
 		// credTextShit.alignment = CENTER;
 
 		credTextShit.visible = false;
 
-		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		if (titleJSON.backgroundSprite == null && titleJSON.backgroundSprite.length < 0)
+			titleJSON.newgroundsLogo = "newgrounds_logo";
+
+		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image(titleJSON.newgroundsLogo));
 		add(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
@@ -277,7 +375,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		var fullText:String = File.getContent("assets/data/introText.txt");
+		var fullText:String = Assets.getText(Paths.txt('introText'));
 
 		var firstArray:Array<String> = fullText.split('\n');
 		var swagGoodArray:Array<Array<String>> = [];
@@ -294,8 +392,6 @@ class TitleState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		call("update", [elapsed]);
-		
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
@@ -305,7 +401,7 @@ class TitleState extends MusicBeatState
 			FlxG.fullscreen = !FlxG.fullscreen;
 		}
 
-		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
+		var pressedEnter:Bool = controls.ACCEPT;
 
 		#if mobile
 		for (touch in FlxG.touches.list)
@@ -317,19 +413,6 @@ class TitleState extends MusicBeatState
 		}
 		#end
 
-		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
-
-		if (gamepad != null)
-		{
-			if (gamepad.justPressed.START)
-				pressedEnter = true;
-
-			#if switch
-			if (gamepad.justPressed.B)
-				pressedEnter = true;
-			#end
-		}
-
 		if (pressedEnter && !transitioning && skippedIntro)
 		{
 			#if !switch
@@ -340,7 +423,8 @@ class TitleState extends MusicBeatState
 				NGio.unlockMedal(61034);
 			#end
 
-			titleText.animation.play('press');
+			if (FlxG.save.data.flashing)
+				titleText.animation.play('press');
 
 			FlxG.camera.flash(FlxColor.WHITE, 1);
 			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
@@ -348,24 +432,25 @@ class TitleState extends MusicBeatState
 			transitioning = true;
 			// FlxG.sound.music.stop();
 
+			MainMenuState.firstStart = true;
+
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
-
-				// Get current version of Better Fusion Engine
+				// Get current version of Kade Engine
 				
-				var http = new haxe.Http("https://raw.githubusercontent.com/music-discussion/FNF-Fusion-Engine-but-Better/master/version.downloadMe"); // get versio check :)
+				var http = new haxe.Http("https://raw.githubusercontent.com/KadeDev/Kade-Engine/master/version.downloadMe");
 				var returnedData:Array<String> = [];
 				
 				http.onData = function (data:String)
 				{
 					returnedData[0] = data.substring(0, data.indexOf(';'));
 					returnedData[1] = data.substring(data.indexOf('-'), data.length);
-				  	if (!MainMenuState.kadeEngineVer.contains(returnedData[0].trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "" || FlxG.keys.justPressed.ONE)
+				  	if (!MainMenuState.kadeEngineVer.contains(returnedData[0].trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "")
 					{
 						trace('outdated lmao! ' + returnedData[0] + ' != ' + MainMenuState.kadeEngineVer);
 						OutdatedSubState.needVer = returnedData[0];
 						OutdatedSubState.currChanges = returnedData[1];
-						FlxG.switchState(new OutdatedSubState());
+						FlxG.switchState(new MainMenuState());
 					}
 					else
 					{
@@ -379,13 +464,11 @@ class TitleState extends MusicBeatState
 				}
 				
 				http.request();
-				call('endScript', []);
-				
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
 
-		if (pressedEnter && !skippedIntro)
+		if (pressedEnter && !skippedIntro && initialized)
 		{
 			skipIntro();
 		}
@@ -423,18 +506,15 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	var titleStateTXT:Array<String> = CoolUtil.coolTextFile(Paths.txt('titleState')); // hold on. finding txt.
-	var txtVis:Bool; // = Std.string(titleStateTXT[20]); // this is suprisingly easy to do my god.
-
-	// CURWACKY TEXT SHIT
-
-	var topText:String; // = Std.string(titleStateTXT[25]);
-	var bottomText:String; // =  Std.string(titleStateTXT[26]);W
-
+	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
+	public static var closedState:Bool = false;
 	override function beatHit()
 	{
 		super.beatHit();
 		call("beatHit", [curBeat]);
+
+		if (camZooming)
+			FlxTween.tween(FlxG.camera, {zoom:1.05}, 0.3, {ease: FlxEase.quadOut, type: BACKWARD});
 
 		logoBl.animation.play('bump');
 		danceLeft = !danceLeft;
@@ -524,10 +604,5 @@ class TitleState extends MusicBeatState
 			remove(credGroup);
 			skippedIntro = true;
 		}
-	}
-
-	function redoCurWack():Void
-	{
-		curWacky = FlxG.random.getObject(getIntroTextShit());
 	}
 }

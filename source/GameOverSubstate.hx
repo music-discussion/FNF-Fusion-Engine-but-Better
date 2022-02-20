@@ -7,9 +7,6 @@ import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
-#if sys
-import sys.io.File;
-#end
 class GameOverSubstate extends MusicBeatSubstate
 {
 	var bf:Boyfriend;
@@ -21,12 +18,9 @@ class GameOverSubstate extends MusicBeatSubstate
 	{
 		var daStage = PlayState.curStage;
 		var daBf:String = '';
-		switch (daStage)
+		switch (PlayState.SONG.player1)
 		{
-			case 'school':
-				stageSuffix = '-pixel';
-				daBf = 'bf-pixel-dead';
-			case 'schoolEvil':
+			case 'bf-pixel':
 				stageSuffix = '-pixel';
 				daBf = 'bf-pixel-dead';
 			default:
@@ -53,7 +47,7 @@ class GameOverSubstate extends MusicBeatSubstate
 
 		bf.playAnim('firstDeath');
 	}
-
+	var startVibin:Bool = false;
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
@@ -63,22 +57,19 @@ class GameOverSubstate extends MusicBeatSubstate
 			endBullshit();
 		}
 
+		if(FlxG.save.data.InstantRespawn)
+			{
+				LoadingState.loadAndSwitchState(new PlayState());
+			}
+
 		if (controls.BACK)
 		{
 			FlxG.sound.music.stop();
 
 			if (PlayState.isStoryMode)
 				FlxG.switchState(new StoryMenuState());
-			else{
-				var parsed:Dynamic = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
-
-				if(parsed.length==1){
-					FreeplayState.id = 0;
-					FlxG.switchState(new FreeplayState());
-				}else{
-					FlxG.switchState(new FreeplayCategory());
-				}
-			}
+			else
+				FlxG.switchState(new FreeplayState());
 			PlayState.loadRep = false;
 		}
 
@@ -90,6 +81,7 @@ class GameOverSubstate extends MusicBeatSubstate
 		if (bf.animation.curAnim.name == 'firstDeath' && bf.animation.curAnim.finished)
 		{
 			FlxG.sound.playMusic(Paths.music('gameOver' + stageSuffix));
+			startVibin = true;
 		}
 
 		if (FlxG.sound.music.playing)
@@ -101,6 +93,11 @@ class GameOverSubstate extends MusicBeatSubstate
 	override function beatHit()
 	{
 		super.beatHit();
+
+		if (startVibin && !isEnding)
+		{
+			bf.playAnim('deathLoop', true);
+		}
 
 		FlxG.log.add('beat');
 	}

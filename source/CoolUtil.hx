@@ -10,17 +10,197 @@ import openfl.display.BitmapData;
 import sys.io.File;
 import sys.FileSystem;
 #end
+
+import openfl.utils.Assets;
+import lime.utils.Assets;
+import flixel.FlxG;
+import openfl.utils.Assets;
+import lime.utils.Assets as LimeAssets;
+import lime.utils.AssetLibrary;
+import lime.utils.AssetManifest;
+
 using StringTools;
 
 class CoolUtil
 {
-	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"];
+	public static var difficultyArray:Array<String> = ['Easy', "Normal", "Hard"];
+	public static var CurSongDiffs:Array<String> = ['EASY', 'NORMAL', 'HARD'];
+
+	public static function difficultyFromInt(difficulty:Int):String
+	{
+		return difficultyArray[difficulty];
+	}
 
 	public static function difficultyString():String
+		{
+			return CurSongDiffs[PlayState.storyDifficulty];
+		}
+
+	public static function coolTextFile(path:String):Array<String>
 	{
-		return difficultyArray[PlayState.storyDifficulty];
+		var daList:Array<String> = Assets.getText(path).trim().split('\n');
+
+		for (i in 0...daList.length)
+		{
+			daList[i] = daList[i].trim();
+		}
+
+		return daList;
 	}
 	
+	public static function coolStringFile(path:String):Array<String>
+		{
+			var daList:Array<String> = path.trim().split('\n');
+	
+			for (i in 0...daList.length)
+			{
+				daList[i] = daList[i].trim();
+			}
+	
+			return daList;
+		}
+
+	public static function numberArray(max:Int, ?min = 0):Array<Int>
+	{
+		var dumbArray:Array<Int> = [];
+		for (i in min...max)
+		{
+			dumbArray.push(i);
+		}
+		return dumbArray;
+	}
+
+	public static function getSongFromJsons(song:String, diff:Int, customChart:Bool = false)
+		{
+			var path = "assets/data/charts/" + song;
+			if (customChart)
+				path = "assets/data/freeplayCharts/" + song;
+	
+			if (PlayState.isStoryMode) //idk why its flagged as incorrect, game still compiles??????
+				return song + PlayState.storySuffix;
+	
+			#if sys
+			if (FileSystem.exists(path))
+			{
+				var diffs:Array<String> = [];
+				var sortedDiffs:Array<String> = [];
+				diffs = FileSystem.readDirectory(path);
+	
+				var easy:String = "";
+				var normal:String = "";
+				var hard:String = "";
+				var extra:Array<String> = [];
+				var extraCount = 0;
+				
+				for (file in diffs)
+				{
+					if (!file.contains(".hscript") && file.endsWith(".json")) //fuck you
+					{
+						if (!file.endsWith(".json")) //get rid of non json files
+							diffs.remove(file);
+						else if (file.endsWith("-easy.json")) //add easy first
+						{
+							easy = file;
+						}
+						else if (file.endsWith(song + ".json")) //add normal
+						{
+							normal = file;
+						}
+						else if (file.endsWith("-hard.json")) //add hard
+						{
+							hard = file;
+						}
+						else
+						{
+							extra.push(file);
+							extraCount++;
+						}
+					}
+	
+					
+				}
+				var textDiffs:Array<String> = [];
+				if (easy != "")
+				{
+					sortedDiffs.push(easy); //pushes them in correct order
+					textDiffs.push("Easy");
+				}
+				if (normal != "")
+				{
+					sortedDiffs.push(normal);
+					textDiffs.push("Normal");
+				}
+				if (hard != "")
+				{
+					sortedDiffs.push(hard);
+					textDiffs.push("Hard");
+				}
+				if (extraCount != 0)
+					for (i in extra)
+					{
+						sortedDiffs.push(i);
+					}
+						
+	
+	
+				var outputDiffs:Array<String> = [];
+				for (file in sortedDiffs)
+				{
+					var noJson = StringTools.replace(file,".json", "");
+					var noSongName = StringTools.replace(noJson,song.toLowerCase(), "");
+					outputDiffs.push(noSongName); //gets just the difficulty on the end of the file
+				}
+				
+				if (extraCount != 0)
+					for (file in extra)
+					{
+						var noJson = StringTools.replace(file,".json", "");
+						var noSongName = StringTools.replace(noJson,song.toLowerCase(), "");
+						var fixedShit = StringTools.replace(noSongName,"-", "");
+						textDiffs.push(fixedShit.toUpperCase()); //upper cases the difficulty to use them in the array
+					}
+				CurSongDiffs = textDiffs;
+				if (diff > outputDiffs.length)
+					diff = outputDiffs.length;
+				return song + outputDiffs[diff];
+			}
+			else 
+				return "tutorial"; //in case it dont work lol
+			#else
+				//do nothing lol
+			#end
+		}
+
+		public static function songCompatCheck(noteType:Int)
+		{
+				switch (PlayState.SONG.song.toLowerCase())
+				{
+					case "ectospasm" | "spectral":
+						if (noteType == 1)
+							noteType = 8;
+						else if (noteType == 2)
+							noteType = 4;
+					case "godspeed" | "where-are-you": //for his mod lmao
+						if (noteType <= 4)
+							noteType = 0;
+						else if (noteType == 5)
+							noteType = 1;
+						else if (noteType == 6)
+							noteType = 2;
+						else if (noteType == 7)
+							noteType = 3;
+						else if (noteType == 8)
+							noteType = 6;
+						else if (noteType == 9)
+							noteType = 7;
+					default: 
+						//nada
+				}
+		
+		
+				return noteType;
+		}
+
 	public static function getString(dyn:Dynamic,key:String,jsonName:String,?d:String):String{
 		if(Reflect.hasField(dyn,key)){
 			return Reflect.field(dyn,key);
@@ -83,17 +263,6 @@ class CoolUtil
 		}
 		return File.getContent(file);
 	}
-	public static function coolTextFile(path:String):Array<String>
-	{
-		var daList:Array<String> = Assets.getText(path).trim().split('\n');
-
-		for (i in 0...daList.length)
-		{
-			daList[i] = daList[i].trim();
-		}
-
-		return daList;
-	}
 
 	public static function boundTo(value:Float, min:Float, max:Float):Float {
 		var newValue:Float = value;
@@ -107,146 +276,46 @@ class CoolUtil
 
 		return TJSON.parse(json);
 	}
-	public static function coolStringFile(path:String):Array<String>
-		{
-			var daList:Array<String> = path.trim().split('\n');
-	
-			for (i in 0...daList.length)
-			{
-				daList[i] = daList[i].trim();
-			}
-	
-			return daList;
-		}
 
-	public static function numberArray(max:Int, ?min = 0):Array<Int>
-	{
-		var dumbArray:Array<Int> = [];
-		for (i in min...max)
-		{
-			dumbArray.push(i);
-		}
-		return dumbArray;
-	}
-	public static function stringifyJson(json:Dynamic, ?fancy:Bool = true):String {
-		// use tjson to prettify it
-		var style:String = if (fancy) 'fancy' else null;
-		return TJSON.encode(json,style);
-	}
-	public static function coolDynamicTextFile(path:String):Array<String>
-		{
-			var daList:Array<String> = File.getContent(path).trim().split('\n');
-	
-			for (i in 0...daList.length)
-			{
-				daList[i] = daList[i].trim();
+	public static function dominantColor(sprite:flixel.FlxSprite):Int{
+		var countByColor:Map<Int, Int> = [];
+		for(col in 0...sprite.frameWidth){
+			for(row in 0...sprite.frameHeight){
+			  var colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
+			  if(colorOfThisPixel != 0){
+				  if(countByColor.exists(colorOfThisPixel)){
+				    countByColor[colorOfThisPixel] =  countByColor[colorOfThisPixel] + 1;
+				  }else if(countByColor[colorOfThisPixel] != 13520687 - (2*13520687)){
+					 countByColor[colorOfThisPixel] = 1;
+				  }
+			  }
 			}
-	
-			return daList;
-		}
-
-	//because controls.hx sucks. we result to CoolUtil. the one place with all the goodies.
-	
-	public static function bindCheck(mania:Int)
-		{
-			var keysMap = ClientPrefs.keyBinds;
-	
-			var binds:Array<Int> = [keysMap.get('note_left')[0],keysMap.get('note_down')[0], keysMap.get('note_up')[0], keysMap.get('note_right')[0]];
-			switch(mania)
-			{
-				case 0: 
-					binds = [keysMap.get('note_left')[0],keysMap.get('note_down')[0], keysMap.get('note_up')[0], keysMap.get('note_right')[0]];
-				case 1: 
-					binds = [keysMap.get('6k0')[0], keysMap.get('6k1')[0], keysMap.get('6k2')[0], keysMap.get('6k4')[0], keysMap.get('6k5')[0], keysMap.get('6k6')[0]];
-				case 2: 
-					if (PlayState.maniaToChange	!= 2)
-					{
-						switch (PlayState.maniaToChange)
-						{
-							case 0: 
-								binds = [keysMap.get('note_left')[0],keysMap.get('note_down')[0], keysMap.get('note_up')[0], keysMap.get('note_right')[0], -1, -1, -1, -1, -1];
-							case 1: 
-								binds = [keysMap.get('6k0')[0], keysMap.get('6k5')[0], keysMap.get('6k1')[0], keysMap.get('6k2')[0],-1, keysMap.get('6k4')[0],-1, -1,keysMap.get('6k6')[0]];
-							case 3: 
-								binds = [keysMap.get('note_left')[0],keysMap.get('note_down')[0], keysMap.get('note_up')[0], keysMap.get('note_right')[0], keysMap.get('6k3')[0], -1, -1, -1, -1];
-							case 4: 
-								binds = [keysMap.get('6k0')[0], keysMap.get('6k5')[0], keysMap.get('6k1')[0], keysMap.get('6k2')[0],keysMap.get('6k3')[0], keysMap.get('6k4')[0],-1, -1,keysMap.get('6k6')[0]];
-							case 5: 
-								binds = [keysMap.get('9k0')[0], keysMap.get('9k1')[0], keysMap.get('9k2')[0], keysMap.get('9k3')[0], -1, keysMap.get('9k5')[0], keysMap.get('9k6')[0], keysMap.get('9k7')[0], keysMap.get('9k8')[0]];
-							case 6: 
-								binds = [-1,-1,-1,-1,keysMap.get('6k3')[0],-1,-1,-1,-1];
-							case 7:
-								binds = [keysMap.get('note_left')[0],-1,-1, keysMap.get('note_right')[0],-1,-1,-1,-1,-1];
-							case 8: 
-								binds = [keysMap.get('note_left')[0],-1,-1, keysMap.get('note_right')[0],keysMap.get('6k3')[0],-1,-1,-1,-1];
-						}
-					}
-					else
-						binds = [keysMap.get('9k0')[0], keysMap.get('9k1')[0], keysMap.get('9k2')[0], keysMap.get('9k3')[0], keysMap.get('9k4')[0], keysMap.get('9k5')[0], keysMap.get('9k6')[0], keysMap.get('9k7')[0], keysMap.get('9k8')[0]];
-				case 3: 
-					binds = [keysMap.get('note_left')[0],keysMap.get('note_down')[0], keysMap.get('6k3')[0], keysMap.get('note_up')[0], keysMap.get('note_right')[0]];
-				case 4: 
-					binds = [keysMap.get('6k0')[0], keysMap.get('6k1')[0], keysMap.get('6k2')[0], keysMap.get('6k3')[0], keysMap.get('6k4')[0], keysMap.get('6k5')[0], keysMap.get('6k6')[0]];
-				case 5: 
-					binds = [keysMap.get('9k0')[0], keysMap.get('9k1')[0], keysMap.get('9k2')[0], keysMap.get('9k3')[0], keysMap.get('9k5')[0], keysMap.get('9k6')[0], keysMap.get('9k7')[0], keysMap.get('9k8')[0]];
-				case 6: 
-					binds = [keysMap.get('6k3')[0]];
-				case 7:
-					binds = [keysMap.get('note_left')[0], keysMap.get('note_right')[0]];
-				case 8: 
-					binds = [keysMap.get('note_left')[0], keysMap.get('6k3')[0], keysMap.get('note_right')[0]];
+		 }
+		var maxCount = 0;
+		var maxKey:Int = 0;//after the loop this will store the max color
+		countByColor[flixel.util.FlxColor.BLACK] = 0;
+			for(key in countByColor.keys()){
+			if(countByColor[key] >= maxCount){
+				maxCount = countByColor[key];
+				maxKey = key;
 			}
-			return binds;
 		}
-		public static function altbindCheck(mania:Int)
+		return maxKey;
+	}
+		public static function stringifyJson(json:Dynamic, ?fancy:Bool = true):String {
+			// use tjson to prettify it
+			var style:String = if (fancy) 'fancy' else null;
+			return TJSON.encode(json,style);
+		}
+		public static function coolDynamicTextFile(path:String):Array<String>
 			{
-				var keysMap = ClientPrefs.keyBinds;
+				var daList:Array<String> = File.getContent(path).trim().split('\n');
 		
-				var binds:Array<Int> = [keysMap.get('note_left')[1],keysMap.get('note_down')[1], keysMap.get('note_up')[1], keysMap.get('note_right')[1]];
-				switch(mania)
+				for (i in 0...daList.length)
 				{
-					case 0: 
-						binds = [keysMap.get('note_left')[1],keysMap.get('note_down')[1], keysMap.get('note_up')[1], keysMap.get('note_right')[1]];
-					case 1: 
-						binds = [keysMap.get('6k0')[1], keysMap.get('6k1')[1], keysMap.get('6k2')[1], keysMap.get('6k4')[1], keysMap.get('6k5')[1], keysMap.get('6k6')[1]];
-					case 2: 
-						if (PlayState.maniaToChange != 2)
-						{
-							switch (PlayState.maniaToChange)
-							{
-								case 0: 
-									binds = [keysMap.get('note_left')[1],keysMap.get('note_down')[1], keysMap.get('note_up')[1], keysMap.get('note_right')[1], -1, -1, -1, -1, -1];
-								case 1: 
-									binds = [keysMap.get('6k0')[1], keysMap.get('6k5')[1], keysMap.get('6k1')[1], keysMap.get('6k2')[1],-1, keysMap.get('6k4')[1],-1, -1,keysMap.get('6k6')[0]];
-								case 3: 
-									binds = [keysMap.get('note_left')[1],keysMap.get('note_down')[1], keysMap.get('note_up')[1], keysMap.get('note_right')[1], keysMap.get('6k3')[1], -1, -1, -1, -1];
-								case 4: 
-									binds = [keysMap.get('6k0')[1], keysMap.get('6k5')[1], keysMap.get('6k1')[1], keysMap.get('6k2')[1],keysMap.get('6k3')[1], keysMap.get('6k4')[1],-1, -1,keysMap.get('6k6')[1]];
-								case 5: 
-									binds = [keysMap.get('9k0')[1], keysMap.get('9k1')[1], keysMap.get('9k2')[1], keysMap.get('9k3')[1], -1, keysMap.get('9k5')[1], keysMap.get('9k6')[1], keysMap.get('9k7')[1], keysMap.get('9k8')[1]];
-								case 6: 
-									binds = [-1,-1,-1,-1,keysMap.get('6k3')[1],-1,-1,-1,-1];
-								case 7:
-									binds = [keysMap.get('note_left')[1],-1,-1, keysMap.get('note_right')[1],-1,-1,-1,-1,-1];
-								case 8: 
-									binds = [keysMap.get('note_left')[1],-1,-1, keysMap.get('note_right')[1],keysMap.get('6k3')[1],-1,-1,-1,-1];
-							}
-						}
-						else
-							binds = [keysMap.get('9k0')[1], keysMap.get('9k1')[1], keysMap.get('9k2')[1], keysMap.get('9k3')[1], keysMap.get('9k4')[1], keysMap.get('9k5')[1], keysMap.get('9k6')[1], keysMap.get('9k7')[1], keysMap.get('9k8')[1]];
-					case 3: 
-						binds = [keysMap.get('note_left')[1],keysMap.get('note_down')[1], keysMap.get('6k3')[1], keysMap.get('note_up')[1], keysMap.get('note_right')[1]];
-					case 4: 
-						binds = [keysMap.get('6k0')[1], keysMap.get('6k1')[1], keysMap.get('6k2')[1], keysMap.get('6k3')[1], keysMap.get('6k4')[1], keysMap.get('6k5')[1], keysMap.get('6k6')[1]];
-					case 5: 
-						binds = [keysMap.get('9k0')[1], keysMap.get('9k1')[1], keysMap.get('9k2')[1], keysMap.get('9k3')[1], keysMap.get('9k5')[1], keysMap.get('9k6')[1], keysMap.get('9k7')[1], keysMap.get('9k8')[1]];
-					case 6: 
-						binds = [keysMap.get('6k3')[1]];
-					case 7:
-						binds = [keysMap.get('note_left')[1], keysMap.get('note_right')[1]];
-					case 8: 
-						binds = [keysMap.get('note_left')[1], keysMap.get('6k3')[1], keysMap.get('note_right')[1]];
+					daList[i] = daList[i].trim();
 				}
-				return binds;
+		
+				return daList;
 			}
 }

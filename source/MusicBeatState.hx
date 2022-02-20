@@ -12,7 +12,6 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.ui.FlxUIState;
 import flixel.math.FlxRect;
 import flixel.util.FlxTimer;
-import flixel.FlxState;
 
 class MusicBeatState extends FlxUIState
 {
@@ -56,9 +55,10 @@ class MusicBeatState extends FlxUIState
 
 		updateCurStep();
 		updateBeat();
-		if (oldStep != curStep && curStep > 0){
+
+		if (oldStep != curStep && curStep > 0)
 			stepHit();
-		}
+
 		if (FlxG.save.data.fpsRain && skippedFrames >= 6)
 			{
 				if (currentColor >= array.length)
@@ -70,7 +70,7 @@ class MusicBeatState extends FlxUIState
 			else
 				skippedFrames++;
 
-		if ((cast (Lib.current.getChildAt(0), Main)).getFPSCap != FlxG.save.data.fpsCap)
+		if ((cast (Lib.current.getChildAt(0), Main)).getFPSCap != FlxG.save.data.fpsCap && FlxG.save.data.fpsCap <= 290)
 			(cast (Lib.current.getChildAt(0), Main)).setFPSCap(FlxG.save.data.fpsCap);
 
 		super.update(elapsed);
@@ -100,39 +100,24 @@ class MusicBeatState extends FlxUIState
 		curStep = lastChange.stepTime + Math.floor((Conductor.songPosition - lastChange.songTime) / Conductor.stepCrochet);
 	}
 
-	public static function switchState(nextState:FlxState) { //thanks shadow mario. very cool.
-		// Custom made Trans in
-		var curState:Dynamic = FlxG.state;
-		var leState:MusicBeatState = curState;
-		if(!FlxTransitionableState.skipNextTransIn) {
-			leState.openSubState(new CustomFadeTransition(0.7, false));
-			if(nextState == FlxG.state) {
-				CustomFadeTransition.finishCallback = function() {
-					FlxG.resetState();
-				};
-				//trace('resetted');
-			} else {
-				CustomFadeTransition.finishCallback = function() {
-					FlxG.switchState(nextState);
-				};
-				//trace('changed state');
-			}
-			return;
-		}
-		FlxTransitionableState.skipNextTransIn = false;
-		FlxG.switchState(nextState);
-	}
-
 	public function stepHit():Void
 	{
-		
-		if (curStep % 4 == 0){
+
+		if (curStep % 4 == 0)
 			beatHit();
-		}
 	}
 
 	public function beatHit():Void
 	{
 		//do literally nothing dumbass
+	}
+	
+	public function fancyOpenURL(schmancy:String)
+	{
+		#if linux
+		Sys.command('/usr/bin/xdg-open', [schmancy, "&"]);
+		#else
+		FlxG.openURL(schmancy);
+		#end
 	}
 }
