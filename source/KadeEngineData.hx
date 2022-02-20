@@ -151,7 +151,7 @@ class KadeEngineData
 		if (FlxG.save.data.freeplayInst == null)
 			FlxG.save.data.freeplayInst = true;
 
-		if (FlxG.save.data.circleShit == null)
+	//	if (FlxG.save.data.circleShit == null)
 			FlxG.save.data.circleShit = false;
 
 		if (FlxG.save.data.zoom == null)

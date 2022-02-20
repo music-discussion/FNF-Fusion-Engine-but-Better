@@ -194,9 +194,9 @@ class Paths
 				case 'dad-battle': songLowercase = 'dadbattle';
 				case 'philly-nice': songLowercase = 'philly';
 			}
-		if (FileSystem.exists('assets/songs/${songLowercase}/Voices.$SOUND_EXT'))
-			return 'songs:assets/songs/${songLowercase}/Voices.$SOUND_EXT';
-		else 
+	//	if (FileSystem.exists('assets/songs/${songLowercase}/Voices.$SOUND_EXT'))
+	//		return 'songs:assets/songs/${songLowercase}/Voices.$SOUND_EXT';
+	//	else 
 			return 'assets/music/${song}_Voices.$SOUND_EXT'; //so old fusion users won't get errors.
 	}
 
@@ -211,10 +211,10 @@ class Paths
 		//trace(FileSystem.exists('assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT'));
 	//	trace('assets/songs/' + songLowercase + '/Inst' + prefix.toLowerCase() + '.$SOUND_EXT');
 
-		if (FileSystem.exists('assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT')) {
-			trace('ke song or fusion switch');
-			return 'songs:assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT';}
-		else 
+	//	if (FileSystem.exists('assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT')) {
+	//		trace('ke song or fusion switch');
+	//		return 'songs:assets/songs/${songLowercase}/Inst${prefix.toLowerCase()}.$SOUND_EXT';}
+	//	else 
 			return 'assets/music/${song}_Inst${prefix.toLowerCase()}.$SOUND_EXT'; //saving old fusion people.
 	}
 

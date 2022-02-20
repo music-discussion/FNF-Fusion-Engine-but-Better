@@ -85,7 +85,7 @@ class OptionsMenu extends MusicBeatState
 			new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
 		]),
 		new OptionCategory("Arrows and Strums", [
-			new CircleOption("Activate Circle Arrows like Funky Friday!"),
+			#if debug new CircleOption("Activate Circle Arrows like Funky Friday!"), #end
 			#if desktop new CpuStrums("CPU's strumline lights up when a note hits it.") #end
 		]),
 		new OptionCategory("Zooming", [

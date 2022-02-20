@@ -3503,12 +3503,14 @@ class PlayState extends MusicBeatState
 				
 					case 'normal':
 						{
-							//babyArrow.frames = Paths.getSparrowAtlas('noteassets/NOTE_assets');
+							babyArrow.frames = Paths.getSparrowAtlas('noteassets/NOTE_assets');
+							/*var tex:FlxAtlasFrames;
 							if (!FlxG.save.data.circleShit)
-								babyArrow.frames = FlxAtlasFrames.fromSparrow('assets/images/NOTE_assets.png', 'assets/images/NOTE_assets.xml');
+								tex = Paths.getSparrowAtlas('noteassets/NOTE_assets');
 							else {
-								babyArrow.frames = FlxAtlasFrames.fromSparrow('assets/images/noteassets/circle/NOTE_assets.png', 'assets/images/noteassets/circle/NOTE_assets.xml');
+								tex = Paths.getSparrowAtlas('noteassets/circle/NOTE_assets');
 							}
+							babyArrow.frames = tex;*
 							babyArrow.animation.addByPrefix('green', 'arrowUP');
 							babyArrow.animation.addByPrefix('blue', 'arrowDOWN');
 							babyArrow.animation.addByPrefix('purple', 'arrowLEFT');
