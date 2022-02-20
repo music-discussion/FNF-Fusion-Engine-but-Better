@@ -117,10 +117,10 @@ class Caching extends MusicBeatState
 
 		toBeDone = Lambda.count(images) + Lambda.count(music);
 
-		var bar = new FlxBar(10,FlxG.height - 50,FlxBarFillDirection.LEFT_TO_RIGHT,FlxG.width,40,null,"done",0,toBeDone);
-		bar.color = FlxColor.PURPLE;
+		//var bar = new FlxBar(10,FlxG.height - 50,FlxBarFillDirection.LEFT_TO_RIGHT,FlxG.width,40,null,"done",0,toBeDone);
+	//	bar.color = FlxColor.PURPLE;
 
-		add(bar);
+	//	add(bar);
 
 		add(kadeLogo);
 		add(text);
@@ -165,7 +165,6 @@ class Caching extends MusicBeatState
 	function cache()
 	{
 		trace("LOADING: " + toBeDone + " OBJECTS.");
-
 		for (i in images)
 		{
 			var replaced = i.replace(".png","");
@@ -178,13 +177,13 @@ class Caching extends MusicBeatState
 			done++;
 		}
 
-		for (i in music)
+	/*	for (i in music)
 		{
 			FlxG.sound.cache(Paths.inst(i));
 			FlxG.sound.cache(Paths.voices(i));
 			trace("cached " + i);
 			done++;
-		}
+		}*/
 
 		//caching potential fusion tracks.
 

@@ -6727,9 +6727,9 @@ class PlayState extends MusicBeatState
 		trace(FlxColor.fromInt(CoolUtil.dominantColor(iconP2)));
 		switch (PlayStateChangeables.flip)
 		{
-			case false:
+			case true: 
 				healthBar.createFilledBar(FlxColor.fromInt(CoolUtil.dominantColor(iconP2)), FlxColor.fromInt(CoolUtil.dominantColor(iconP1))); 
-			case true:
+			case false:
 				healthBar.createFilledBar(FlxColor.fromInt(CoolUtil.dominantColor(iconP1)), FlxColor.fromInt(CoolUtil.dominantColor(iconP2))); 
 		}
 	}
