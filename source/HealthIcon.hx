@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxSprite;
+import flixel.FlxG;
 
 #if windows
 import Sys;
@@ -15,12 +16,18 @@ import flash.display.BitmapData;
 import sys.FileSystem;
 #end
 
+using StringTools;
+
 class HealthIcon extends FlxSprite
 {
 	/**
 	 * Used for FreeplayState! If you use it elsewhere, prob gonna annoying
 	 */
 	public var sprTracker:FlxSprite;
+	private var isOldIcon:Bool = false;
+	private var isPlayer:Bool = false;
+	private var char:String = '';
+
 
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
@@ -28,14 +35,14 @@ class HealthIcon extends FlxSprite
 
 		var name:String = 'betterfusion_customize/icons/' + char;
 
-		if(Paths.fileExists('images/' + name + '.png', IMAGE)){ //later versions of psych icon support
+		if(FileSystem.exists('images/' + name + '.png')){ //later versions of psych icon support
 			trace('we are dealing with an old psych icon. do the routine. | images/' + name + '.png');
 			isOldIcon = (char == 'bf-old');
 			this.isPlayer = isPlayer;
 			changeIcon(char);
 			scrollFactor.set();
 		}
-		else if(Paths.fileExists('images/betterfusion_customize/icons/icon-' + char + '.png', IMAGE)){ //older versions of psych icon support
+		else if(FileSystem.exists('images/betterfusion_customize/icons/icon-' + char + '.png')){ //older versions of psych icon support
 			var name:String = 'icons/psych/icon-' + char;
 			trace('we are dealing with a new psych icon. do the routine. | images/' + name + '.png');
 			isOldIcon = (char == 'bf-old');

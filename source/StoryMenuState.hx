@@ -120,7 +120,7 @@ class StoryMenuState extends MusicBeatState
 			{
 				if (storySongList[0] == song) 
 				{
-					weekNames.push(song);
+				//	weekNames.push(song);
 			} else 
 				{
 						weekSongs.push(song);
@@ -131,6 +131,7 @@ class StoryMenuState extends MusicBeatState
 	
 		for (i in storySongJson.weekGreyText) 
 		{
+			trace(i);
 			weekNames.push(i);
 		}
 	
@@ -146,6 +147,7 @@ class StoryMenuState extends MusicBeatState
 
 		for (i in storySongJson.weekUnlocked)
 		{
+			trace(i);
 			if(i == false)
 				weekUnlocked.push(false);
 			else 
