@@ -3508,7 +3508,7 @@ class PlayState extends MusicBeatState
 
 	function generateRanking():String
 	{
-		var ranking:String = "N/A";
+		var ranking:String = "N/A"; //fix
 
 		if (misses == 0 && bads == 0 && shits == 0 && goods == 0) // Marvelous (SICK) Full Combo
 			ranking = "(MFC)";
