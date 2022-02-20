@@ -93,14 +93,21 @@ class Caching extends MusicBeatState
 					continue;
 				images.push(i);
 			}
+
+			for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/images/custom_chars")))
+			{
+				if (!i.endsWith(".png"))
+					continue;
+				images.push(i);
+			}
 		}
 
 		trace("caching music...");
 
-		for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/songs")))
-		{
-			music.push(i);
-		}
+	//	for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/music")))
+	//	{
+	//		music.push(i);
+	//	}
 
 	//	for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/music")))
 	//	{
