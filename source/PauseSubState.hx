@@ -176,8 +176,10 @@ class PauseSubState extends MusicBeatSubstate
 			{
 				case "Resume":
 					close();
+					PlayState.instance.call('exitPauseMenu', []);
 				case "Restart Song":
 					FlxG.resetState();
+					PlayState.instance.call('endScript', []);
 				case "Exit to menu":
 					PlayState.loadRep = false;
 					if (PlayState.lua != null)
@@ -192,6 +194,7 @@ class PauseSubState extends MusicBeatSubstate
 					}
 					else
 						FlxG.switchState(new MainMenuState());
+					PlayState.instance.call('endScript', []);
 			}
 		}
 

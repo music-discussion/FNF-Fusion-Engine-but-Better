@@ -5,23 +5,33 @@ import Controls.KeyboardScheme;
 import flixel.FlxG;
 import openfl.display.FPS;
 import openfl.Lib;
+import flash.text.TextField;
+import flixel.FlxG;
+import flixel.addons.display.FlxGridOverlay;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.input.keyboard.FlxKey;
+import flixel.math.FlxMath;
+import flixel.text.FlxText;
+import flixel.util.FlxColor;
+import lime.utils.Assets;
 
 class OptionCatagory
 {
 	
-	private var _options:Array<Option> = new Array<Option>();
-	public final function getOptions():Array<Option>
+	private var _options:Array<Dynamic> = new Array<Dynamic>();
+
+	public final function getOptions():Array<Dynamic>
 	{
 		return _options;
 	}
 
-	public final function addOption(opt:Option)
+	public final function addOption(opt:Dynamic)
 	{
 		_options.push(opt);
 	}
 
 	
-	public final function removeOption(opt:Option)
+	public final function removeOption(opt:Dynamic)
 	{
 		_options.remove(opt);
 	}
@@ -31,7 +41,7 @@ class OptionCatagory
 		return _name;
 	}
 
-	public function new (catName:String, options:Array<Option>)
+	public function new (catName:String, options:Array<Dynamic>)
 	{
 		_name = catName;
 		_options = options;
@@ -70,6 +80,37 @@ class Option
 	public function right():Bool { return throw "stub!"; }
 }
 
+class OCinOC
+{ // OptionCatagory in OptionCatagory
+	private var _options:Array<OptionCatagory> = new Array<OptionCatagory>();
+	public final function getOptions():Array<OptionCatagory>
+	{
+		return _options;
+	}
+
+	public final function addOption(opt:Dynamic)
+	{
+		_options.push(opt);
+	}
+
+	
+	public final function removeOption(opt:Dynamic)
+	{
+		_options.remove(opt);
+	}
+
+	private var _name:String = "New Catagory";
+	public final function getName() {
+		return _name;
+	}
+
+	public function new (catName:String, options:Array<OptionCatagory>)
+	{
+		_name = catName;
+		_options = options;
+	}
+}
+
 class DFJKOption extends Option
 {
 	public static var rotation:Array<String> = ["ASWD","DFJK","JKIL","QWOP","ASKL"];
@@ -85,21 +126,48 @@ class DFJKOption extends Option
 
 	public override function press():Bool
 	{
-		FlxG.save.data.controls =(FlxG.save.data.controls+1)%rotation.length;
-		
+		FlxG.save.data.controls = (FlxG.save.data.controls + 1) % rotation.length;
 
 		controls.setKeyboardScheme(KeyboardScheme.Solo, true,rotation[FlxG.save.data.controls]);
 
-
 		display = updateDisplay();
+
 		return true;
 	}
 
 	private override function updateDisplay():String
 	{
+		trace(rotation[FlxG.save.data.controls]);
+		trace(FlxG.save.data.controls);
+
+		ClientPrefs.changeControls(FlxG.save.data.controls, 0); //used for extra keys. houses your 4k shit as well as your multikey.
+
 		return  visualRotation[FlxG.save.data.controls];
 	}
 }
+
+/*class DFJKOption extends Option //maybe one day
+{
+	private var controls:Controls;
+
+	public function new(controls:Controls)
+	{
+		super();
+		this.controls = controls;
+	}
+
+	public override function press():Bool
+	{
+		OptionsMenu.instance.openSubState(new KeyBindMenu());
+		return false;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Key Bindings for Four Key";
+	}
+}*/
+
 class NewInputOption extends Option{
 
 	public function new(desc:String){
@@ -119,6 +187,36 @@ class NewInputOption extends Option{
 				return true;
 			}
 }
+
+class InputOption extends Option{
+
+	public function new(desc:String){
+		super();
+		description = desc;
+		updateDisplay();
+	}
+
+	private function change()
+	{
+		if (FlxG.save.data.input == 'kade')
+			FlxG.save.data.input = 'psych';
+		else 
+			FlxG.save.data.input = 'kade';
+	}
+
+	private override function updateDisplay():String //get this function outta here.
+	{
+		return FlxG.save.data.input == 'kade' ? "Kade Input" : "Psych Input";
+	}
+	
+	public override function press():Bool
+	{
+		change();
+		display = updateDisplay();
+		return true;
+	}
+}
+
 class ResetKey extends Option{
 
 	public function new(desc:String){
@@ -176,6 +274,26 @@ class AccuracyOption extends Option
 	private override function updateDisplay():String
 	{
 		return "Accuracy " + (!FlxG.save.data.accuracyDisplay ? "off" : "on");
+	}
+}
+
+class AchievementOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+	public override function press():Bool
+	{
+		FlxG.save.data.achievements = !FlxG.save.data.achievements;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Achievements " + (!FlxG.save.data.achievements ? "off" : "on");
 	}
 }
 
@@ -270,7 +388,7 @@ class FPSOption extends Option
 	public override function press():Bool
 	{
 		FlxG.save.data.fps = !FlxG.save.data.fps;
-		(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.fps);
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.fps);
 		display = updateDisplay();
 		return true;
 	}
@@ -278,6 +396,159 @@ class FPSOption extends Option
 	private override function updateDisplay():String
 	{
 		return "FPS Counter " + (!FlxG.save.data.fps ? "off" : "on");
+	}
+}
+
+class SplashOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.notesplash = !FlxG.save.data.notesplash;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Note Splashes " + (!FlxG.save.data.notesplash ? "Off" : "On");
+	}
+}
+
+class CpuStrumsOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.cpuStrums = !FlxG.save.data.cpuStrums;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "CPU Note Glows " + (!FlxG.save.data.cpuStrums ? "Off" : "On");
+	}
+}
+
+class FreeplayInstOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.freeplayInst = !FlxG.save.data.freeplayInst;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Inst in Freeplay " + (!FlxG.save.data.freeplayInst ? "Off" : "On");
+	}
+}
+
+class NoZoomOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.noZoom = !FlxG.save.data.noZoom;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "" + (!FlxG.save.data.noZoom ? "No Cam Zooming" : "Cam Zooming On");
+	}
+}
+
+class SmallZoomOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.smallZoom = !FlxG.save.data.smallZoom;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Small Zoom" + (!FlxG.save.data.smallZoom ? " Off sad y tho" : " On");
+	}
+}
+
+class BigZoomOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.bigZoom = !FlxG.save.data.bigZoom;
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Big Zoom " + (!FlxG.save.data.bigZoom ? "off" : "on");
+	}
+}
+
+class CircleOption extends Option
+{
+	public function new(desc:String)
+	{
+		super();
+		description = desc;
+	}
+
+	public override function press():Bool
+	{
+		FlxG.save.data.circleShit = !FlxG.save.data.circleShit;
+	//	(cast (Lib.current.getChildAt(0), Main)).toggleFPS(FlxG.save.data.notesplash);
+		display = updateDisplay();
+		return true;
+	}
+
+	private override function updateDisplay():String
+	{
+		return "Circle Arrows " + (!FlxG.save.data.circleShit ? "Off" : "On");
 	}
 }
 

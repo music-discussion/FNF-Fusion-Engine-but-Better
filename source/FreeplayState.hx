@@ -1,26 +1,73 @@
 package;
 
-import flash.text.TextField;
+import openfl.geom.Matrix;
+import openfl.display.BitmapData;
+import openfl.utils.AssetType;
+import lime.graphics.Image;
+import flixel.graphics.FlxGraphic;
+import openfl.utils.AssetManifest;
+import openfl.utils.AssetLibrary;
+import flixel.system.FlxAssets;
+import llua.Convert;
+import llua.Lua;
+import llua.State;
+import llua.LuaL;
+import lime.app.Application;
+import lime.media.AudioContext;
+import lime.media.AudioManager;
+import openfl.Lib;
+import Section.SwagSection;
+import Song.SwagSong;
+import WiggleEffect.WiggleEffectType;
+import flixel.FlxBasic;
+import flixel.FlxCamera;
 import flixel.FlxG;
+import flixel.FlxGame;
+import flixel.FlxObject;
 import flixel.FlxSprite;
+import flixel.FlxState;
+import flixel.FlxSubState;
 import flixel.addons.display.FlxGridOverlay;
+import flixel.addons.effects.FlxTrail;
+import flixel.addons.effects.FlxTrailArea;
+import flixel.addons.effects.chainable.FlxEffectSprite;
+import flixel.addons.effects.chainable.FlxWaveEffect;
+import flixel.addons.transition.FlxTransitionableState;
+import flixel.graphics.atlas.FlxAtlas;
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
+import flixel.math.FlxPoint;
+import flixel.math.FlxRect;
+import flixel.system.FlxSound;
 import flixel.text.FlxText;
+import flixel.tweens.FlxEase;
+import flixel.tweens.FlxTween;
+import flixel.ui.FlxBar;
+import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
+import flixel.util.FlxSort;
+import flixel.util.FlxStringUtil;
+import flixel.util.FlxTimer;
+import haxe.Json;
 import lime.utils.Assets;
+import openfl.display.BlendMode;
+import openfl.display.StageQuality;
+import openfl.filters.ShaderFilter;
 
 #if sys
 import sys.io.File;
 import sys.FileSystem;
 
 import flash.media.Sound;
+
 #end
 #if windows
 import Discord.DiscordClient;
 #end
 
 using StringTools;
+
 class SongMetadatas
 {
 	public var songName:String = "";
@@ -46,19 +93,35 @@ class FreeplayState extends MusicBeatState
 	var diffText:FlxText;
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
+	//var iconRPC:String = "";
+	var SONG:SwagSong;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
+	private var iconArray:Array<HealthIcon> = [];
 
 	override function create()
 	{
+
 		var parsed = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
-		var initSonglist:Dynamic = parsed[id].songs;
+	//	var freeplayIcons:Array<String> = CoolUtil.coolTextFile(Paths.txt('freeplayIcons')); // FOR TESTING SHIT, MAY SOON BE ADDED
+		var initSonglist:Dynamic = parsed.songs;
+		var initSonglistIcons:Dynamic = parsed.icons;
+	//	var ICONinitSonglist = CoolUtil.coolTextFile(Paths.txt('ICONfreeplaySonglist'));
+
+		trace(initSonglist 	+ ' | ' + initSonglistIcons + ' | ');
+
 		for (i in 0...initSonglist.length)
 		{
-
-			songs.push(new SongMetadatas(initSonglist[i], 1, "bf"));
+			songs.push(new SongMetadatas(initSonglist[i], 1, initSonglistIcons[i])); 
+		//	songs.push(new SongMetadata(initSonglist[i], 1, Std.string(ICONfreeplaySonglist.data[1]))); 
+			// Std.string(titleStateTXT[26])
+			// songs.push(new SongMetadata(initSonglist[i], 1, data[1]));
+		//	var data:Array<String> = initSonglist[i].split(':');
+		//	songs.push(new SongMetadata(data[0], Std.parseInt(data[2]), data[1]));
 		}
+
+		// Std.string(titleStateTXT[0]);
 
 		/* 
 			if (FlxG.sound.music != null)
@@ -96,9 +159,12 @@ class FreeplayState extends MusicBeatState
 			songText.targetY = i;
 			grpSongs.add(songText);
 
+			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
+			icon.sprTracker = songText;
 
-
-
+			// using a FlxGroup is too much fuss!
+			iconArray.push(icon);
+			add(icon);
 
 			// songText.x += 40;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
@@ -173,6 +239,39 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
+	/*
+	switch(SONG.player1)
+		{
+			case 'bf' | 'bf-christmas' | 'bf-car':
+				p1Color = 0xFF31B0D1;
+		}
+
+		switch(SONG.player2)
+		{
+			case 'gf':
+				p2Color = 0xFFA5004D;
+			case 'dad':
+				p2Color = 0xFFAF66CE;
+			case 'spooky':
+				p2Color = 0xFFBDA47F;
+			case 'mom' | 'mom-car':
+				p2Color = 0xFFD8558E;
+			case 'monetser' | 'monster-christmas':
+				p2Color = 0xFFF3FF6E;
+			case 'pico':
+				p2Color = 0xFFD57E00;
+			case 'senpai' | 'senpai-angry':
+				p2Color = 0xFFFFAA6F;
+			case 'spirit':
+				p2Color = 0xFFFF3C6E;
+			case 'parents-christmas':
+		//		p2Color = 0xFFD65555;
+		}
+		*/
+
+	private static var vocals:FlxSound = null;
+	var instPlaying:Int = -1;
+
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
@@ -230,6 +329,7 @@ class FreeplayState extends MusicBeatState
 					diffic = '-hard';
 			}
 			var poop:String = songs[curSelected].songName.toLowerCase() + diffic;
+
 			if (!FileSystem.exists('assets/data/' + songs[curSelected].songName.toLowerCase() + '/' + poop.toLowerCase() + '.json'))
 			{
 				// assume we pecked up the difficulty, return to default difficulty
@@ -283,6 +383,14 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
+		public static function destroyFreeplayVocals() {
+			if(vocals != null) {
+				vocals.stop();
+				vocals.destroy();
+			}
+			vocals = null;
+		}
+
 	function changeSelection(change:Int = 0)
 	{
 		#if !switch
@@ -306,27 +414,41 @@ class FreeplayState extends MusicBeatState
 		// lerpScore = 0;
 		#end
 
-		#if PRELOAD_ALL
-		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
-		#end
+		if (FlxG.save.data.freeplayInst) 
+		{
+			if (FileSystem.exists('assets/music/'+songs[curSelected].songName+'_Inst.ogg'))
+			{ //hold on, just checking if the song exists.
+				FlxG.sound.playMusic(Sound.fromFile(Paths.inst(songs[curSelected].songName)), 1, false);
+			}
+			else { //to prevent crashes just play bopeebo.
+				FlxG.sound.playMusic(Paths.inst('Bopeebo_Inst'), 0);
+			}
+		}
 
 		var bullShit:Int = 0;
 
-
-		for (item in grpSongs.members)
-		{
-			item.targetY = bullShit - curSelected;
-			bullShit++;
-
-			item.alpha = 0.6;
-			// item.setGraphicSize(Std.int(item.width * 0.8));
-
-			if (item.targetY == 0)
+		for (i in 0...iconArray.length)
 			{
-				item.alpha = 1;
-				// item.setGraphicSize(Std.int(item.width));
+				iconArray[i].alpha = 0.6;
+				iconArray[i].animation.curAnim.curFrame = 0; //shout out to BetaBits. he figured this idea to put the thing here and it worked!
 			}
-		}
+	
+			iconArray[curSelected].alpha = 1;
+	
+			for (item in grpSongs.members)
+			{
+				item.targetY = bullShit - curSelected;
+				bullShit++;
+	
+				item.alpha = 0.6;
+				// item.setGraphicSize(Std.int(item.width * 0.8));
+	
+				if (item.targetY == 0)
+				{
+					item.alpha = 1;
+					// item.setGraphicSize(Std.int(item.width));
+				}
+			}
 	}
 }
 

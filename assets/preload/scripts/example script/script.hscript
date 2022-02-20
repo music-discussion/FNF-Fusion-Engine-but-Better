@@ -1,0 +1,552 @@
+var noteBounce = 1;
+var ymoveshit = 0;
+var doymoveshit = false;
+
+var doCameraShit = false;
+var cameraWaveShit = false;
+var camSpeed = 0.4;
+
+var dadmiddlescroll = 350;
+var bfmiddlescroll = -255;
+
+var camyoffset = 100;
+
+function stepHit(step) //every step (happens 4 times per beat, best place to put events)
+{ //most of the functions and stuff in here won't work but you can trial and erorr lol.
+    switch (step)
+    {
+        case 256: 
+            noteBounce = 0;
+        case 153, 157, 217, 221: //left and right move
+            PlayState.instance.tweenModifier("xOffset", 100, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("xOffset", 100, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+        case 155, 219: 
+            PlayState.instance.tweenModifier("xOffset", -100, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("xOffset", -100, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+        case 159, 223: 
+            PlayState.instance.tweenModifier("xOffset", 0, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("xOffset", 0, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+
+        case 85, 117, 853, 885: //that one jack pattern part idk lol
+            PlayState.instance.tweenModifier("yOffset", -30, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("yOffset", -30, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+        case 87, 119, 855, 887: 
+            PlayState.instance.tweenModifier("yOffset", -60, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("yOffset", -60, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+        case 89, 121, 857, 889: 
+            PlayState.instance.tweenModifier("yOffset", 0, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("yOffset", 0, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+        case 91, 123, 859, 891: 
+            PlayState.instance.tweenModifier("yOffset", 50, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("yOffset", 50, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+        case 93, 125, 861, 893: 
+            PlayState.instance.tweenModifier("yOffset", 100, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("yOffset", 100, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+        case 95, 127, 863, 895: 
+            PlayState.instance.tweenModifier("yOffset", 0, 0, "cubeInOut", Conductor.stepCrochet / 1000);
+            PlayState.instance.tweenModifier("yOffset", 0, 1, "cubeInOut", Conductor.stepCrochet / 1000);
+
+
+
+
+
+        case 258: 
+            goMiddleScroll(true);
+            noteBounce = 2;
+        case 299: 
+            resetX();
+        case 384: 
+            goMiddleScroll(false);
+            noteBounce = 0;
+            doCameraShit = true;
+            FlxTween.tween(PlayState.p1.noteCams[0], {x: 300}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut}); //split cams apart
+            FlxTween.tween(PlayState.p1.noteCams[1], {x: -300}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+            //PlayState.p1.noteCams[0].flash(FlxColor.WHITE, 0.4);
+            //PlayState.p1.noteCams[1].flash(FlxColor.WHITE, 0.4);
+        case 511: 
+            resetX();
+            noteBounce = 4;
+        case 573: 
+            PlayState.p1.modifiers.strumsFollowNotes = 1.5;
+        case 639: 
+            PlayState.p1.modifiers.strumsFollowNotes = 0;
+            goMiddleScroll(false);
+        case 447: //side scroll
+            FlxTween.tween(PlayState.p1.noteCams[0], {x: 0}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+            FlxTween.tween(PlayState.p1.noteCams[1], {x: 0}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+            PlayState.instance.tweenModifier("yOffset", 300, 1);
+            PlayState.instance.tweenModifier("xOffset", 200, 1);
+            PlayState.instance.tweenModifier("scrollAngle", 0, 1);
+            PlayState.p1.modifiers.StrumLinefollowAngle = true;
+            PlayState.p2.modifiers.StrumLinefollowAngle = true;
+            PlayState.instance.camHUD.visible = false;
+            noteBounce = 3;
+       case 479: //switch scroll back
+            doCameraShit = false;
+            PlayState.instance.tweenModifier("yOffset", 0, 1);
+            PlayState.instance.tweenModifier("xOffset", bfmiddlescroll, 1);
+            PlayState.instance.tweenModifier("scrollAngle", -90, 1);
+            PlayState.instance.camHUD.visible = true;
+            PlayState.p1.modifiers.StrumLinefollowAngle = false;
+            PlayState.p2.modifiers.StrumLinefollowAngle = false;
+            noteBounce = 0;
+        case 201: 
+            wig(true);
+            PlayState.instance.tweenModifier("drugged", 1, 1, "cubeInOut", Conductor.stepCrochet / 500);
+        case 208: 
+            wig(false);
+            PlayState.instance.tweenModifier("drugged", 0, 1, "cubeOut", Conductor.stepCrochet / 500);
+
+
+        case 633: 
+            PlayState.instance.bopNotes(1);
+            PlayState.instance.bopNotes(0);
+            goMiddleScroll(false);
+        case 704: 
+            noteBounce = 0;
+            PlayState.p1.modifiers.cosWaveY = [50, 0.5];
+        case 752: 
+            doCameraShit = true;
+            FlxTween.tween(PlayState.p1.noteCams[0], {x: 300}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut}); //split cams apart
+            FlxTween.tween(PlayState.p1.noteCams[1], {x: -300}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        case 764: 
+            twist(true);
+        case 768: 
+            doCameraShit = false;
+            resetX();
+            PlayState.p1.modifiers.cosWaveY = [0, 0];
+        case 800: 
+            resetX();
+            twist(false);
+        case 830: 
+            //PlayState.p1.modifiers.boundStrums = false;
+            PlayState.p1.modifiers.strumsFollowNotes = 1.5;
+            resetX();
+        case 858: 
+            PlayState.p1.modifiers.strumsFollowNotes = 0;
+        case 913, 922: 
+            //PlayState.p1.modifiers.scramble = 1;
+            PlayState.p1.modifValues.bopTo0 = [50, 0, 30];
+            PlayState.p1.modifValues.bopTo1 = [0, 0, 0];
+            PlayState.p1.modifValues.bopTo2 = [0, 0, 0];
+            PlayState.p1.modifValues.bopTo3 = [-50, 0, -30];
+            PlayState.instance.bopNotes(1);
+        case 929: 
+            PlayState.p1.modifValues.bopTo0 = [0, 0, 0];
+            PlayState.p1.modifValues.bopTo1 = [0, 50, 25];
+            PlayState.p1.modifValues.bopTo2 = [0, -50, -25];
+            PlayState.p1.modifValues.bopTo3 = [0, 0, 0];
+            PlayState.instance.bopNotes(1);
+        case 960: 
+            goMiddleScroll(false);
+        case 972: 
+            twist(true);
+        case 978: 
+            twist(false);
+        case 992: 
+            PlayState.p1.modifiers.cosWaveX = [50, 0.6];
+            wig(true);
+        case 1017: 
+            twist(true);
+        case 1024: 
+            twist(false);
+            PlayState.p1.modifiers.cosWaveX = [0, 0];
+            PlayState.p1.modifiers.sinWaveY = [60, 1];
+            wig(false);
+        case 1033: 
+            resetX();
+        case 1089: 
+            PlayState.p1.modifiers.sinWaveY = [0, 0];
+            wig(true);
+            PlayState.instance.tweenModifier("scrollAngle", -120, 1);
+            //PlayState.instance.tweenModifier("yOffset", -200, 1);
+            PlayState.p1.modifiers.StrumLinefollowAngle = true;
+            PlayState.p2.modifiers.StrumLinefollowAngle = true;
+        case 1095: 
+            PlayState.instance.tweenModifier("scrollAngle", -60, 1);
+        case 1101: 
+            PlayState.instance.tweenModifier("scrollAngle", -120, 1);
+        case 1130: 
+            PlayState.instance.tweenModifier("scrollAngle", -90, 1);
+            wig(false);
+            PlayState.instance.tweenModifier("yOffset", 0, 1);
+            PlayState.p1.modifiers.StrumLinefollowAngle = false;
+            PlayState.p2.modifiers.StrumLinefollowAngle = false;
+        case 1152: 
+            doymoveshit = true;
+            PlayState.p1.modifiers.boundStrums = true;
+        case 1215: 
+            doymoveshit = false;
+            PlayState.p1.modifiers.boundStrums = false;
+            PlayState.instance.tweenModifier("yOffset", 0, 1);
+
+        case 1233: 
+            goMiddleScroll(false);
+        case 1244: 
+            twist(true);
+        case 1248: 
+            twist(false);
+        case 1260: 
+            twist(true);
+        case 1264:
+            twist(false);
+        case 1276: 
+            twist(true);
+        case 1280: 
+            twist(false);
+            doCameraShit = true;
+            cameraWaveShit = true;
+            noteBounce = 4;
+        case 1408: 
+            PlayState.instance.tweenModifier("xOffset", dadmiddlescroll, 0);
+            PlayState.p2.modifiers.noteAlpha = 0.3;
+            PlayState.p2.modifiers.strumAlpha = 0.3;
+        case 1472: 
+            noteBounce = 0;
+            camSpeed = 0.6;
+            PlayState.instance.tweenModifier("xOffset", -1500, 0);
+
+        case 1516:
+            twist(true);
+        case 1520: 
+            twist(false);
+        case 1532:
+            twist(true);
+        case 1536: 
+            twist(false);
+            doCameraShit = false;
+            cameraWaveShit = false;
+            resetX();
+            PlayState.p2.modifiers.noteAlpha = 1;
+            PlayState.p2.modifiers.strumAlpha = 1;
+            noteBounce = 1;
+    }
+
+    switch (noteBounce)
+    {
+        case 1: 
+            if (step % 32 == 1 || step % 32 == 21)
+            {
+                PlayState.p1.modifValues.bopTo0 = [20, 30, 40];
+                PlayState.p1.modifValues.bopTo1 = [10, 30, 20];
+                PlayState.p1.modifValues.bopTo2 = [-10, 30, -20];
+                PlayState.p1.modifValues.bopTo3 = [-20, 30, -40];
+                PlayState.p1.modifValues.bopTo4 = [-10, 30, -20];
+                PlayState.p1.modifValues.bopTo5 = [20, 30, 40];
+                PlayState.p1.modifValues.bopTo6 = [10, 30, 20];
+                PlayState.p1.modifValues.bopTo7 = [-10, 30, -20];
+                PlayState.p1.modifValues.bopTo8 = [-20, 30, -40];
+
+                PlayState.p2.modifValues.bopTo0 = [20, 30, 40];
+                PlayState.p2.modifValues.bopTo1 = [10, 30, 20];
+                PlayState.p2.modifValues.bopTo2 = [-10, 30, -20];
+                PlayState.p2.modifValues.bopTo3 = [-20, 30, -40];
+                PlayState.p2.modifValues.bopTo4 = [-10, 30, -20];
+                PlayState.p2.modifValues.bopTo5 = [20, 30, 40];
+                PlayState.p2.modifValues.bopTo6 = [10, 30, 20];
+                PlayState.p2.modifValues.bopTo7 = [-10, 30, -20];
+                PlayState.p2.modifValues.bopTo8 = [-20, 30, -40];
+
+                
+                PlayState.instance.bopNotes(1);
+                PlayState.instance.bopNotes(0);
+            }
+            else if (step % 32 == 9 || step % 32 == 25)
+            {
+                PlayState.p1.modifValues.bopTo0 = [20, -30, -40];
+                PlayState.p1.modifValues.bopTo1 = [10, -30, -20];
+                PlayState.p1.modifValues.bopTo2 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo3 = [-20, -30, 40];
+                PlayState.p1.modifValues.bopTo4 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo5 = [20, -30, -40];
+                PlayState.p1.modifValues.bopTo6 = [10, -30, -20];
+                PlayState.p1.modifValues.bopTo7 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo8 = [-20, -30, 40];
+
+                PlayState.p2.modifValues.bopTo0 = [20, -30, -40];
+                PlayState.p2.modifValues.bopTo1 = [10, -30, -20];
+                PlayState.p2.modifValues.bopTo2 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo3 = [-20, -30, 40];
+                PlayState.p2.modifValues.bopTo4 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo5 = [20, -30, -40];
+                PlayState.p2.modifValues.bopTo6 = [10, -30, -20];
+                PlayState.p2.modifValues.bopTo7 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo8 = [-20, -30, 40];
+
+                
+                PlayState.instance.bopNotes(1);
+                PlayState.instance.bopNotes(0);
+            }
+        case 2: 
+            if (step % 16 == 1)
+            {
+                PlayState.p1.modifValues.bopTo0 = [20, -30, -40];
+                PlayState.p1.modifValues.bopTo1 = [10, -30, -20];
+                PlayState.p1.modifValues.bopTo2 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo3 = [-20, -30, 40];
+                PlayState.p1.modifValues.bopTo4 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo5 = [20, -30, -40];
+                PlayState.p1.modifValues.bopTo6 = [10, -30, -20];
+                PlayState.p1.modifValues.bopTo7 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo8 = [-20, -30, 40];
+
+                PlayState.p2.modifValues.bopTo0 = [20, -30, -40];
+                PlayState.p2.modifValues.bopTo1 = [10, -30, -20];
+                PlayState.p2.modifValues.bopTo2 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo3 = [-20, -30, 40];
+                PlayState.p2.modifValues.bopTo4 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo5 = [20, -30, -40];
+                PlayState.p2.modifValues.bopTo6 = [10, -30, -20];
+                PlayState.p2.modifValues.bopTo7 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo8 = [-20, -30, 40];
+
+                
+                PlayState.instance.bopNotes(1);
+                PlayState.instance.bopNotes(0);
+            }
+        case 3: 
+            if (step % 2 == 1)
+            {
+                PlayState.p1.modifValues.bopTo0 = [0, -30, -60];
+                PlayState.p1.modifValues.bopTo1 = [0, -30, -60];
+                PlayState.p1.modifValues.bopTo2 = [0, 30, 60];
+                PlayState.p1.modifValues.bopTo3 = [0, 30, 60];
+                PlayState.p1.modifValues.bopTo4 = [0, 30, 60];
+                PlayState.p1.modifValues.bopTo5 = [0, -30, -60];
+                PlayState.p1.modifValues.bopTo6 = [0, -30, -60];
+                PlayState.p1.modifValues.bopTo7 = [0, 30, 60];
+                PlayState.p1.modifValues.bopTo8 = [0, 30, 60];
+                
+                PlayState.instance.bopNotes(1);
+            }
+        case 4: 
+            if (step % 16 == 5 || step % 16 == 13)
+            {
+                PlayState.p1.modifValues.bopTo0 = [20, -30, -40];
+                PlayState.p1.modifValues.bopTo1 = [10, -30, -20];
+                PlayState.p1.modifValues.bopTo2 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo3 = [-20, -30, 40];
+                PlayState.p1.modifValues.bopTo4 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo5 = [20, -30, -40];
+                PlayState.p1.modifValues.bopTo6 = [10, -30, -20];
+                PlayState.p1.modifValues.bopTo7 = [-10, -30, 20];
+                PlayState.p1.modifValues.bopTo8 = [-20, -30, 40];
+
+                PlayState.p2.modifValues.bopTo0 = [20, -30, -40];
+                PlayState.p2.modifValues.bopTo1 = [10, -30, -20];
+                PlayState.p2.modifValues.bopTo2 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo3 = [-20, -30, 40];
+                PlayState.p2.modifValues.bopTo4 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo5 = [20, -30, -40];
+                PlayState.p2.modifValues.bopTo6 = [10, -30, -20];
+                PlayState.p2.modifValues.bopTo7 = [-10, -30, 20];
+                PlayState.p2.modifValues.bopTo8 = [-20, -30, 40];
+
+                
+                PlayState.instance.bopNotes(1);
+                PlayState.instance.bopNotes(0);
+            }
+    }
+
+    if (step > 384 && step < 416)
+    {
+        var goTo = step % 4 * 50;
+        goTo += 250;
+        FlxTween.tween(PlayState.p1.noteCams[0], {x: goTo}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut}); //split cams apart
+        FlxTween.tween(PlayState.p1.noteCams[1], {x: -goTo}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+    }
+    else if (step > 416 && step < 447 && step % 2 == 0)
+    {
+        var goTo = step % 4 * 25;
+        goTo += 250;
+        FlxTween.tween(PlayState.p1.noteCams[0], {x: goTo}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut}); //split cams apart
+        FlxTween.tween(PlayState.p1.noteCams[1], {x: -goTo}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+    }
+
+    if (step > 256 && step < 1536)
+    {
+    if (step % 4 == 1) //voices are a step ahead becuase we dont got proper inst and vocals files yet
+    {
+        PlayState.p1.noteCams[0].zoom = 1.03;
+        PlayState.p1.noteCams[1].zoom = 1.03;
+        PlayState.p2.noteCams[0].zoom = 1.03;
+        PlayState.p2.noteCams[1].zoom = 1.03;
+        PlayState.p1.noteCamsSus[0].zoom = 1.03;
+        PlayState.p1.noteCamsSus[1].zoom = 1.03;
+        PlayState.p2.noteCamsSus[0].zoom = 1.03;
+        PlayState.p2.noteCamsSus[1].zoom = 1.03;
+    }
+    else 
+    {
+        FlxTween.tween(PlayState.p1.noteCams[0], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        FlxTween.tween(PlayState.p1.noteCams[1], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        FlxTween.tween(PlayState.p2.noteCams[0], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        FlxTween.tween(PlayState.p2.noteCams[1], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        FlxTween.tween(PlayState.p1.noteCamsSus[0], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        FlxTween.tween(PlayState.p1.noteCamsSus[1], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        FlxTween.tween(PlayState.p2.noteCamsSus[0], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+        FlxTween.tween(PlayState.p2.noteCamsSus[1], {zoom: 1}, Conductor.stepCrochet / 1000, {ease: FlxEase.cubeInOut});
+    }
+    }
+
+
+}
+
+
+function beatHit(beat) //every beat
+{
+
+}
+
+function update(elapsed) //every frame
+{
+    if (doymoveshit)
+    {
+        ymoveshit += elapsed * 80; //slowly moved y value
+        ymoveshit = ymoveshit % FlxG.height; //it have bound strums but it was annoying to play, this line fixes the looping
+        PlayState.p1.modifiers.yOffset = ymoveshit;
+    }
+
+    if (doCameraShit)
+    {
+        if (cameraWaveShit)
+        {
+            PlayState.p1.noteCams[0].x = 525 * Math.sin(PlayState.instance.currentBeat * camSpeed);
+            PlayState.p1.noteCams[1].x = -525 * Math.sin(PlayState.instance.currentBeat * camSpeed);
+            PlayState.p1.noteCams[0].y = camyoffset + 175 * Math.cos(PlayState.instance.currentBeat * camSpeed);
+            PlayState.p1.noteCams[1].y = camyoffset + -175 * Math.cos(PlayState.instance.currentBeat * camSpeed);
+        }
+    }
+    else 
+    {
+        PlayState.p1.noteCams[0].x = 0;
+        PlayState.p1.noteCams[1].x = 0;
+        PlayState.p1.noteCams[0].y = 0;
+        PlayState.p1.noteCams[1].y = 0;
+    }
+
+}
+
+function twist(start)
+{
+    if (start)
+    {
+        var curmaniashit = PlayState.p1.strums.members[0].curMania;
+        if (CoolUtil.CurSongDiffs[PlayState.storyDifficulty].toLowerCase() == "multikey") //only modchart difference between diffs
+        {
+            PlayState.p1.tweenModifierValue("xOffset0", Note.noteWidths[curmaniashit] * 8);
+            PlayState.p1.tweenModifierValue("xOffset1", Note.noteWidths[curmaniashit] * 6);
+            PlayState.p1.tweenModifierValue("xOffset2", Note.noteWidths[curmaniashit] * 4);
+            PlayState.p1.tweenModifierValue("xOffset3", Note.noteWidths[curmaniashit] * 2);
+            //PlayState.p1.tweenModifierValue("xOffset4", Note.noteWidths[curmaniashit] * 3);
+            PlayState.p1.tweenModifierValue("xOffset5", -Note.noteWidths[curmaniashit] * 2);
+            PlayState.p1.tweenModifierValue("xOffset6", -Note.noteWidths[curmaniashit] * 4);
+            PlayState.p1.tweenModifierValue("xOffset7", -Note.noteWidths[curmaniashit] * 6);
+            PlayState.p1.tweenModifierValue("xOffset8", -Note.noteWidths[curmaniashit] * 8);
+        }
+        else
+        {
+            PlayState.p1.tweenModifierValue("xOffset0", Note.noteWidths[curmaniashit] * 3);
+            PlayState.p1.tweenModifierValue("xOffset1", Note.noteWidths[curmaniashit]);
+            PlayState.p1.tweenModifierValue("xOffset2", -Note.noteWidths[curmaniashit]);
+            PlayState.p1.tweenModifierValue("xOffset3", -Note.noteWidths[curmaniashit] * 3);
+        }
+
+        wig(true);
+    }
+    else 
+    {
+        PlayState.p1.tweenModifierValue("xOffset0", 0);
+        PlayState.p1.tweenModifierValue("xOffset1", 0);
+        PlayState.p1.tweenModifierValue("xOffset2", 0);
+        PlayState.p1.tweenModifierValue("xOffset3", 0);
+        PlayState.p1.tweenModifierValue("xOffset4", 0);
+        PlayState.p1.tweenModifierValue("xOffset5", 0);
+        PlayState.p1.tweenModifierValue("xOffset6", 0);
+        PlayState.p1.tweenModifierValue("xOffset7", 0);
+        PlayState.p1.tweenModifierValue("xOffset8", 0);
+        wig(false);
+    }
+}
+
+function goMiddleScroll(isDad)
+{
+    if (!SaveData.middlescroll) //no mid scroll yet.
+    {
+        if (isDad)
+        {
+            PlayState.instance.tweenModifier("xOffset", 1500, 1);
+            PlayState.instance.tweenModifier("xOffset", dadmiddlescroll, 0); //middlescroll for dad
+        }
+        else
+        {
+            PlayState.instance.tweenModifier("xOffset", bfmiddlescroll, 1); //middlescoll for bf
+            PlayState.instance.tweenModifier("xOffset", -1500.0, 0);
+        }
+    }
+}
+
+function resetX()
+{
+    PlayState.instance.tweenModifier("xOffset", 0, 1); //back to normal
+    PlayState.instance.tweenModifier("xOffset", 0, 0);
+}
+function resetY()
+{
+
+}
+
+function wig(start)
+{
+    if (start)
+    {
+        PlayState.p1.wiggleShit.set_waveSpeed(2);
+        PlayState.p1.wiggleShit.set_waveFrequency(7);
+        PlayState.p1.wiggleShit.set_waveAmplitude(0.02);
+    }
+    else 
+    {
+        PlayState.p1.wiggleShit.set_waveSpeed(0);
+        PlayState.p1.wiggleShit.set_waveFrequency(0);
+        PlayState.p1.wiggleShit.set_waveAmplitude(0);
+    }
+}
+
+function loadScript() /*as soon as the script exists, good for changing varibles at the start (if savedata or static var, make sure to change it back after!!!!!)*/
+{
+    if (SaveData.downscroll)
+        camyoffset = -100;
+
+    PlayState.instance.amountOfNoteCams = 2;
+
+    
+    
+}
+
+function onPlayStateCreated()
+{
+
+    PlayState.instance.alignCams = false;
+    var bfHSV = new HSVEffect();
+    
+    bfHSV.hue = -0.15;
+    bfHSV.saturation = -0.2;
+    bfHSV.brightness = -0.3;
+    bfHSV.update();
+    PlayState.instance.camGame.setFilters([new ShaderFilter(bfHSV.shader)]);
+
+}
+
+function endScript() /*any place the song can end (pause menu from exiting, entering chart editor, etc)*/
+{
+
+}
+
+function startSong(song) //when countdown ends
+{
+}
+
+function endSong() //only if song ends from beating it (e.g you wanna play a cutscene or something idk)
+{
+
+}

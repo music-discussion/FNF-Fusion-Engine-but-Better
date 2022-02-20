@@ -11,6 +11,7 @@ import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
+import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.system.FlxSound;
@@ -24,11 +25,16 @@ import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
 
+import flixel.input.keyboard.FlxKey; //yessssssssssssss
+
 #if windows
 import Discord.DiscordClient;
 #end
 #if sys
+
+import Sys;
 import sys.io.File;
+import sys.FileSystem;
 
 #end
 #if desktop
@@ -52,11 +58,29 @@ class TitleState extends MusicBeatState
 
 	var wackyImage:FlxSprite;
 
+	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
+	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
+	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
+
+	public var modchartScript:HscriptShit;
+	public static var instance:TitleState = null; //to access in other places
+
+	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
+	{
+		if (modchartScript.enabled)
+			modchartScript.call(tfisthis, shitToGoIn); //because
+	}
+
 	override public function create():Void
 	{
+		instance = this;
+
 		#if polymod
 		polymod.Polymod.init({modRoot: "mods", dirs: ['introMod']});
 		#end
+
+		modchartScript = new HscriptShit(Paths.hScript('titlemenu'));
+		trace ("file loaded = " + modchartScript.enabled);
 		
 		#if sys
 		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
@@ -94,9 +118,15 @@ class TitleState extends MusicBeatState
 
 		FlxG.save.bind('funkin', 'ninjamuffin99');
 
-		KadeEngineData.initSave();
+		//////////////////////////////////////////////////////////////////////
 
+		//the hole squad lmfao
+
+		KadeEngineData.initSave();
+		ClientPrefs.setControls();
 		Highscore.load();
+
+		//////////////////////////////////////////////////////////////////////
 
 		if (FlxG.save.data.weekUnlocked != null)
 		{
@@ -121,8 +151,10 @@ class TitleState extends MusicBeatState
 		}else{
 			FlxG.switchState(new FreeplayCategory());
 		}
+		call('endScript', []);
 		#elseif CHARTING
 		FlxG.switchState(new ChartingState());
+		call('endScript', []);
 		#else
 		new FlxTimer().start(1, function(tmr:FlxTimer)
 		{
@@ -245,7 +277,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		var fullText:String = File.getContent("assets/preload/data/introText.txt");
+		var fullText:String = File.getContent("assets/data/introText.txt");
 
 		var firstArray:Array<String> = fullText.split('\n');
 		var swagGoodArray:Array<Array<String>> = [];
@@ -262,6 +294,8 @@ class TitleState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		call("update", [elapsed]);
+		
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
@@ -317,15 +351,36 @@ class TitleState extends MusicBeatState
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
 
-				// Get current version of Kade Engine
-
-					
-						FlxG.switchState(new MainMenuState());
-					
-
+				// Get current version of Better Fusion Engine
 				
-
-
+				var http = new haxe.Http("https://raw.githubusercontent.com/music-discussion/FNF-Fusion-Engine-but-Better/master/version.downloadMe"); // get versio check :)
+				var returnedData:Array<String> = [];
+				
+				http.onData = function (data:String)
+				{
+					returnedData[0] = data.substring(0, data.indexOf(';'));
+					returnedData[1] = data.substring(data.indexOf('-'), data.length);
+				  	if (!MainMenuState.kadeEngineVer.contains(returnedData[0].trim()) && !OutdatedSubState.leftState && MainMenuState.nightly == "" || FlxG.keys.justPressed.ONE)
+					{
+						trace('outdated lmao! ' + returnedData[0] + ' != ' + MainMenuState.kadeEngineVer);
+						OutdatedSubState.needVer = returnedData[0];
+						OutdatedSubState.currChanges = returnedData[1];
+						FlxG.switchState(new OutdatedSubState());
+					}
+					else
+					{
+						FlxG.switchState(new MainMenuState());
+					}
+				}
+				
+				http.onError = function (error) {
+				  trace('error: $error');
+				  FlxG.switchState(new MainMenuState()); // fail but we go anyway
+				}
+				
+				http.request();
+				call('endScript', []);
+				
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
@@ -368,9 +423,18 @@ class TitleState extends MusicBeatState
 		}
 	}
 
+	var titleStateTXT:Array<String> = CoolUtil.coolTextFile(Paths.txt('titleState')); // hold on. finding txt.
+	var txtVis:Bool; // = Std.string(titleStateTXT[20]); // this is suprisingly easy to do my god.
+
+	// CURWACKY TEXT SHIT
+
+	var topText:String; // = Std.string(titleStateTXT[25]);
+	var bottomText:String; // =  Std.string(titleStateTXT[26]);W
+
 	override function beatHit()
 	{
 		super.beatHit();
+		call("beatHit", [curBeat]);
 
 		logoBl.animation.play('bump');
 		danceLeft = !danceLeft;
@@ -382,10 +446,14 @@ class TitleState extends MusicBeatState
 
 		FlxG.log.add(curBeat);
 
+		if (!FileSystem.exists(Paths.hScript('titlemenu'))) {
 		switch (curBeat)
 		{
 			case 1:
-				createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
+			createCoolText(["Better Fusion Team"]); //this way cause it wouldnt show up
+			addMoreText("Psych Engine Team"); //AND IT STILL DOESNT
+			addMoreText("srPerez");
+			addMoreText('other');
 			// credTextShit.visible = true;
 			case 3:
 				addMoreText('present');
@@ -398,12 +466,12 @@ class TitleState extends MusicBeatState
 			// credTextShit.screenCenter();
 			case 5:
 				if (Main.watermarks)
-					createCoolText(['Fusion Engine', 'by']);
+					createCoolText(['Fusion Engine Originally', 'by Kidsfreej']); //god so much copy and paste, but its worth it
 				else
 					createCoolText(['In Partnership', 'with']);
 			case 7:
 				if (Main.watermarks)
-					addMoreText('Kidsfreej on Github');
+					addMoreText('thanks very cool man');
 				else
 				{
 					addMoreText('Newgrounds');
@@ -412,16 +480,16 @@ class TitleState extends MusicBeatState
 			// credTextShit.text += '\nNewgrounds';
 			case 8:
 				deleteCoolText();
-				ngSpr.visible = false;
+				ngSpr.visible = false; //clear check lol
 			// credTextShit.visible = false;
 
 			// credTextShit.text = 'Shoutouts Tom Fulp';
 			// credTextShit.screenCenter();
 			case 9:
-				createCoolText([curWacky[0]]);
+					createCoolText([curWacky[0]]);
 			// credTextShit.visible = true;
 			case 11:
-				addMoreText(curWacky[1]);
+					addMoreText(curWacky[1]);
 			// credTextShit.text += '\nlmao';
 			case 12:
 				deleteCoolText();
@@ -429,16 +497,18 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = "Friday";
 			// credTextShit.screenCenter();
 			case 13:
-				addMoreText('Friday');
+				addMoreText("Better");
 			// credTextShit.visible = true;
 			case 14:
-				addMoreText('Night');
+				addMoreText("Fusion");
 			// credTextShit.text += '\nNight';
 			case 15:
-				addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
-
+				addMoreText("Engine"); // credTextShit.text += '\nFunkin';
+				// finally its over, only to get a billlion errors. hopefully not
+				// I was right but they are fixed :)
 			case 16:
 				skipIntro();
+		} 
 		}
 	}
 
@@ -454,5 +524,10 @@ class TitleState extends MusicBeatState
 			remove(credGroup);
 			skippedIntro = true;
 		}
+	}
+
+	function redoCurWack():Void
+	{
+		curWacky = FlxG.random.getObject(getIntroTextShit());
 	}
 }

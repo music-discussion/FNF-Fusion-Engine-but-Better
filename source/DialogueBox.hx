@@ -153,6 +153,18 @@ class DialogueBox extends FlxSpriteGroup
 				{
 					clickSounds[1] = Sound.fromFile('assets/images/custom_chars/' + PlayState.SONG.player2 + '/text.ogg');
 				}
+
+				if (dialogueList[3] != null)
+					{
+						if (FileSystem.exists('assets/images/custom_chars/' + PlayState.SONG.player2 + '/portrait_' + dialogueList[3] + ".png"))
+							{
+								var coolP2Json = Character.getAnimJson(PlayState.SONG.player2);
+								isPixel[1] = if (Reflect.hasField(coolP2Json, "isPixel")) coolP2Json.isPixel else false;
+								var rawPic = BitmapData.fromFile('assets/images/custom_chars/' + PlayState.SONG.player2 + "/portrait_" + dialogueList[3] + ".png");
+								var rawXml = File.getContent('assets/images/custom_chars/' + PlayState.SONG.player2 + "/portrait_" + dialogueList[3] + ".xml");
+								portraitLeft.frames = FlxAtlasFrames.fromSparrow(rawPic, rawXml);
+							}
+					}
 		}
 		if (isPixel[1]) {
 			portraitLeft.setGraphicSize(Std.int(portraitLeft.width * PlayState.daPixelZoom * 0.9));
@@ -215,6 +227,18 @@ class DialogueBox extends FlxSpriteGroup
 				}
 				if (FileSystem.exists('assets/images/custom_chars/'+ PlayState.SONG.player1 + '/text.ogg')) {
 					clickSounds[0] = Sound.fromFile('assets/images/custom_chars/' + PlayState.SONG.player1 + '/text.ogg');
+				}
+				trace(dialogueList[3]);
+				if (dialogueList[3] != null)
+				{
+					if (FileSystem.exists('assets/images/custom_chars/' + PlayState.SONG.player1 + '/portrait_' + dialogueList[3] + ".png"))
+						{
+							var coolP1Json = Character.getAnimJson(PlayState.SONG.player1);
+							isPixel[0] = if (Reflect.hasField(coolP1Json, "isPixel")) coolP1Json.isPixel else false;
+							var rawPic = BitmapData.fromFile('assets/images/custom_chars/' + PlayState.SONG.player1 + "/portrait_" + dialogueList[3] + ".png");
+							var rawXml = File.getContent('assets/images/custom_chars/' + PlayState.SONG.player1 + "/portrait_" + dialogueList[3] + ".xml");
+							portraitRight.frames = FlxAtlasFrames.fromSparrow(rawPic, rawXml);
+						}
 				}
 		}
 		trace("here4");
@@ -370,6 +394,7 @@ class DialogueBox extends FlxSpriteGroup
 		if (dialogueList[0].startsWith(':dad:') && sided) {
 			box.flipX = true;
 		}
+
 		if (isPixel[2]) {
 			box.setGraphicSize(Std.int(box.width * PlayState.daPixelZoom * 0.9));
 		} else {

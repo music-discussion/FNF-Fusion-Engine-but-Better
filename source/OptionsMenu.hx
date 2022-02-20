@@ -19,11 +19,13 @@ class OptionsMenu extends MusicBeatState
 	var selector:FlxText;
 	var curSelected:Int = 0;
 
-	var options:Array<OptionCatagory> = [
+	//var options:Array<OptionCatagory> = [
+	var options:Array<Dynamic> = [
 		new OptionCatagory("Gameplay", [
 			new DFJKOption(controls),
-			new NewInputOption("Swaps the input system"),
-			new ResetKey("gamer goes brr ior no brrr"),
+			new InputOption("Swaps the input system from Kade to Psych."),
+			new NewInputOption("Swaps the input system from New to one near the Week 7 update."),
+			new ResetKey("Enable or Disable the use of R to kill yourself."),
 			new Judgement("Customize your Hit Timings (LEFT or RIGHT)"),
 			#if desktop
 			new FPSCapOption("Cap your FPS (Left for -10, Right for +10. SHIFT to go faster)"),
@@ -48,9 +50,32 @@ class OptionsMenu extends MusicBeatState
 			new FPSOption("Toggle the FPS Counter"),
 			new ReplayOption("View replays"),
 			#end
-			new WatermarkOption("Turn off all watermarks from the engine.")
+			new WatermarkOption("Turn off all watermarks from the engine."),
 			
-		])
+		]),
+			new OptionCatagory("Splashes", [
+				new SplashOption("Disable or ReEnable note splashes on notes. (doesnt work ): "),
+			]),
+			new OptionCatagory("Menus", [
+				new FreeplayInstOption("Disable or Enable Instrumental playing on selected songs in Freeplay."),
+				#if debug
+				new AchievementOption("Replaces Donate Button with Achievements area.")
+				#end
+			]),
+			new OptionCatagory("Arrows and Strums", [
+				new CircleOption("Activate Circle Arrows like Funky Friday!"),
+				new CpuStrumsOption("Disable or Enable cpuStrums lighting up when the opponent sings."),
+			]),
+			new OptionCatagory("Zooming", [
+				new SmallZoomOption("Activate SmallZooming between big zooms."),
+			//	new BigZoomOption("Activate Big Zoom between Big zooms (doesnt work with small zoom)"),
+				new NoZoomOption("Disable Cam Zooming on beat. (like tutorial) (cancels small zoom.)"),
+			]),
+		/*
+			new OptionCatagory("Insert", [
+
+			]),
+		*/
 		
 	];
 
@@ -59,6 +84,7 @@ class OptionsMenu extends MusicBeatState
 	public static var versionShit:FlxText;
 
 	var currentSelectedCat:OptionCatagory;
+	var currentSelectedCIC:OCinOC;
 
 	override function create()
 	{
@@ -201,6 +227,7 @@ class OptionsMenu extends MusicBeatState
 					currentSelectedCat = options[curSelected];
 					isCat = true;
 					grpControls.clear();
+
 					for (i in 0...currentSelectedCat.getOptions().length)
 						{
 							var controlLabel:Alphabet = new Alphabet(0, (70 * i) + 30, currentSelectedCat.getOptions()[i].getDisplay(), true, false);
@@ -232,9 +259,11 @@ class OptionsMenu extends MusicBeatState
 		if (curSelected >= grpControls.length)
 			curSelected = 0;
 
-		if (isCat)
-			currentDescription = currentSelectedCat.getOptions()[curSelected].getDescription();
-		else
+		trace(options[curSelected]);
+
+		if (isCat) {
+							currentDescription = currentSelectedCat.getOptions()[curSelected].getDescription();
+		} else
 			currentDescription = "Please select a catagory";
 		versionShit.text = "Offset (Left, Right, Shift for slow): " + truncateFloat(FlxG.save.data.offset,2) + " - Description - " + currentDescription;
 

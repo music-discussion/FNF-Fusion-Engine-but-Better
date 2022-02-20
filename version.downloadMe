@@ -1,1 +1,13 @@
-1.4.2
+0.2.5;
+- Maybe more Control Types?
+- Fixed Health Bar Colors
+- Added JSON Scale Changing
+- Added Small Cam Zoom like KAPI as an Option
+- Added No Cam Zoom Option
+- Fixed Sustains Seperated
+- Fixed NoteSplashes
+- Added Pixel Splash (Only is activated when stage is classifed as pixel.)
+- Added Extra Keys
+- Added HScript Modding Support
+- Added Shaders
+- Fixed Note Types

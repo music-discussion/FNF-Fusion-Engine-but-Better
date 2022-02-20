@@ -22,8 +22,12 @@ class Main extends Sprite
 	var framerate:Int = 120; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
+	public static var cirleArrows:Bool = false; // whether to use cirlce arrows
+	public static var fpsVar:FPS;
+	public static var editor:Bool = false;
 
 	public static var watermarks = true; // Whether to put Kade Engine liteartly anywhere
+	public static var differentTitle = true; //whether to add camera bops and other stuff.
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
@@ -118,3 +122,6 @@ class Main extends Sprite
 	}
 }
 //developed by kidsfreej on github
+//stop promoting -Discussions.
+
+//you said you don't play or mod fnf anymore.

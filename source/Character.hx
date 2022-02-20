@@ -7,6 +7,7 @@ import flash.display.BitmapData;
 import lime.utils.Assets;
 import lime.system.System;
 import lime.app.Application;
+import flixel.tweens.FlxTween;
 #if sys
 import sys.io.File;
 import sys.FileSystem;
@@ -17,6 +18,31 @@ import haxe.Json;
 import tjson.TJSON;
 import haxe.format.JsonParser;
 using StringTools;
+
+typedef CharacterFile = {
+	var animations:Array<AnimArray>;
+	var image:String;
+	var scale:Float;
+	var sing_duration:Float;
+	var healthicon:String;
+
+	var position:Array<Float>;
+	var camera_position:Array<Float>;
+
+	var flip_x:Bool;
+	var no_antialiasing:Bool;
+	var healthbar_color:Array<Int>;
+	var hasNoteSkin:Bool;
+}
+
+typedef AnimArray = {
+	var anim:String;
+	var name:String;
+	var fps:Int;
+	var loop:Bool;
+	var indices:Array<Int>;
+	var offsets:Array<Int>;
+}
 
 class Character extends FlxSprite
 {
@@ -38,6 +64,38 @@ class Character extends FlxSprite
 	public var like:String = "bf";
 	public var isDie:Bool = false;
 	public var isPixel:Bool = false;
+
+	//extra stuff
+
+	public var colorTween:FlxTween;
+	//public var holdTimer:Float = 0;
+	public var heyTimer:Float = 0;
+	public var specialAnim:Bool = false;
+	public var animationNotes:Array<Dynamic> = [];
+	//public var stunned:Bool = false;
+	public var singDuration:Float = 4; //Multiplier of how long a character holds the sing pose
+	public var idleSuffix:String = '';
+	public var danceIdle:Bool = false; //Character use "danceLeft" and "danceRight" instead of "idle"
+
+	public var healthIcon:String = 'face';
+	public var animationsArray:Array<AnimArray> = [];
+
+	public var positionArray:Array<Float> = [0, 0];
+	public var cameraPosition:Array<Float> = [0, 0];
+
+	//Used on Character Editor
+	public var imageFile:String = '';
+	public var jsonScale:Float = 1;
+	public var noAntialiasing:Bool = false;
+	public var originalFlipX:Bool = false;
+	public var healthColorArray:Array<Int> = [255, 0, 0];
+
+	public static var DEFAULT_CHARACTER:String = 'bf'; //In case a character is missing, it will use BF on its place
+
+	public var healthBarColor:Int = 0xFF9271FD;
+
+	public var charHasNoteSkin:Bool = false;
+
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		animOffsets = new Map<String, Array<Dynamic>>();
@@ -308,6 +366,7 @@ class Character extends FlxSprite
 				animation.addByPrefix('singRIGHTmiss', 'BF NOTE RIGHT MISS', 24, false);
 				animation.addByPrefix('singDOWNmiss', 'BF NOTE DOWN MISS', 24, false);
 				animation.addByPrefix('hey', 'BF HEY', 24, false);
+				animation.addByPrefix('hit', 'BF hit', 24, false);
 
 				animation.addByPrefix('firstDeath', "BF dies", 24, false);
 				animation.addByPrefix('deathLoop', "BF Dead Loop", 24, true);
@@ -575,7 +634,7 @@ class Character extends FlxSprite
 					}
 					frames = tex;
 
-					for( field in Reflect.fields(parsedAnimJson.animation) ) {
+					for(field in Reflect.fields(parsedAnimJson.animation) ) {
 						var fps = 24;
 						if (Reflect.hasField(Reflect.field(parsedAnimJson.animation,field), "fps")) {
 							fps = Reflect.field(parsedAnimJson.animation,field).fps;
@@ -605,6 +664,7 @@ class Character extends FlxSprite
 					for( field in Reflect.fields(parsedAnimJson.offset)) {
 						addOffset(field, Reflect.field(parsedAnimJson.offset,field)[0],  Reflect.field(parsedAnimJson.offset,field)[1]);
 					}
+
 					camOffsetX = if (parsedAnimJson.camOffset != null) parsedAnimJson.camOffset[0] else 0;
 					camOffsetY = if (parsedAnimJson.camOffset != null) parsedAnimJson.camOffset[1] else 0;
 					enemyOffsetX = if (parsedAnimJson.enemyOffset != null) parsedAnimJson.enemyOffset[0] else 0;
@@ -615,11 +675,23 @@ class Character extends FlxSprite
 					midpointY = if (parsedAnimJson.midpoint != null) parsedAnimJson.midpoint[1] else 0;
 					flipX = if (parsedAnimJson.flipx != null) parsedAnimJson.flipx else false;
 
+					healthColorArray[0] = if (parsedAnimJson.healthbar_color[0] != null) parsedAnimJson.healthbar_color[0] else 131;
+					healthColorArray[1] = if (parsedAnimJson.healthbar_color[1] != null) parsedAnimJson.healthbar_color[1] else 234;
+					healthColorArray[2] = if (parsedAnimJson.healthbar_color[2] != null) parsedAnimJson.healthbar_color[2] else 35;
+
+					charHasNoteSkin = if (parsedAnimJson.hasNoteSkin != null) parsedAnimJson.hasNoteSkin else false;
+
+				//	if (isPlayer) healthBarColor = PlayState.colormansucks; //why, why, why
+
 					like = parsedAnimJson.like;
 					if (like == "bf-car") {
 						// ignore it, this is used for gameover state
 						like = "bf";
 					}
+
+					if (like == "pico")
+						trace('you can be gay right along with him');
+					
 					isPixel = parsedAnimJson.isPixel;
 					if (parsedAnimJson.isPixel) {
 						antialiasing = false;
@@ -901,5 +973,10 @@ class Character extends FlxSprite
 		var charJson = CoolUtil.parseJson(Assets.getText('assets/images/custom_chars/custom_chars.jsonc'));
 		var animJson = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/'+Reflect.field(charJson,char).like + '.json'));
 		return animJson;
+	}
+
+	public function quickAnimAdd(name:String, anim:String)
+	{
+		animation.addByPrefix(name, anim, 24, false);
 	}
 }

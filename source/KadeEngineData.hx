@@ -62,6 +62,36 @@ class KadeEngineData
 		if (FlxG.save.data.watermark == null)
 			FlxG.save.data.watermark = true;
 
+		if (FlxG.save.data.notesplash == null)
+			FlxG.save.data.notesplash = true;
+
+		if (FlxG.save.data.cpuStrums == null)
+			FlxG.save.data.cpuStrums = true;
+
+		if (FlxG.save.data.freeplayInst == null)
+			FlxG.save.data.freeplayInst = true;
+
+		if (FlxG.save.data.circleShit == null)
+			FlxG.save.data.circleShit = false;
+
+		if (FlxG.save.data.zoom == null)
+			FlxG.save.data.zoom = 1;
+
+		if (FlxG.save.data.noZoom == null)
+			FlxG.save.data.noZoom = false;
+
+		if (FlxG.save.data.achievements == null)
+			FlxG.save.data.achievements = false;
+
+		if (FlxG.save.data.smallZoom == null)
+			FlxG.save.data.smallZoom = false;
+
+		if (FlxG.save.data.antialiasing == null)
+			FlxG.save.data.antialiasing = true;
+
+		if (FlxG.save.data.input == null)
+			FlxG.save.data.input = "kade";
+
 		Conductor.recalculateTimings();
 
 		Main.watermarks = FlxG.save.data.watermark;

@@ -31,6 +31,10 @@ typedef SwagSong =
 	var uiType:String;
 	var isSpooky:Null<Bool>;
 	var isHey:Null<Bool>;
+
+	var mania:Int;
+
+	var isPixelStage:Null<Bool>;
 }
 
 class Song
@@ -40,6 +44,7 @@ class Song
 	public var bpm:Int;
 	public var needsVoices:Bool = true;
 	public var speed:Float = 1;
+	public var mania:Int = 0;
 	
 	public var player1:String = 'bf';
 	public var player2:String = 'dad';
@@ -50,6 +55,8 @@ class Song
 	public var cutsceneType:String = "none";
 	public var uiType:String = 'normal';
 	public var isHey:Null<Bool> = false;
+
+	public var isPixelStage:Bool = false;
 	public function new(song, notes, bpm)
 	{
 		this.song = song;
@@ -98,6 +105,23 @@ class Song
 					parsedJson.stage = 'stage';
 				}
 			}
+
+			if (parsedJson.isPixelStage == null) {
+				var pixelornot:Bool;
+				switch (parsedJson.song.toLowerCase())
+				{
+					case 'senpai' | 'roses' | 'thorns':
+						pixelornot = true;
+					default: 
+						pixelornot = false;
+				}
+
+				PlayState.isPixelStage = pixelornot;
+			}
+			else {
+				PlayState.isPixelStage = parsedJson.isPixelStage;
+			}
+
 			if (parsedJson.isHey == null) {
 				parsedJson.isHey = false;
 				if (parsedJson.song.toLowerCase() == 'bopeebo')

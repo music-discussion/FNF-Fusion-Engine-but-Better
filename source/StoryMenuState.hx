@@ -21,15 +21,21 @@ import sys.io.File;
 import sys.FileSystem;
 #end
 using StringTools;
-typedef StorySongsJson = {
+
+typedef StorySongsJson = 
+{
 	var songs: Array<Array<String>>;
+	var weekGreyText: Array<String>;
 	var weekNames: Array<String>;
 	var characters: Array<Array<String>>;
 }
-typedef DifficultysJson = {
+
+typedef DifficultysJson = 
+{
 	var difficulties:Array<Dynamic>;
 	var defaultDiff:Int;
 }
+
 class StoryMenuState extends MusicBeatState
 {
 	var scoreText:FlxText;
@@ -43,6 +49,7 @@ class StoryMenuState extends MusicBeatState
 	var weekCharacters:Array<Dynamic> = [];
 
 	var weekNames:Array<String> = [];
+	var weekGreyText:Array<String> = [];
 	var weekTitles:Array<String> = [];
 	var txtWeekTitle:FlxText;
 
@@ -77,28 +84,40 @@ class StoryMenuState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 		}
 		var storySongJson:StorySongsJson = CoolUtil.parseJson(File.getContent('assets/data/storySonglist.json'));
+
 		persistentUpdate = persistentDraw = true;
-		for (storySongList in storySongJson.songs) {
+
+		for (storySongList in storySongJson.songs) 
+		{
 			var weekSongs = [];
-			for (song in storySongList) {
-				if (storySongList[0] == song) {
+			for (song in storySongList) 
+			{
+				if (storySongList[0] == song) 
+				{
 					weekNames.push(song);
-				} else {
+				} else 
+				{
 					weekSongs.push(song);
 				}
 			}
 			weekData.push(weekSongs);
 		}
-		for (weekTitle in storySongJson.weekNames) {
+
+		for (weekTitle in storySongJson.weekGreyText) 
+		{
 			weekTitles.push(weekTitle);
 		}
-		for (storyCharList in storySongJson.characters) {
+
+		for (storyCharList in storySongJson.characters) 
+		{
 			var weekChars = [];
-			for (char in storyCharList) {
+			for (char in storyCharList) 
+			{
 				weekChars.push(char);
 			}
 			weekCharacters.push(weekChars);
 		}
+
 		persistentUpdate = persistentDraw = true;
 
 		scoreText = new FlxText(10, 10, 0, "SCORE: 49324858", 36);
@@ -255,7 +274,7 @@ class StoryMenuState extends MusicBeatState
 
 		scoreText.text = "WEEK SCORE:" + lerpScore;
 
-		txtWeekTitle.text = weekNames[curWeek].toUpperCase();
+		txtWeekTitle.text = weekGreyText[curWeek].toUpperCase();
 		txtWeekTitle.x = FlxG.width - (txtWeekTitle.width + 10);
 
 		// FlxG.watch.addQuick('font', scoreText.font);
@@ -351,12 +370,13 @@ class StoryMenuState extends MusicBeatState
 
 			PlayState.storyDifficulty = curDifficulty;
 			for (peckUpAblePath in PlayState.storyPlaylist) {
+				trace('assets/data/'+peckUpAblePath.toLowerCase()+'/'+peckUpAblePath.toLowerCase() + diffic+'.json');
 				if (!FileSystem.exists('assets/data/'+peckUpAblePath.toLowerCase()+'/'+peckUpAblePath.toLowerCase() + diffic+'.json')) {
 					// probably messed up difficulty
 					trace("UH OH DIFFICULTY DOESN'T EXIST FOR A SONG");
 					trace("CHANGING TO DEFAULT DIFFICULTY");
 					diffic = "";
-					PlayState.storyDifficulty =1;
+					PlayState.storyDifficulty = 1;
 				}
 			}
 			PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
@@ -479,6 +499,7 @@ class StoryMenuState extends MusicBeatState
 			txtTracklist.text += "\n" + i;
 		}
 
+		txtTracklist.text += "\n";
 		txtTracklist.text = txtTracklist.text.toUpperCase();
 
 		txtTracklist.screenCenter(X);

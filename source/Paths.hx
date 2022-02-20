@@ -4,10 +4,28 @@ import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
+import sys.io.File;
+import sys.FileSystem;
+import flixel.graphics.FlxGraphic;
+import openfl.display.BitmapData;
+
+import flash.media.Sound;
+
+using StringTools;
 
 class Paths
 {
 	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
+
+	#if (haxe >= "4.0.0")
+	public static var ignoreModFolders:Map<String, Bool> = new Map();
+	public static var customImagesLoaded:Map<String, FlxGraphic> = new Map();
+	public static var customSoundsLoaded:Map<String, Sound> = new Map();
+	#else
+	public static var ignoreModFolders:Map<String, Bool> = new Map<String, Bool>();
+	public static var customImagesLoaded:Map<String, FlxGraphic> = new Map<String, FlxGraphic>();
+	public static var customSoundsLoaded:Map<String, Sound> = new Map<String, Sound>();
+	#end
 
 	static var currentLevel:String;
 
@@ -16,7 +34,7 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 
-	static function getPath(file:String, type:AssetType, library:Null<String>)
+	/*static function getPath(file:String, type:AssetType, library:Null<String>)
 	{
 		if (library != null)
 			return getLibraryPath(file, library);
@@ -33,19 +51,52 @@ class Paths
 		}
 
 		return getPreloadPath(file);
+	}*/
+
+	inline static public function formatToSongPath(path:String) {
+		return path.toLowerCase().replace(' ', '-');
 	}
 
-	static public function getLibraryPath(file:String, library = "preload")
-	{
-		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
-	}
+	static public var currentModDirectory:String = null;
 
-	inline static function getLibraryPathForce(file:String, library:String)
-	{
-		return '$library:assets/$library/$file';
-	}
+//	static public function getLibraryPath(file:String, library = "preload")
+//	{
+//		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+//	}
 
-	inline static function getPreloadPath(file:String)
+//	inline static function getLibraryPathForce(file:String, library:String)
+//	{
+//		return '$library:assets/$library/$file';
+//	}
+
+	static function getPath(file:String, type:AssetType, library:Null<String>)
+		{
+			if (library != null)
+				return getLibraryPath(file, library);
+			if (currentLevel != null)
+			{
+				var levelPath = getLibraryPathForce(file, currentLevel);
+				if (OpenFlAssets.exists(levelPath, type))
+					return levelPath;
+				levelPath = getLibraryPathForce(file, "shared");
+				if (OpenFlAssets.exists(levelPath, type))
+					return levelPath;
+			}
+	
+			return getPreloadPath(file);
+		}
+	
+		static public function getLibraryPath(file:String, library = "default")
+		{
+			return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+		}
+	
+		inline static function getLibraryPathForce(file:String, library:String)
+		{
+			return '$library:assets/$library/$file';
+		}
+
+	inline static public function getPreloadPath(file:String)
 	{
 		return 'assets/$file';
 	}
@@ -68,6 +119,12 @@ class Paths
 	inline static public function txt(key:String, ?library:String)
 	{
 		return getPath('data/$key.txt', TEXT, library);
+	}
+
+	inline static public function hScript(file:String)
+	{
+		//return getPath('scripts/$script.txt', TEXT, library);
+		return 'assets/scripts/$file/script.hscript';
 	}
 
 	inline static public function xml(key:String, ?library:String)
@@ -107,6 +164,12 @@ class Paths
 		return 'assets/music/${song}_Inst.$SOUND_EXT';
 	}
 
+	inline static public function categoryMusic(song:String)
+	{ //this wasnt soooooooo bad.
+		trace('assets/categoryMusic/${song}');
+		return 'assets/categoryMusic/${song}';
+	}
+
 	inline static public function image(key:String, ?library:String)
 	{
 		return getPath('images/$key.png', IMAGE, library);
@@ -125,5 +188,47 @@ class Paths
 	inline static public function getPackerAtlas(key:String, ?library:String)
 	{
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));
+	}
+
+	inline public static function getPsychPreloadPath(file:String = '')
+	{
+		return 'assets/$file'; //only used for psych engine states and thats it.
+	}
+
+	inline public static function getDataPsychPreloadPath(file:String = '') //custom made :)
+		{
+			return 'assets/data/$file'; //only used for psych engine states and thats it.
+		}
+
+	inline static public function mods(key:String = '') {
+		return 'assets/images/' + key;
+	}
+
+//	static var currentLevel:String;
+	static public function getModFolders()
+	{
+	//	#if MODS_ALLOWED
+		ignoreModFolders.set('characters', true);
+		ignoreModFolders.set('custom_events', true);
+		ignoreModFolders.set('custom_notetypes', true);
+		ignoreModFolders.set('data', true);
+		ignoreModFolders.set('songs', true);
+		ignoreModFolders.set('music', true);
+		ignoreModFolders.set('sounds', true);
+		ignoreModFolders.set('videos', true);
+		ignoreModFolders.set('images', true);
+		ignoreModFolders.set('stages', true);
+		ignoreModFolders.set('weeks', true);
+//		#end
+	}
+
+	static public function modFolders(key:String) {
+		if(currentModDirectory != null && currentModDirectory.length > 0) {
+			var fileToCheck:String = mods(currentModDirectory + '/' + key);
+			if(FileSystem.exists(fileToCheck)) {
+				return fileToCheck;
+			}
+		}
+		return 'assets/images/' + key;
 	}
 }

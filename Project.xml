@@ -3,7 +3,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin' Fusion Engine" file="Fusion Engine" packageName="com.ninjamuffin99.funkin" package="com.ninjamuffin99.funkin" main="Main" version="0.2.7.1" company="ninjamuffin99" />
+	<app title="Friday Night Funkin' Fusion Engine but BETTER" file="Better Fusion Engine" packageName="com.discussions.betterfusioneng" package="com.discussions.betterfusioneng" main="Main" version="0.2.7.1" company="Discussions" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -42,24 +42,17 @@
 
 	<classpath name="source" />
 
-	
-	<assets path="assets/preload" exclude="*.ogg" if="web"/>
-	<assets path="assets/preload" exclude="*.mp3" unless="web"/>
+	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="web"/>
+	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 
-
-
-	<assets path="assets/images" />
-	<assets path="assets/data" />
+	<assets path="assets/categoryMusic" include="*.mp3" if="web" />
+	<assets path="assets/categoryMusic" include="*.ogg" unless="web" />
 	<assets path='example_mods' rename='mods' embed='false'/>
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
 	<!-- <template path='mods' /> -->
 
 	<!-- <library name="noPreload" preload='false'/> -->
 	<!-- <library name="noPreload"/> -->
-	<assets path="assets/music" include="*.mp3" if="web"/>
-	<assets path="assets/music" include="*.ogg" unless="web"/>
-	<assets path="assets/sounds" include="*.mp3" if="web" />
-	<assets path="assets/sounds" include="*.ogg" unless="web" />
 
 	<!-- NOTE FOR FUTURE SELF SINCE FONTS ARE ALWAYS FUCKY 
 		TO FIX ONE OF THEM, I CONVERTED IT TO OTF. DUNNO IF YOU NEED TO
@@ -74,7 +67,6 @@
 
 	<!--In case you want to use the addons package-->
 	<haxelib name="flixel-addons" />
-	<haxelib name="hscript" />
 
 	<!--In case you want to use the ui package-->
 	<haxelib name="flixel-ui" />
@@ -83,6 +75,9 @@
 	<haxelib name="faxe" if='switch'/>
 	<haxelib name="polymod"/>
 	<haxelib name="discord_rpc" if="windows"/>
+	<haxelib name="hxcpp-debug-server" if="desktop"/>
+	<haxelib name="hscript" />
+	<haxelib name="hscript-ex" /> <!--bruhj-->
 
 	<haxelib name="linc_luajit"/>
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
