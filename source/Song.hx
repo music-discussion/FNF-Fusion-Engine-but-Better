@@ -2,6 +2,7 @@ package;
 
 import Section.SwagSection;
 import haxe.Json;
+import DownloadingState.DownloadableObj;
 import haxe.format.JsonParser;
 import lime.utils.Assets;
 import tjson.TJSON;
@@ -11,29 +12,41 @@ import sys.FileSystem;
 import lime.system.System;
 import haxe.io.Path;
 #end
+
 using StringTools;
 
 typedef SwagSong =
 {
-	var validScore:Bool;
 	var song:String;
 	var notes:Array<SwagSection>;
-	var bpm:Int;
+	var bpm:Float;
 	var needsVoices:Bool;
 	var speed:Float;
+	var mania:Int;
+	//var noteValues:Array<Float>;
 
 	var player1:String;
 	var player2:String;
+	var gfVersion:String;
+	var noteStyle:String;
 	var stage:String;
-	var gf:String;
+	var validScore:Bool;
+
+	var instSuffix:String;
+	var vocalsSuffix:String;
+	var displayName:String;
+
+	var audioFromUrl:Bool;
+	var instUrl:String;
+	var vocalsUrl:String;
+
+	var downloadingStuff:Array<DownloadableObj>;
+
 	var isMoody:Null<Bool>;
 	var cutsceneType:String;
 	var uiType:String;
 	var isSpooky:Null<Bool>;
 	var isHey:Null<Bool>;
-
-	var mania:Int;
-
 	var isPixelStage:Null<Bool>;
 }
 
@@ -41,15 +54,26 @@ class Song
 {
 	public var song:String;
 	public var notes:Array<SwagSection>;
-	public var bpm:Int;
+	public var bpm:Float;
 	public var needsVoices:Bool = true;
 	public var speed:Float = 1;
 	public var mania:Int = 0;
-	
+
 	public var player1:String = 'bf';
 	public var player2:String = 'dad';
-	public var stage:String = 'stage';
-	public var gf:String = 'gf';
+	public var gfVersion:String = '';
+	public var noteStyle:String = '';
+	public var stage:String = '';
+
+	public var instSuffix:String = '';
+	public var vocalsSuffix:String = '';
+	public var displayName:String = '';
+
+	public var audioFromUrl:Bool = false;
+	public var instUrl:String = '';
+	public var vocalsUrl:String = '';
+
+	public var downloadingStuff:Array<DownloadableObj> = [];
 	public var isMoody:Null<Bool> = false;
 	public var isSpooky:Null<Bool> = false;
 	public var cutsceneType:String = "none";
@@ -57,6 +81,7 @@ class Song
 	public var isHey:Null<Bool> = false;
 
 	public var isPixelStage:Bool = false;
+
 	public function new(song, notes, bpm)
 	{
 		this.song = song;
@@ -64,9 +89,29 @@ class Song
 		this.bpm = bpm;
 	}
 
-	public static function loadFromJson(jsonInput:String, ?folder:String,?epic:Int):SwagSong
+	public static function loadFromJson(jsonInput:String, ?folder:String):SwagSong
+	{
+		/*trace(jsonInput);
+
+		// pre lowercasing the folder name
+		var folderLowercase = StringTools.replace(folder, " ", "-").toLowerCase();
+		switch (folderLowercase) {
+			case 'dad-battle': folderLowercase = 'dadbattle';
+			case 'philly-nice': folderLowercase = 'philly';
+		}
+		
+		trace('loading ' + folderLowercase + '/' + jsonInput.toLowerCase());
+
+		var rawJson = Assets.getText(Paths.json(folderLowercase + '/' + jsonInput.toLowerCase())).trim();
+
+		while (!rawJson.endsWith("}"))
 		{
-			var rawJson:String = "";
+			rawJson = rawJson.substr(0, rawJson.length - 1);
+			// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
+		}
+
+		return parseJSONshit(rawJson);*/
+		var rawJson:String = "";
 			if (jsonInput != folder)
 			{
 				// means this isn't normal difficulty
@@ -127,21 +172,21 @@ class Song
 				if (parsedJson.song.toLowerCase() == 'bopeebo')
 					parsedJson.isHey = true;
 			}
-			if (parsedJson.gf == null) {
+			if (parsedJson.gfVersion == null) {
 				// are you kidding me did i really do song to lowercase
 				switch (parsedJson.stage) {
 					case 'limo':
-						parsedJson.gf = 'gf-car';
+						parsedJson.gfVersion = 'gf-car';
 					case 'mall':
-						parsedJson.gf = 'gf-christmas';
+						parsedJson.gfVersion = 'gf-christmas';
 					case 'mallEvil':
-						parsedJson.gf = 'gf-christmas';
+						parsedJson.gfVersion = 'gf-christmas';
 					case 'school':
-						parsedJson.gf = 'gf-pixel';
+						parsedJson.gfVersion = 'gf-pixel';
 					case 'schoolEvil':
-						parsedJson.gf = 'gf-pixel';
+						parsedJson.gfVersion = 'gf-pixel';
 					default:
-						parsedJson.gf = 'gf';
+						parsedJson.gfVersion = 'gf';
 				}
 	
 			}
@@ -212,12 +257,14 @@ class Song
 				parsedJson.speed = realJson.speed;
 			}
 			return parsedJson;
-		}
-	
-		public static function parseJSONshit(rawJson:String):SwagSong
-		{
-			var swagShit:SwagSong = cast CoolUtil.parseJson(rawJson).song;
-			return swagShit;
-		}
 	}
-	
+
+	public static function parseJSONshit(rawJson:String):SwagSong
+	{
+		//var swagShit:SwagSong = cast Json.parse(rawJson).song;
+	//	swagShit.validScore = true;
+	//	return swagShit;
+		var swagShit:SwagSong = cast CoolUtil.parseJson(rawJson).song;
+		return swagShit;
+	}
+}

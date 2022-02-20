@@ -94,15 +94,15 @@ class Caching extends MusicBeatState
 				images.push(i);
 			}
 
-		//	for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/images/custom_chars")))
-		//	{
-		//		if (!i.endsWith(".png"))
-		//			continue;
-		//		images.push(i);
-		//	}
+			for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/images/custom_chars")))
+			{
+				if (!i.endsWith(".png"))
+					continue;
+				images.push(i);
+			}
 		}
 
-		//trace("caching music...");
+		trace("caching music...");
 
 	//	for (i in FileSystem.readDirectory(FileSystem.absolutePath("assets/music")))
 	//	{
@@ -115,7 +115,7 @@ class Caching extends MusicBeatState
 	//	}
 		#end
 
-		toBeDone = Lambda.count(images) /*+ Lambda.count(music) + Lambda.count(fusionMusic)*/;
+		toBeDone = Lambda.count(images) + Lambda.count(music);
 
 		var bar = new FlxBar(10,FlxG.height - 50,FlxBarFillDirection.LEFT_TO_RIGHT,FlxG.width,40,null,"done",0,toBeDone);
 		bar.color = FlxColor.PURPLE;
@@ -178,13 +178,13 @@ class Caching extends MusicBeatState
 			done++;
 		}
 
-		/*for (i in music)
+		for (i in music)
 		{
 			FlxG.sound.cache(Paths.inst(i));
 			FlxG.sound.cache(Paths.voices(i));
 			trace("cached " + i);
 			done++;
-		}*/
+		}
 
 		//caching potential fusion tracks.
 

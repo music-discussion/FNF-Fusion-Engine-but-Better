@@ -62,6 +62,13 @@ class HscriptShit //funni modcharts
             }
 
         }
+        else if (CacheShit.modcharts[path] != null && PlayState.modcharts)
+        {
+            loadScript(path);
+            enabled = true;
+            setScriptVars();
+            interp.execute(script);
+        }
         else 
         {
             trace("no file detected");

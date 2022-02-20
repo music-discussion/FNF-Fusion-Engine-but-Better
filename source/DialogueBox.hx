@@ -139,7 +139,7 @@ class DialogueBox extends FlxSpriteGroup
 			default:
 				if (FileSystem.exists('assets/images/custom_chars/' + PlayState.SONG.player2 + '/portrait.png'))
 				{
-					var coolP2Json = Character.getAnimJson(PlayState.SONG.player2);
+					var coolP2Json = getAnimJson(PlayState.SONG.player2);
 					isPixel[1] = if (Reflect.hasField(coolP2Json, "isPixel")) coolP2Json.isPixel else false;
 					var rawPic = BitmapData.fromFile('assets/images/custom_chars/' + PlayState.SONG.player2 + "/portrait.png");
 					var rawXml = File.getContent('assets/images/custom_chars/' + PlayState.SONG.player2 + "/portrait.xml");
@@ -158,7 +158,7 @@ class DialogueBox extends FlxSpriteGroup
 					{
 						if (FileSystem.exists('assets/images/custom_chars/' + PlayState.SONG.player2 + '/portrait_' + dialogueList[3] + ".png"))
 							{
-								var coolP2Json = Character.getAnimJson(PlayState.SONG.player2);
+								var coolP2Json = getAnimJson(PlayState.SONG.player2);
 								isPixel[1] = if (Reflect.hasField(coolP2Json, "isPixel")) coolP2Json.isPixel else false;
 								var rawPic = BitmapData.fromFile('assets/images/custom_chars/' + PlayState.SONG.player2 + "/portrait_" + dialogueList[3] + ".png");
 								var rawXml = File.getContent('assets/images/custom_chars/' + PlayState.SONG.player2 + "/portrait_" + dialogueList[3] + ".xml");
@@ -215,7 +215,7 @@ class DialogueBox extends FlxSpriteGroup
 			default:
 				if (FileSystem.exists('assets/images/custom_chars/' + PlayState.SONG.player1 + '/portrait.png'))
 				{
-					var coolP1Json = Character.getAnimJson(PlayState.SONG.player1);
+					var coolP1Json = getAnimJson(PlayState.SONG.player1);
 					isPixel[0] = if (Reflect.hasField(coolP1Json, "isPixel")) coolP1Json.isPixel else false;
 					var rawPic = BitmapData.fromFile('assets/images/custom_chars/' + PlayState.SONG.player1 + "/portrait.png");
 					var rawXml = File.getContent('assets/images/custom_chars/' + PlayState.SONG.player1 + "/portrait.xml");
@@ -233,7 +233,7 @@ class DialogueBox extends FlxSpriteGroup
 				{
 					if (FileSystem.exists('assets/images/custom_chars/' + PlayState.SONG.player1 + '/portrait_' + dialogueList[3] + ".png"))
 						{
-							var coolP1Json = Character.getAnimJson(PlayState.SONG.player1);
+							var coolP1Json = getAnimJson(PlayState.SONG.player1);
 							isPixel[0] = if (Reflect.hasField(coolP1Json, "isPixel")) coolP1Json.isPixel else false;
 							var rawPic = BitmapData.fromFile('assets/images/custom_chars/' + PlayState.SONG.player1 + "/portrait_" + dialogueList[3] + ".png");
 							var rawXml = File.getContent('assets/images/custom_chars/' + PlayState.SONG.player1 + "/portrait_" + dialogueList[3] + ".xml");
@@ -646,7 +646,8 @@ class DialogueBox extends FlxSpriteGroup
 				portraitCustom = new FlxSprite(0, 40);
 				var customPixel = false;
 				if (FileSystem.exists('assets/images/custom_chars/'+realChar+'/portrait.png')) {
-					var coolCustomJson = Character.getAnimJson(realChar);
+					var coolCustomJson = getAnimJson(realChar);
+
 					customPixel = if (Reflect.hasField(coolCustomJson, "isPixel"))
 						coolCustomJson.isPixel
 					else
@@ -743,5 +744,20 @@ class DialogueBox extends FlxSpriteGroup
 		var splitName:Array<String> = dialogueList[0].split(":");
 		curCharacter = splitName[1];
 		dialogueList[0] = dialogueList[0].substr(splitName[1].length + 2).trim();
+	}
+
+	public function getAnimJson(char:String, isPsychFile:Null<Bool> = false) { //ported for easier use.
+		if (FileSystem.exists('assets/images/custom_chars/psych-'+ char + '.json'))
+			isPsychFile = true;
+			
+		switch (isPsychFile) {
+			case false:
+				var charJson = CoolUtil.parseJson(Assets.getText('assets/images/custom_chars/custom_chars.jsonc'));
+				var animJson = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/'+Reflect.field(charJson,char).like + '.json'));
+				return animJson;
+			case true: 
+				var animJson = CoolUtil.parseJson(File.getContent('assets/images/custom_chars/psych-'+ curCharacter.toLowerCase() + '.json'));
+				return animJson;
+		}
 	}
 }

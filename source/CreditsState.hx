@@ -32,6 +32,7 @@ class CreditsState extends MusicBeatState
 		['kidsfreeJ', 			'kidsfreej', 		'Original Developer for Fusion', 					'https://github.com/kidsfreej',						 0xFFE8F115],
 		['Special Thanks'],
 		['BetaBits', 			'placeholder', 		'Fixed a Bug with Icons in Freeplay', 				'https://gamebanana.com/members/1792702',			 0xFF54E75F],
+		['Epic Gamer', 			'epicgamer',		'Fixed a Bug where Freeplay would Crash upon Load',	'https://epicgamer2469.github.io/',					 0xFF0de6fe],
 		['srPerez', 			'perez', 			'The Idea of More Keys',							'https://twitter.com/NewSrPerez',					 0xFFFF9E00],
 		['kadeDev', 			'kade', 			'Mastermind of Kade',								'https://twitter.com/NewSrPerez',					 0xFF2ECA5f],
 		['Psych Engine Team'],
@@ -129,7 +130,7 @@ class CreditsState extends MusicBeatState
 				colorTween.cancel();
 			}
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			MusicBeatState.switchState(new MainMenuState());
+			FlxG.switchState(new MainMenuState());
 		}
 		if(controls.ACCEPT) {
 			//fancyOpenURL(creditsStuff[curSelected][3]);

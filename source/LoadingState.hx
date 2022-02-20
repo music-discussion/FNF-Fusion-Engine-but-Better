@@ -26,16 +26,22 @@ class LoadingState extends MusicBeatState
 	var logo:FlxSprite;
 	var gfDance:FlxSprite;
 	var danceLeft = false;
+
+	var downloadStuff:Bool = false;
 	
-	function new(target:FlxState, stopMusic:Bool)
+	function new(target:FlxState, stopMusic:Bool, downloadStuff:Bool = false)
 	{
 		super();
 		this.target = target;
 		this.stopMusic = stopMusic;
+		this.downloadStuff = downloadStuff;
 	}
 	
 	override function create()
 	{
+		if (!downloadStuff)
+			CacheShit.clearCache();
+
 		logo = new FlxSprite(-150, -100);
 		logo.frames = Paths.getSparrowAtlas('logoBumpin');
 		logo.antialiasing = true;
@@ -144,28 +150,11 @@ class LoadingState extends MusicBeatState
 		return Paths.voices(PlayState.SONG.song);
 	}
 	
-	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false)
+	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false, downloadShit:Bool = false)
 	{
-		FlxG.switchState(getNextState(target, stopMusic));
+		FlxG.switchState(getNextState(target, stopMusic, downloadShit));
 	}
-	
-	static function getNextState(target:FlxState, stopMusic = false):FlxState
-	{
-		Paths.setCurrentLevel("week" + PlayState.storyWeek);
-		#if NO_PRELOAD_ALL
-		var loaded = isSoundLoaded(getSongPath())
-			&& (!PlayState.SONG.needsVoices || isSoundLoaded(getVocalPath()))
-			&& isLibraryLoaded("shared");
-		
-		if (!loaded)
-			return new LoadingState(target, stopMusic);
-		#end
-		if (stopMusic && FlxG.sound.music != null)
-			FlxG.sound.music.stop();
-		
-		return target;
-	}
-	
+
 	#if NO_PRELOAD_ALL
 	static function isSoundLoaded(path:String):Bool
 	{
@@ -177,6 +166,23 @@ class LoadingState extends MusicBeatState
 		return Assets.getLibrary(library) != null;
 	}
 	#end
+	
+	static function getNextState(target:FlxState, stopMusic = false, downloadShit:Bool = false):FlxState
+	{
+		Paths.setCurrentLevel("week" + PlayState.storyWeek);
+		#if NO_PRELOAD_ALL
+		var loaded = isSoundLoaded(getSongPath())
+			&& (!PlayState.SONG.needsVoices || isSoundLoaded(getVocalPath()))
+			&& isLibraryLoaded("shared");
+		
+		if (!loaded)
+			return new LoadingState(target, stopMusic, downloadShit);
+		#end
+		if (stopMusic && FlxG.sound.music != null)
+			FlxG.sound.music.stop();
+		
+		return target;
+	}
 	
 	override function destroy()
 	{

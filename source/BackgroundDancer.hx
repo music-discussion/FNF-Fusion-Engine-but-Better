@@ -13,6 +13,7 @@ import openfl.utils.ByteArray;
 #end
 import haxe.Json;
 import haxe.format.JsonParser;
+
 class BackgroundDancer extends FlxSprite
 {
 	public function new(x:Float, y:Float, ?type:String = "normal")

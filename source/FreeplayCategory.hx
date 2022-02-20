@@ -28,7 +28,7 @@ using StringTools;
 
 class FreeplayCategory extends MusicBeatState
 {
-	var songs:Array<SongMetadata> = [];
+	var songs:Array<CatagoryMetadata> = [];
 	var selector:FlxText;
 	var curSelected:Int = 0;
 	var curDifficulty:Int = 1;
@@ -49,16 +49,8 @@ class FreeplayCategory extends MusicBeatState
 
 		for (i in 0...parsed.length)
 		{
-			songs.push(new SongMetadata(parsed[i].name, 1, categoryIcons[i]));
+			songs.push(new CatagoryMetadata(parsed[i].name, 1, categoryIcons[i]));
 		}
-
-		/* 
-			if (FlxG.sound.music != null)
-			{
-				if (!FlxG.sound.music.playing)
-					FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			}
-		 */
 
 		 #if windows
 		 // Updating Discord Rich Presence
@@ -94,19 +86,10 @@ class FreeplayCategory extends MusicBeatState
 			// using a FlxGroup is too much fuss!
 			iconArray.push(icon);
 			add(icon);
-
-			// songText.x += 40;
-			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
-			// songText.screenCenter(X);
 		}
-
-
-
 
 		changeSelection();
 
-		// FlxG.sound.playMusic(Paths.music('title'), 0);
-		// FlxG.sound.music.fadeIn(2, 0, 0.8);
 		selector = new FlxText();
 
 		selector.size = 40;
@@ -115,29 +98,12 @@ class FreeplayCategory extends MusicBeatState
 
 		var swag:Alphabet = new Alphabet(1, 0, "swag");
 
-		// JUST DOIN THIS SHIT FOR TESTING!!!
-		/* 
-			var md:String = Markdown.markdownToHtml(Assets.getText('CHANGELOG.md'));
-
-			var texFel:TextField = new TextField();
-			texFel.width = FlxG.width;
-			texFel.height = FlxG.height;
-			// texFel.
-			texFel.htmlText = md;
-
-			FlxG.stage.addChild(texFel);
-
-			// scoreText.textField.htmlText = md;
-
-			trace(md);
-		 */
-
 		super.create();
 	}
 
 	public function addSong(songName:String, weekNum:Int, songCharacter:String)
 	{
-		songs.push(new SongMetadata(songName, weekNum, songCharacter));
+		songs.push(new CatagoryMetadata(songName, weekNum, songCharacter));
 	}
 
 	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>)
@@ -169,8 +135,6 @@ class FreeplayCategory extends MusicBeatState
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
 
-
-
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
 		var accepted = controls.ACCEPT;
@@ -191,7 +155,7 @@ class FreeplayCategory extends MusicBeatState
 		if (accepted)
 		{
 
-			FreeplayState.id=curSelected;
+			FreeplayState.id = curSelected;
 			LoadingState.loadAndSwitchState(new FreeplayState());
 		}
 	}
@@ -206,17 +170,17 @@ class FreeplayCategory extends MusicBeatState
 			curDifficulty = 0;
 
 		#if !switch
-		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
+	//	intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
 		#end
 
 		switch (curDifficulty)
 		{
 			case 0:
-				diffText.text = "EASY";
+				diffText.text = "";
 			case 1:
-				diffText.text = 'NORMAL';
+				diffText.text = '';
 			case 2:
-				diffText.text = "HARD";
+				diffText.text = "";
 		}
 	}
 
@@ -239,14 +203,14 @@ class FreeplayCategory extends MusicBeatState
 		// selector.y = (70 * curSelected) + 30;
 
 		#if !switch
-		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
+	//	intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
 		// lerpScore = 0;
 		#end
 
 		if (FlxG.save.data.freeplayInst)
 		{
 			if (FileSystem.exists('assets/categoryMusic/option'+curSelected+".ogg"))
-				FlxG.sound.playMusic(Paths.categoryMusic('option'+curSelected), 0); //this might not work lol.
+				FlxG.sound.playMusic(Sound.fromFile(Paths.categoryMusic('option'+curSelected)), 1, false); //this might not work lol.
 			else {
 				if (!FlxG.sound.music.playing)
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
@@ -275,7 +239,7 @@ class FreeplayCategory extends MusicBeatState
 	
 }
 
-class SongMetadata
+class CatagoryMetadata
 {
 	public var songName:String = "";
 	public var week:Int = 0;

@@ -1,3 +1,4 @@
+import flixel.input.gamepad.FlxGamepad;
 import openfl.Lib;
 import flixel.FlxG;
 
@@ -7,20 +8,21 @@ class KadeEngineData
     {
         if (FlxG.save.data.newInput == null)
 			FlxG.save.data.newInput = true;
-		if (FlxG.save.data.resetKey == null)
-			FlxG.save.data.resetKey = true;
 
 		if (FlxG.save.data.downscroll == null)
 			FlxG.save.data.downscroll = false;
 
-		if (FlxG.save.data.controls == null)
-			FlxG.save.data.controls = "wasd";
+		if (FlxG.save.data.antialiasing == null)
+			FlxG.save.data.antialiasing = true;
+
+		if (FlxG.save.data.missSounds == null)
+			FlxG.save.data.missSounds = true;
+
+		if (FlxG.save.data.dfjk == null)
+			FlxG.save.data.dfjk = false;
 			
 		if (FlxG.save.data.accuracyDisplay == null)
 			FlxG.save.data.accuracyDisplay = true;
-
-		if (FlxG.save.data.offset == null)
-			FlxG.save.data.offset = 0;
 
 		if (FlxG.save.data.offset == null)
 			FlxG.save.data.offset = 0;
@@ -62,16 +64,98 @@ class KadeEngineData
 		if (FlxG.save.data.watermark == null)
 			FlxG.save.data.watermark = true;
 
-		if (FlxG.save.data.notesplash == null)
-			FlxG.save.data.notesplash = true;
+		if (FlxG.save.data.ghost == null)
+			FlxG.save.data.ghost = true;
+
+		if (FlxG.save.data.distractions == null)
+			FlxG.save.data.distractions = true;
+
+		if (FlxG.save.data.flashing == null)
+			FlxG.save.data.flashing = true;
+
+		if (FlxG.save.data.resetButton == null)
+			FlxG.save.data.resetButton = false;
+
+		if (FlxG.save.data.InstantRespawn == null)
+			FlxG.save.data.InstantRespawn = false;
+		
+		if (FlxG.save.data.botplay == null)
+			FlxG.save.data.botplay = false;
 
 		if (FlxG.save.data.cpuStrums == null)
-			FlxG.save.data.cpuStrums = true;
+			FlxG.save.data.cpuStrums = false;
+
+		if (FlxG.save.data.strumline == null)
+			FlxG.save.data.strumline = false;
+		
+		if (FlxG.save.data.customStrumLine == null)
+			FlxG.save.data.customStrumLine = 0;
+
+		if (FlxG.save.data.camzoom == null)
+			FlxG.save.data.camzoom = true;
+
+		if (FlxG.save.data.scoreScreen == null)
+			FlxG.save.data.scoreScreen = true;
+
+		if (FlxG.save.data.inputShow == null)
+			FlxG.save.data.inputShow = false;
+
+		if (FlxG.save.data.optimize == null)
+			FlxG.save.data.optimize = false;
+		
+		if (FlxG.save.data.cacheImages == null)
+			FlxG.save.data.cacheImages = false;
+
+		if (FlxG.save.data.oldtimings == null)
+			FlxG.save.data.oldtimings = false;
+
+		if (FlxG.save.data.gracetmr == null)
+			FlxG.save.data.gracetmr = true;
+
+		if (FlxG.save.data.noteSplash == null)
+			FlxG.save.data.noteSplash = true;
+
+		if (FlxG.save.data.zoom == null)
+			FlxG.save.data.zoom = 1;
+
+		if (FlxG.save.data.noteColor == null)
+			FlxG.save.data.noteColor = "darkred";
+
+		if (FlxG.save.data.gthc == null)
+			FlxG.save.data.gthc = false;
+
+		if (FlxG.save.data.gthm == null)
+			FlxG.save.data.gthm = false;
+
+		if (FlxG.save.data.randomNotes == null)
+			FlxG.save.data.randomNotes = false;
+
+		if (FlxG.save.data.randomSection == null)
+			FlxG.save.data.randomSection = true;
+
+		if (FlxG.save.data.mania == null)
+			FlxG.save.data.mania = 0;
+
+		if (FlxG.save.data.randomMania == null)
+			FlxG.save.data.randomMania = 0;
+
+		if (FlxG.save.data.flip == null)
+			FlxG.save.data.flip = false;
+
+		if (FlxG.save.data.bothSide == null)
+			FlxG.save.data.bothSide = false;
+
+		if (FlxG.save.data.randomNoteTypes == null)
+			FlxG.save.data.randomNoteTypes = 0;
 
 		if (FlxG.save.data.freeplayInst == null)
 			FlxG.save.data.freeplayInst = true;
 
-		if (FlxG.save.data.circleShit == null)
+<<<<<<< Updated upstream
+	//	if (FlxG.save.data.circleShit == null)
+=======
+		//if (FlxG.save.data.circleShit == null)
+>>>>>>> Stashed changes
 			FlxG.save.data.circleShit = false;
 
 		if (FlxG.save.data.zoom == null)
@@ -86,13 +170,16 @@ class KadeEngineData
 		if (FlxG.save.data.smallZoom == null)
 			FlxG.save.data.smallZoom = false;
 
-		if (FlxG.save.data.antialiasing == null)
-			FlxG.save.data.antialiasing = true;
-
 		if (FlxG.save.data.input == null)
 			FlxG.save.data.input = "kade";
+		
+		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
+		
+		KeyBinds.gamepad = gamepad != null;
 
 		Conductor.recalculateTimings();
+		PlayerSettings.player1.controls.loadKeyBinds();
+		KeyBinds.keyCheck();
 
 		Main.watermarks = FlxG.save.data.watermark;
 
