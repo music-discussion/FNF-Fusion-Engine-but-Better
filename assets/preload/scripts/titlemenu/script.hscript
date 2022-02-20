@@ -1,21 +1,8 @@
-var camZooming:Bool = false;
-var defaultCamZoom:Float = 1.05;
 
-function update(elasped)
-{
-    if (camZooming)
-    {
-        FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);\
-		TitleState.call("onCamZoom", []); //dk what this would be used for.
-    }
-}
 
 function beatHit(beat)
 {
-    if (camZooming && FlxG.camera.zoom < 1.35 && curBeat % 4 == 0)
-    {
-        FlxG.camera.zoom += 0.015;
-    }
+    TitleState.camZooming = true;
 
     trace(beat); //helps me debug.
 
@@ -77,7 +64,6 @@ function beatHit(beat)
 
             case 19:
                 TitleState.instance.deleteCoolText();
-                TitleState.instance.redoCurWack();
 
             case 20:
                 TitleState.instance.addMoreText("You are");
