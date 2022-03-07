@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<TextureAtlas imagePath="campaign_menu_UI_assets.png">
+<TextureAtlas imagePath="test2">
 <SubTexture name="ALT0000" x="0" y="0" width="148" height="71" frameX="0" frameY="0" frameWidth="148" frameHeight="71" />
 <SubTexture name="EASY0000" x="148" y="0" width="201" height="73" frameX="0" frameY="0" frameWidth="201" frameHeight="73" />
 <SubTexture name="HARD0000" x="349" y="0" width="217" height="71" frameX="0" frameY="0" frameWidth="217" frameHeight="71" />

@@ -73,6 +73,9 @@ import sys.io.File;
 import sys.FileSystem;
 #end
 
+import openfl.net.URLRequest;
+import openfl.net.URLStream;
+
 #if sys
 import lime.media.AudioBuffer;
 import flash.media.Sound;
@@ -385,6 +388,9 @@ class PlayState extends MusicBeatState
 
 		isPixelStage = PlayState.SONG.isPixelStage;
 
+		#if sys
+		cacheSong();
+		#end
 
 		if (!isStoryMode)
 		{
@@ -2968,8 +2974,31 @@ class PlayState extends MusicBeatState
 		
 	}
 
-	var songStarted = false;
+	function cacheSong():Void 
+	{
+			var inst = Paths.inst(PlayState.SONG.song, '');
+			if (CacheShit.sounds[inst] == null)
+			{
+				var sound:FlxSoundAsset = null;
+				if (PlayState.SONG.audioFromUrl)
+					sound = new Sound(new URLRequest(PlayState.SONG.instUrl));
+				else
+					sound = Sound.fromFile(inst);
+				CacheShit.sounds[inst] = sound;
+			}
+			var vocal = Paths.voices(PlayState.SONG.song);
+			if (CacheShit.sounds[vocal] == null)
+			{
+				var sound:FlxSoundAsset = null;
+				if (PlayState.SONG.audioFromUrl)
+					sound = new Sound(new URLRequest(PlayState.SONG.vocalsUrl));
+				else
+					sound = Sound.fromFile(vocal);
+				CacheShit.sounds[vocal] = sound;
+			}
+	}
 
+	var songStarted = false;
 	function startSong():Void
 	{
 		startingSong = false;
@@ -2979,8 +3008,18 @@ class PlayState extends MusicBeatState
 
 		if (!paused)
 		{
-			FlxG.sound.playMusic(Sound.fromFile(Paths.inst(PlayState.SONG.song)), 1, false);
+			var inst = Paths.inst(PlayState.SONG.song, '');
+			var sound:FlxSoundAsset = null;
+
+			if (PlayState.SONG.audioFromUrl)
+				sound = new Sound(new URLRequest(PlayState.SONG.instUrl));
+
+			if (sound != null)
+				inst = sound;
+
+			FlxG.sound.playMusic(Sound.fromFile(inst), 1, false);
 			call("startSong", [PlayState.SONG.song]);
+			trace(FlxG.sound.music == null);
 		}
 
 		if (FlxG.save.data.noteSplash)
@@ -3029,12 +3068,14 @@ class PlayState extends MusicBeatState
 			songPosBG.scrollFactor.set();
 			add(songPosBG);
 
+			try {
 			songPosBar = new FlxBar(songPosBG.x + 4, songPosBG.y + 4, LEFT_TO_RIGHT, Std.int(songPosBG.width - 8), Std.int(songPosBG.height - 8), this,
 				'songPositionBar', 0, songLength - 1000);
 			songPosBar.numDivisions = 1000;
 			songPosBar.scrollFactor.set();
 			songPosBar.createFilledBar(FlxColor.GRAY, FlxColor.LIME);
 			add(songPosBar);
+			} catch (exception) {trace(exception);}
 
 			var songName = new FlxText(songPosBG.x + (songPosBG.width / 2) - (SONG.song.length * 5),songPosBG.y,0,SONG.song, 16);
 			if (PlayStateChangeables.useDownscroll)
@@ -3057,6 +3098,15 @@ class PlayState extends MusicBeatState
 
 		if (useVideo)
 			GlobalVideo.get().resume();
+
+		try {
+			songPosBar = new FlxBar(songPosBG.x + 4, songPosBG.y + 4, LEFT_TO_RIGHT, Std.int(songPosBG.width - 8), Std.int(songPosBG.height - 8), this,
+				'songPositionBar', 0, songLength - 1000);
+			songPosBar.numDivisions = 1000;
+			songPosBar.scrollFactor.set();
+			songPosBar.createFilledBar(FlxColor.GRAY, FlxColor.LIME);
+			add(songPosBar);
+			} catch (exception) {trace(exception);}
 		
 		#if windows
 		// Updating Discord Rich Presence (with Time Left)
@@ -3075,8 +3125,16 @@ class PlayState extends MusicBeatState
 
 		curSong = songData.song;
 
+		var vocal = Paths.voices(PlayState.SONG.song);
+		var sound:FlxSoundAsset = null;
+		if (PlayState.SONG.audioFromUrl)
+			sound = new Sound(new URLRequest(PlayState.SONG.vocalsUrl));
+
+		if (sound != null)
+			vocal = sound;
+
 		if (SONG.needsVoices)
-			vocals = new FlxSound().loadEmbedded(Sound.fromFile(Paths.voices(PlayState.SONG.song)));
+			vocals = new FlxSound().loadEmbedded(Sound.fromFile(vocal));
 		else
 			vocals = new FlxSound();
 
@@ -3095,7 +3153,7 @@ class PlayState extends MusicBeatState
 		var playerCounter:Int = 0;
 
 		// Per song offset check
-		#if windows
+		/*#if windows
 			// pre lowercasing the song name (generateSong)
 			var songLowercase = StringTools.replace(PlayState.SONG.song, " ", "-").toLowerCase();
 				switch (songLowercase) {
@@ -3121,7 +3179,7 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-		#end
+		#end*/
 		var daBeats:Int = 0; // Not exactly representative of 'daBeats' lol, just how much it has looped
 
 		//if (FlxG.save.data.randomNotes != "Regular" && FlxG.save.data.randomNotes != "None" && FlxG.save.data.randomNotes != "Section")

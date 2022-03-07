@@ -127,6 +127,7 @@ class FreeplayState extends MusicBeatState {
 	private var iconArray:Array<HealthIcon> = [];
 
 	public static var id:Int = 1;
+//	public var curDiff:DifficultyIcons = null;
 
 	override function create() {
 		var parsed = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
@@ -231,6 +232,8 @@ class FreeplayState extends MusicBeatState {
 			FlxG.save.data.bothSide ? "Both side: On (only 4k songs, turns into 8k) (P)" : "Both side: Off (P)", 16);
 		bothSideText.setFormat(Paths.font("vcr.ttf"), 14, FlxColor.WHITE, RIGHT);
 
+		//curDiff = new DifficultyIcons(CoolUtil.difficultyArray, 1, 0, -1000);
+
 		var settingsBG:FlxSprite = new FlxSprite(randomText.x - 6, 484).makeGraphic(Std.int(FlxG.width * 0.35), 300, 0xFF000000);
 		settingsBG.alpha = 0.6;
 		add(settingsBG);
@@ -246,6 +249,7 @@ class FreeplayState extends MusicBeatState {
 		add(randomText);
 		add(randomModeText);
 		add(maniaText);
+		//add(curDiff);
 		add(flipModeText);
 		add(bothSideText);
 		add(randomManiaText);
@@ -444,12 +448,26 @@ class FreeplayState extends MusicBeatState {
 	}
 
 	function changeDiff(change:Int = 0) {
+		var diffJson = CoolUtil.parseJson(File.getContent("assets/images/custom_difficulties/difficulties.json"));
+		var maxDiff:Int = 0;
+		var length = diffJson.difficulties.length - 1;
+		for (i in 0...length)
+		{
+			maxDiff += 1;
+		}
+	//	maxDiff -= 1; //beginning is 0
+		trace(maxDiff);
+
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
-			curDifficulty = 2;
-		if (curDifficulty > 2)
+			curDifficulty = maxDiff;
+		if (curDifficulty > maxDiff)
 			curDifficulty = 0;
+
+		var _diff = DifficultyIcons.changeDifficultyFreeplay(curDifficulty, change);
+
+		trace(_diff.difficulty);
 
 		// adjusting the highscore song name to be compatible (changeDiff)
 		var songHighscore = StringTools.replace(songs[curSelected].songName, " ", "-");
@@ -465,7 +483,7 @@ class FreeplayState extends MusicBeatState {
 		combo = Highscore.getCombo(songHighscore, curDifficulty);
 		#end
 
-		diffText.text = CoolUtil.difficultyFromInt(curDifficulty).toUpperCase();
+		diffText.text = '< ' + _diff.text.toUpperCase() + ' >';
 	}
 
 	function changeSelection(change:Int = 0) {

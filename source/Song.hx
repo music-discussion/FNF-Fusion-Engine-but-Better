@@ -36,7 +36,7 @@ typedef SwagSong =
 	var vocalsSuffix:String;
 	var displayName:String;
 
-	var audioFromUrl:Bool;
+	var audioFromUrl:Null<Bool>;
 	var instUrl:String;
 	var vocalsUrl:String;
 
@@ -69,7 +69,7 @@ class Song
 	public var vocalsSuffix:String = '';
 	public var displayName:String = '';
 
-	public var audioFromUrl:Bool = false;
+	public var audioFromUrl:Null<Bool> = false;
 	public var instUrl:String = '';
 	public var vocalsUrl:String = '';
 
@@ -229,6 +229,20 @@ class Song
 					parsedJson.uiType = 'normal';
 				}
 			}
+
+			if (parsedJson.audioFromUrl == null) {
+					parsedJson.audioFromUrl = false;
+			}
+
+			if (parsedJson.instUrl == null) {
+					parsedJson.instUrl = '';
+			}
+
+			if (parsedJson.vocalsUrl == null) {
+					parsedJson.vocalsUrl = '';
+
+			}
+
 			// FIX THE CASTING ON WINDOWS/NATIVE
 			// Windows???
 			// trace(songData);

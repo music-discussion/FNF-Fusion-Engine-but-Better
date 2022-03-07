@@ -81,7 +81,7 @@ class StoryMenuState extends MusicBeatState
 
 	var txtWeekTitle:FlxText;
 
-	var curWeek:Int = 0;
+	public static var curWeek:Int = 0;
 
 	var txtTracklist:FlxText;
 
@@ -91,7 +91,7 @@ class StoryMenuState extends MusicBeatState
 	var grpLocks:FlxTypedGroup<FlxSprite>;
 
 	var difficultySelectors:FlxGroup;
-	var sprDifficulty:FlxSprite;
+	var sprDifficulty:DifficultyIcons;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
 
@@ -227,17 +227,17 @@ class StoryMenuState extends MusicBeatState
 		leftArrow.animation.play('idle');
 		difficultySelectors.add(leftArrow);
 
-		sprDifficulty = new FlxSprite(leftArrow.x + 130, leftArrow.y);
-		sprDifficulty.frames = ui_tex;
+		sprDifficulty = new DifficultyIcons(CoolUtil.difficultyArray, 1, leftArrow.x + 130, leftArrow.y);
+		/*sprDifficulty.frames = ui_tex;
 		sprDifficulty.animation.addByPrefix('easy', 'EASY');
 		sprDifficulty.animation.addByPrefix('normal', 'NORMAL');
 		sprDifficulty.animation.addByPrefix('hard', 'HARD');
-		sprDifficulty.animation.play('easy');
-		changeDifficulty();
+		sprDifficulty.animation.play('easy');*/
+	//	changeDifficulty();
 
-		difficultySelectors.add(sprDifficulty);
+		//difficultySelectors.add(sprDifficulty);
 
-		rightArrow = new FlxSprite(sprDifficulty.x + sprDifficulty.width + 50, leftArrow.y);
+		rightArrow = new FlxSprite(leftArrow.x + 130 + sprDifficulty.width + 50, leftArrow.y);
 		rightArrow.frames = ui_tex;
 		rightArrow.animation.addByPrefix('idle', 'arrow right');
 		rightArrow.animation.addByPrefix('press', "arrow push right", 24, false);
@@ -278,6 +278,7 @@ class StoryMenuState extends MusicBeatState
 		// FlxG.watch.addQuick('font', scoreText.font);
 
 		difficultySelectors.visible = weekUnlocked[curWeek];
+		//sprDifficulty.visible = weekUnlocked[curWeek];
 
 		grpLocks.forEach(function(lock:FlxSprite)
 		{
@@ -312,11 +313,11 @@ class StoryMenuState extends MusicBeatState
 
 					if (gamepad.justPressed.DPAD_RIGHT)
 					{
-						changeDifficulty(1);
+						sprDifficulty.changeDifficulty(1);
 					}
 					if (gamepad.justPressed.DPAD_LEFT)
 					{
-						changeDifficulty(-1);
+						sprDifficulty.changeDifficulty(-1);
 					}
 				}
 
@@ -341,9 +342,9 @@ class StoryMenuState extends MusicBeatState
 					leftArrow.animation.play('idle');
 
 				if (controls.RIGHT_P)
-					changeDifficulty(1);
+					sprDifficulty.changeDifficulty(1);
 				if (controls.LEFT_P)
-					changeDifficulty(-1);
+					sprDifficulty.changeDifficulty(-1);
 			}
 
 			if (controls.ACCEPT)
@@ -409,7 +410,7 @@ class StoryMenuState extends MusicBeatState
 		}
 	}
 
-	function changeDifficulty(change:Int = 0):Void
+	/*function changeDifficulty(change:Int = 0):Void
 	{
 		curDifficulty += change;
 
@@ -444,7 +445,7 @@ class StoryMenuState extends MusicBeatState
 		#end
 
 		FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07);
-	}
+	}*/
 
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
