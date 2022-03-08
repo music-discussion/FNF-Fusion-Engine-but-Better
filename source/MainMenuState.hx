@@ -67,7 +67,7 @@ class MainMenuState extends MusicBeatState
 	public static var firstStart:Bool = true;
 
 	public static var nightly:String = "";
-	public static var kadeEngineVerNum:String = "0.3" + nightly;
+	public static var kadeEngineVerNum:String = "0.3.1" + nightly;
 
 	public static var kadeEngineVer:String = "Better Fusion Engine 0.3" + nightly;
 	public static var gameVer:String = "0.2.7.1";
@@ -381,16 +381,37 @@ class MainMenuState extends MusicBeatState
 	public static function musicShit():Void
 		{
 			#if sys
+			FlxG.sound.music.stop();
 			var parsed = CoolUtil.parseJson(File.getContent('assets/data/freeplaySongJson.jsonc'));
-			var initSonglist = parsed[0].songs;
-			if (initSonglist.length > 0)
+			var initSonglist:Dynamic = parsed[0].songs;
+			var initSonglistL:Int = 0;
+
+			for (i in  0...initSonglist.length)
+			{ 
+				initSonglistL ++;
+			}
+
+			if (initSonglistL > 0)
 			{
-				var randomSong = FlxG.random.int(0, initSonglist.length - 1);
+				var randomSong = FlxG.random.int(0, initSonglistL - 1);
 	
-				var song = initSonglist[randomSong].toLowerCase();
-		
-				FlxG.sound.playMusic(Sound.fromFile(Paths.inst(song, '')), 0.6, true);
-				curSong = initSonglist[randomSong];
+		//		var song = initSonglist[randomSong].toLowerCase();
+
+				for (i in 0...initSonglist.length)
+				{
+					var r = FlxG.random.int(0, initSonglistL - 1);
+					var s = initSonglist[i];
+
+					if (r == i && FlxG.sound.music == null) {
+					//	FlxG.sound.playMusic(Sound.fromFile(Paths.inst(songs[curSelected].songName.toLowerCase(), '')), 1, false);
+						trace(Std.string(s.toLowerCase()));
+						FlxG.sound.playMusic(Sound.fromFile(Paths.inst(Std.string(s.toLowerCase()), '')), 0.6, true);
+						curSong = Std.string(s);
+					}
+				}
+
+				if (FlxG.sound.music == null)
+					FlxG.sound.playMusic(Paths.music('freakyMenu'), 1);
 			}
 			else 
 				FlxG.sound.playMusic(Paths.music('freakyMenu'), 1);
