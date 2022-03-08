@@ -43,5 +43,14 @@
   true, 
   true, 
   true
+ ],
+ "diffs": [
+   ["easy","normal","hard"],
+   ["easy","normal","hard"],
+   ["easy","normal","hard"],
+   ["easy","normal","hard"],
+   ["easy","normal","hard"],
+   ["easy","normal","hard"],
+   ["easy","normal","hard"]
  ]
 }

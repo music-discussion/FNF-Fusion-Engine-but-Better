@@ -23,6 +23,11 @@ import sys.io.File;
 import sys.FileSystem;
 #end
 
+import lime.net.curl.CURLCode;
+
+import flixel.graphics.FlxGraphic;
+import openfl.display.BitmapData;
+
 using StringTools;
 
 typedef StorySongsJson = 
@@ -30,6 +35,8 @@ typedef StorySongsJson =
 	var songs: Array<Array<String>>;
 	var weekGreyText: Array<String>;
 	var weekNames: Array<String>;
+	var diffs:Array<Array<String>>;
+	var diffSuffix:Array<String>;
 	var characters: Array<Array<String>>;
 	var weekUnlocked:Array<Bool>;
 }
@@ -38,6 +45,38 @@ typedef DifficultysJson =
 {
 	var difficulties:Array<Dynamic>;
 	var defaultDiff:Int;
+}
+typedef StoryMenuData = 
+{
+	var menuCharacters:Array<MenuChar>;
+	var weeks:Array<Weeks>;
+	var lockWeeks:Bool;
+}
+typedef Weeks =
+{
+	var weekNum:Int;
+	var characters:Array<String>;
+	var diffs:Array<String>;
+	var diffSuffix:Array<String>;
+	var songs:Array<String>;
+	var desc:String;
+} 
+
+typedef MenuChar = 
+{
+	var fileName:String;
+	var anims:Array<AnimOffsets>;
+	var offsets:Array<Float>;
+	var flip:Bool;
+	var scale:Float;
+	var name:String;
+}
+typedef AnimOffsets = 
+{
+	var anim:String; 
+	var xmlname:String;
+	var frameRate:Int;
+	var loop:Bool;
 }
 
 class StoryMenuState extends MusicBeatState
@@ -91,7 +130,8 @@ class StoryMenuState extends MusicBeatState
 	var grpLocks:FlxTypedGroup<FlxSprite>;
 
 	var difficultySelectors:FlxGroup;
-	var sprDifficulty:DifficultyIcons;
+	var sprDifficulty:FlxSprite;
+	var diffList:Array<Array<String>> = [];
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
 
@@ -129,10 +169,22 @@ class StoryMenuState extends MusicBeatState
 			weekData.push(weekSongs);
 		}
 	
-		for (i in storySongJson.weekGreyText) 
+		for (i in storySongJson.diffs)
 		{
-			trace(i);
+			diffList.push(i);
+		}
+
+		for (i in storySongJson.weekGreyText)
+		{
 			weekNames.push(i);
+		}
+
+		for (i in storySongJson.weekUnlocked)
+		{
+			if(i == false)
+				weekUnlocked.push(false);
+			else 
+				weekUnlocked.push(true);
 		}
 	
 		for (storyCharList in storySongJson.characters) 
@@ -143,15 +195,6 @@ class StoryMenuState extends MusicBeatState
 				weekChars.push(char);
 			}
 			weekCharacters.push(weekChars);
-		}
-
-		for (i in storySongJson.weekUnlocked)
-		{
-			trace(i);
-			if(i == false)
-				weekUnlocked.push(false);
-			else 
-				weekUnlocked.push(true);
 		}
 
 		persistentUpdate = persistentDraw = true;
@@ -227,15 +270,23 @@ class StoryMenuState extends MusicBeatState
 		leftArrow.animation.play('idle');
 		difficultySelectors.add(leftArrow);
 
-		sprDifficulty = new DifficultyIcons(CoolUtil.difficultyArray, 1, leftArrow.x + 130, leftArrow.y);
-		/*sprDifficulty.frames = ui_tex;
-		sprDifficulty.animation.addByPrefix('easy', 'EASY');
-		sprDifficulty.animation.addByPrefix('normal', 'NORMAL');
-		sprDifficulty.animation.addByPrefix('hard', 'HARD');
-		sprDifficulty.animation.play('easy');*/
+		var diffPath = 'assets/images/custom_difficulties/' + diffList[curWeek][curDifficulty] + ".png"; //maybe i will have seperate folders for more customizability
+		//trace(diffList[curWeek][curDifficulty]);
+		/*var diffImage:FlxGraphic;
+		if (CacheShit.images[diffPath] == null)
+		{
+			var image:FlxGraphic = FlxGraphic.fromBitmapData(BitmapData.fromFile(diffPath));
+			image.persist = true;
+			CacheShit.images[diffPath] = image;
+		}
+		diffImage = CacheShit.images[diffPath];*/
+		//trace(BitmapData.fromFile(diffPath));
+		//trace(diffPath);
+
+		sprDifficulty = new FlxSprite(leftArrow.x + 130, leftArrow.y).loadGraphic(BitmapData.fromFile(diffPath));
 	//	changeDifficulty();
 
-		//difficultySelectors.add(sprDifficulty);
+		difficultySelectors.add(sprDifficulty);
 
 		rightArrow = new FlxSprite(leftArrow.x + 130 + sprDifficulty.width + 50, leftArrow.y);
 		rightArrow.frames = ui_tex;
@@ -243,8 +294,9 @@ class StoryMenuState extends MusicBeatState
 		rightArrow.animation.addByPrefix('press', "arrow push right", 24, false);
 		rightArrow.animation.play('idle');
 		difficultySelectors.add(rightArrow);
+		changeDifficulty();
 
-		trace("Line 150");
+		trace("Line 299");
 
 		add(yellowBG);
 		add(grpWeekCharacters);
@@ -278,7 +330,7 @@ class StoryMenuState extends MusicBeatState
 		// FlxG.watch.addQuick('font', scoreText.font);
 
 		difficultySelectors.visible = weekUnlocked[curWeek];
-		//sprDifficulty.visible = weekUnlocked[curWeek];
+		sprDifficulty.visible = weekUnlocked[curWeek];
 
 		grpLocks.forEach(function(lock:FlxSprite)
 		{
@@ -313,11 +365,11 @@ class StoryMenuState extends MusicBeatState
 
 					if (gamepad.justPressed.DPAD_RIGHT)
 					{
-						sprDifficulty.changeDifficulty(1);
+						changeDifficulty(1);
 					}
 					if (gamepad.justPressed.DPAD_LEFT)
 					{
-						sprDifficulty.changeDifficulty(-1);
+						changeDifficulty(-1);
 					}
 				}
 
@@ -342,9 +394,9 @@ class StoryMenuState extends MusicBeatState
 					leftArrow.animation.play('idle');
 
 				if (controls.RIGHT_P)
-					sprDifficulty.changeDifficulty(1);
+					changeDifficulty(1);
 				if (controls.LEFT_P)
-					sprDifficulty.changeDifficulty(-1);
+					changeDifficulty(-1);
 			}
 
 			if (controls.ACCEPT)
@@ -378,6 +430,7 @@ class StoryMenuState extends MusicBeatState
 				grpWeekText.members[curWeek].startFlashing();
 				grpWeekCharacters.members[1].animation.play('bfConfirm');
 				stopspamming = true;
+				PlayState.songDiffsArray = diffList;
 			}
 
 			PlayState.storyPlaylist = weekData[curWeek];
@@ -410,29 +463,44 @@ class StoryMenuState extends MusicBeatState
 		}
 	}
 
-	/*function changeDifficulty(change:Int = 0):Void
+	function changeDifficulty(change:Int = 0):Void
 	{
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
-			curDifficulty = 2;
-		if (curDifficulty > 2)
+			curDifficulty = diffList[curWeek].length - 1;
+		if (curDifficulty > diffList[curWeek].length - 1)
 			curDifficulty = 0;
+
+		difficultySelectors.remove(sprDifficulty); //remake diff sprite
+		var diffPath = 'assets/images/custom_difficulties/' + diffList[curWeek][curDifficulty] + ".png";
+		/*var diffImage:FlxGraphic;
+		if (CacheShit.images[diffPath] == null)
+		{
+			var image:FlxGraphic = FlxGraphic.fromBitmapData(BitmapData.fromFile(diffPath));
+			image.persist = true;
+			CacheShit.images[diffPath] = image;
+		}
+		diffImage = CacheShit.images[diffPath];*/
+		sprDifficulty = new FlxSprite(leftArrow.x + 130, leftArrow.y).loadGraphic(BitmapData.fromFile(diffPath));
+		difficultySelectors.add(sprDifficulty);
 
 		sprDifficulty.offset.x = 0;
 
 		switch (curDifficulty)
 		{
 			case 0:
-				sprDifficulty.animation.play('easy');
 				sprDifficulty.offset.x = 20;
 			case 1:
-				sprDifficulty.animation.play('normal');
 				sprDifficulty.offset.x = 70;
 			case 2:
-				sprDifficulty.animation.play('hard');
 				sprDifficulty.offset.x = 20;
 		}
+
+		rightArrow.x = sprDifficulty.x + sprDifficulty.width;
+
+		// USING THESE WEIRD VALUES SO THAT IT DOESNT FLOAT UP
+		sprDifficulty.y = leftArrow.y - 15;
 
 		sprDifficulty.alpha = 0;
 
@@ -445,7 +513,7 @@ class StoryMenuState extends MusicBeatState
 		#end
 
 		FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07);
-	}*/
+	}
 
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;

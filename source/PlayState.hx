@@ -128,7 +128,7 @@ class PlayState extends MusicBeatState
 	public static var healthLossFromSustainMiss:Float = 0.03;
 	public static var healthLossFromMissPress:Float = 0.04;
 	public static var graceTimerCooldown:Float = 0.15;
-
+	public static var songDiffsArray:Array<Array<String>> = [];
 
 	/// modifier shit
 	public static var SongSpeedMultiplier:Float = 1;
@@ -382,9 +382,15 @@ class PlayState extends MusicBeatState
 
 		var songLowercase = PlayState.SONG.song.toLowerCase();
 		// Paths.hScript(songLowercase)
-		modchartScript = new HscriptShit("assets/scripts/" + (isFreeplayChart ? "freeplayCharts" : "charts") + "/" + songLowercase + "/script.hscript");
+		modchartScript = new HscriptShit("assets/scripts/freeplayCharts" + "/" + songLowercase + "/script.hscript", /*normal now*/ "assets/scripts/charts" + "/" + songLowercase + "/script.hscript");
 		trace ("file loaded = " + modchartScript.enabled);
 		call("loadScript", []);
+
+		var diffText = CoolUtil.CurSongDiffs[storyDifficulty];
+		if (isStoryMode)
+			diffText = songDiffsArray[storyWeek][storyDifficulty];
+
+		trace(diffText);
 
 		isPixelStage = PlayState.SONG.isPixelStage;
 
@@ -447,7 +453,7 @@ class PlayState extends MusicBeatState
 
 		#if windows
 		// Making difficulty text for Discord Rich Presence.
-		storyDifficultyText = CoolUtil.difficultyFromInt(storyDifficulty);
+		storyDifficultyText = diffText;
 
 		iconRPC = SONG.player2;
 
@@ -1855,7 +1861,7 @@ class PlayState extends MusicBeatState
 		add(overhealthBar);
 
 		// Add Kade Engine watermark
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " - " + CoolUtil.difficultyFromInt(storyDifficulty) + (Main.watermarks ? " | KE " + MainMenuState.kadeEngineVer : ""), 16);
+		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " - " + diffText + (Main.watermarks ? " | " + MainMenuState.kadeEngineVer : ""), 16);
 		kadeEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
 		kadeEngineWatermark.scrollFactor.set();
 		add(kadeEngineWatermark);
@@ -1933,7 +1939,7 @@ class PlayState extends MusicBeatState
 
 		if (isStoryMode)
 		{
-			switch (StringTools.replace(curSong," ", "-").toLowerCase())
+			switch (SONG.cutsceneType)
 			{
 				case "winter-horrorland":
 					var blackScreen:FlxSprite = new FlxSprite(0, 0).makeGraphic(Std.int(FlxG.width * 2), Std.int(FlxG.height * 2), FlxColor.BLACK);
@@ -1965,10 +1971,10 @@ class PlayState extends MusicBeatState
 					});
 				case 'senpai':
 					schoolIntro(doof);
-				case 'roses':
+				case 'angry-senpai':
 					FlxG.sound.play(Paths.sound('ANGRY'));
 					schoolIntro(doof);
-				case 'thorns':
+				case 'spirit':
 					schoolIntro(doof);
 				case 'none':
 					startCountdown();
@@ -3068,14 +3074,14 @@ class PlayState extends MusicBeatState
 			songPosBG.scrollFactor.set();
 			add(songPosBG);
 
-			try {
+		//	try {
 			songPosBar = new FlxBar(songPosBG.x + 4, songPosBG.y + 4, LEFT_TO_RIGHT, Std.int(songPosBG.width - 8), Std.int(songPosBG.height - 8), this,
 				'songPositionBar', 0, songLength - 1000);
 			songPosBar.numDivisions = 1000;
 			songPosBar.scrollFactor.set();
 			songPosBar.createFilledBar(FlxColor.GRAY, FlxColor.LIME);
 			add(songPosBar);
-			} catch (exception) {trace(exception);}
+		//	} catch (exception) {trace(exception);}
 
 			var songName = new FlxText(songPosBG.x + (songPosBG.width / 2) - (SONG.song.length * 5),songPosBG.y,0,SONG.song, 16);
 			if (PlayStateChangeables.useDownscroll)
