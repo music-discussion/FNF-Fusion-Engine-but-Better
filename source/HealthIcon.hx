@@ -28,6 +28,21 @@ class HealthIcon extends FlxSprite
 	private var isPlayer:Bool = false;
 	private var char:String = '';
 
+	public function checkIcon(char:String = 'bf', isPlayer:Bool = false)
+	{
+		if(FileSystem.exists('assets/images/betterfusion_customize/icons/' + char + '.png'))
+		{ //later versions of psych icon support
+			changeIcon(char);
+		}
+		else if(FileSystem.exists('assets/images/betterfusion_customize/icons/icon-' + char + '.png'))
+		{ //older versions of psych icon support
+			changeIcon(char);
+		}
+		else 
+		{
+			changeFusionIcon(char, isPlayer);
+		}
+	}
 
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
@@ -35,14 +50,14 @@ class HealthIcon extends FlxSprite
 
 		var name:String = 'betterfusion_customize/icons/' + char;
 
-		if(FileSystem.exists('images/' + name + '.png')){ //later versions of psych icon support
+		if(FileSystem.exists('assets/images/betterfusion_customize/icons/' + char + '.png')){ //later versions of psych icon support
 			trace('we are dealing with an old psych icon. do the routine. | images/' + name + '.png');
 			isOldIcon = (char == 'bf-old');
 			this.isPlayer = isPlayer;
 			changeIcon(char);
 			scrollFactor.set();
 		}
-		else if(FileSystem.exists('images/betterfusion_customize/icons/icon-' + char + '.png')){ //older versions of psych icon support
+		else if(FileSystem.exists('assets/images/betterfusion_customize/icons/icon-' + char + '.png')){ //older versions of psych icon support
 			var name:String = 'icons/psych/icon-' + char;
 			trace('we are dealing with a new psych icon. do the routine. | images/' + name + '.png');
 			isOldIcon = (char == 'bf-old');
@@ -173,7 +188,7 @@ class HealthIcon extends FlxSprite
 			}
 		}
 	}
-	public function changeChartingIcon(char:String, isPlayer:Bool = false) {
+	public function changeFusionIcon(char:String, isPlayer:Bool = false) {
 		#if sys
 			var charJson:Dynamic = CoolUtil.parseJson(File.getContent("assets/images/custom_chars/custom_chars.jsonc"));
 			#end
