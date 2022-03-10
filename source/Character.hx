@@ -32,6 +32,7 @@ import openfl.utils.Assets;
 import haxe.Json;
 import haxe.format.JsonParser;
 import flixel.util.FlxColor;
+import flixel.graphics.FlxGraphic;
 
 using StringTools;
 
@@ -180,17 +181,12 @@ class Character extends FlxSprite
 	public var isPlayingAsBF:Bool = false;
 	public var charScript:HscriptShit;
 	public var colorScript:HscriptShit;
+	public var hscriptPath:String = 'assets/images/custom_chars/';
 
-	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>, script:HscriptShit = null) //basically Psych Engine's **callOnLuas**
+	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
 	{
-		if (script != null)
-		{
-			if (script.enabled)
-				script.call(tfisthis, shitToGoIn); //because
-		} else {
-			if (charScript.enabled)
-				charScript.call(tfisthis, shitToGoIn); //because
-		}	
+		if (charScript.enabled)
+			charScript.call(tfisthis, shitToGoIn); //because
 	}
 	public function callColor(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
 	{
@@ -206,6 +202,7 @@ class Character extends FlxSprite
 
 		curCharacter = character;
 		this.isPlayer = isPlayer;
+		this.hscriptPath += (character + '/');
 
 		isPlayingAsBF = !FlxG.save.data.flip;
 
@@ -245,6 +242,7 @@ class Character extends FlxSprite
 					//charScript.interp = Character.getAnimInterp(curCharacter);
 					charScript = new HscriptShit("assets/images/custom_chars/"+curCharacter+".hscript", curCharacter, true);
 					var charPath:String = 'assets/images/custom_chars/' + character + '/';
+					trace(this.hscriptPath);
 					call("init", [this]);
 				}
 
@@ -272,6 +270,9 @@ class Character extends FlxSprite
 				if (!isError) {
 					// use assets, as it is less laggy
 					var animJson = File.getContent("assets/images/custom_chars/"+Reflect.field(charJson,curCharacter).like+".json");
+					if (!FileSystem.exists("assets/images/custom_chars/"+Reflect.field(charJson,curCharacter).like+".json"))
+						var animJson = File.getContent("assets/images/custom_chars/bf.json"); //default to bf to avoid crashing.
+					
 					var parsedAnimJson:Dynamic = CoolUtil.parseJson(animJson);
 
 
@@ -568,7 +569,7 @@ class Character extends FlxSprite
 
 		colorScript = new HscriptShit("assets/images/custom_chars/healthBarColors.hscript");
 		var charPath:String = 'assets/images/custom_chars/' + character + '/';
-		call("loadColor", [this], colorScript);
+		callColor("loadColor", [this]);
 
 		if (isPlayer)
 		{
@@ -595,7 +596,6 @@ class Character extends FlxSprite
 
 	override function update(elapsed:Float)
 	{
-		call("update", [elapsed]);
 		if (!isPlayingAsBF)
 		{
 			if (curCharacter.startsWith('bf') && !isPlayer)
@@ -718,7 +718,7 @@ class Character extends FlxSprite
 			if (!debugMode && beNormal)
 			{
 				if (charScript.interp != null)
-					call("dance", [curCharacter])
+					call("dance", [this])
 				else
 					playAnim('idle');
 

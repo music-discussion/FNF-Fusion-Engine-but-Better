@@ -4521,14 +4521,13 @@ class PlayState extends MusicBeatState
 				}
 			}
 
-			if (PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection) {
+			if (generatedMusic && PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection) {
 				switch(scriptableCamera) {
 					case 'static' | 'char':
 						camFollow.setPosition(scriptCamPos[0], scriptCamPos[1]);
 					default:
 						camFollow.setPosition(boyfriend.getMidpoint().x - 100 + boyfriend.followCamX + bfcam[0], boyfriend.getMidpoint().y - 100 + boyfriend.followCamY + bfcam[1]);
 				}
-			//	call("playerOneTurn", []);
 			}
 
 			if (generatedMusic && PlayState.SONG.notes[Std.int(curStep / 16)] != null) 
@@ -4545,7 +4544,7 @@ class PlayState extends MusicBeatState
 					vocals.volume = 1;
 				}
 			}
-			}
+		}
 
 		if (camZooming)
 		{

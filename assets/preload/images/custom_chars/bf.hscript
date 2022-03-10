@@ -1,11 +1,14 @@
 trace(": )");
 // char is a Character
-// hscripts get priority and gets checked first, and then it is split between fusion and psych.
-function loadCharacter(char, hscriptPath) {
-    trace(": )");
-    var tex = FlxAtlasFrames.fromSparrow(hscriptPath + 'char.png', hscriptPath + 'char.xml');
-    trace(": )");
-    char.frames = tex;
+//ok so priority or checking order goes as follows:
+//hscript first, then psych engine, and finally fusion.
+function init(char) {
+    trace("loading character");
+    trace(char.hscriptPath);
+    var pic:BitmapData = BitmapData.fromFile(char.hscriptPath + 'char.png');
+    var xml:String = char.hscriptPath + 'char.xml';
+    trace("done");
+    char.frames = FlxAtlasFrames.fromSparrow(pic, xml);
     char.animation.addByPrefix('idle', 'BF idle dance', 24, false);
     if (char.isPlayer) {
         char.animation.addByPrefix('singLEFT','BF NOTE LEFT0', 24, false);
@@ -79,9 +82,6 @@ function loadCharacter(char, hscriptPath) {
 portraitOffset = [0, 0];
 dadVar = 4.0;
 isPixel = false;
-function update(elapsed, char) {
-    // do nothing...
-}
 var danced = false;
 function dance(char) {
     char.playAnim('idle');

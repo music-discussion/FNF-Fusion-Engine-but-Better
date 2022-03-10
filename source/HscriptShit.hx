@@ -140,6 +140,13 @@ class HscriptShit //funni modcharts
 		interp.variables.set("dadVar", 4.0);
 		interp.variables.set("isPixel", false);
 		interp.variables.set("colors", [FlxColor.CYAN]);
+        interp.variables.set("scriptableCamera", 'false');
+        interp.variables.set("dance", function (char:Character) {});
+
+        interp.variables.set("init", function (char:Character) {}); //this one function is causing so many problems.
+        interp.variables.set("loadColor", function (character:Character) {});
+
+        interp.variables.set("onCharChange", function (char:Character) {}); 
 		//interp.execute(program);
 		//trace(interp);
 		//return interp;
