@@ -1734,9 +1734,15 @@ class PlayState extends MusicBeatState
 				bfyoffset += 220;
 				gf.x += 180;
 				gf.y += 300;
-				
-
 		}
+
+		bfxoffset -= 350;
+		bfyoffset -= 150;
+		gf.x -= 350;
+		gf.y -= 100;
+		dadxoffset -= 250;
+		dadyoffset -= 100;
+
 		if (PlayStateChangeables.flip)
 		{
 			boyfriend.x += dadxoffset;
@@ -1930,7 +1936,8 @@ class PlayState extends MusicBeatState
 		add(healthBarBG);
 
 		colorScript = new HscriptShit("assets/images/custom_chars/healthBarColors.hscript");
-		callSoloScript("loadColor", [this], colorScript);
+		callSoloScript(colorScript, "loadColor", [dad]);
+		callSoloScript(colorScript, "loadColor", [boyfriend]);
 
 		if (!PlayStateChangeables.flip)
 			{
@@ -4098,16 +4105,13 @@ class PlayState extends MusicBeatState
 			if (healthBar.percent < 20) {
 				iconP1.iconState = Dying;
 				iconP2.iconState = Winning;
-		//		#if windows
-		//		iconRPC = player1Icon + "-dead";
-		//		#end
+			} else if (healthBar.percent > 80) {
+				iconP2.iconState = Dying;
+				iconP1.iconState = Winning;
 			} else {
 				iconP1.iconState = Normal;
-		//		#if windows
-		//		iconRPC = player1Icon;
-		//		#end
+				iconP2.iconState = Normal;
 			}
-			
 			// duo mode shouldn't show low health
 			if (healthBar.percent < 20) {
 				scoreTxt.setFormat("assets/fonts/vcr.ttf", 20, FlxColor.RED, RIGHT, OUTLINE, FlxColor.BLACK);
@@ -4123,8 +4127,12 @@ class PlayState extends MusicBeatState
 		///		#if windows
 		///		iconRPC = player2Icon + "-dead";
 		//		#end
+			} else if (healthBar.percent < 80) {
+				iconP1.iconState = Dying;
+				iconP2.iconState = Winning;
 			} else {
 				iconP2.iconState = Normal;
+				iconP1.iconState = Normal;
 		//		#if windows
 		//		iconRPC = player2Icon;
 		//		#end
