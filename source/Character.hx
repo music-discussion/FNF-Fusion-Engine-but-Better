@@ -182,6 +182,7 @@ class Character extends FlxSprite
 	public var charScript:HscriptShit;
 	public var colorScript:HscriptShit;
 	public var hscriptPath:String = 'assets/images/custom_chars/';
+	var noDanceTwice:Int = 0;
 
 	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
 	{
@@ -567,10 +568,6 @@ class Character extends FlxSprite
 
 		dance();
 
-		colorScript = new HscriptShit("assets/images/custom_chars/healthBarColors.hscript");
-		var charPath:String = 'assets/images/custom_chars/' + character + '/';
-		callColor("loadColor", [this]);
-
 		if (isPlayer)
 		{
 			flipX = !flipX;
@@ -657,6 +654,9 @@ class Character extends FlxSprite
 	 */
 	public function dance()
 	{
+		noDanceTwice++;
+		if (noDanceTwice == 2) {
+			noDanceTwice = 0;
 		if (!debugMode && !FileSystem.exists("assets/images/custom_chars/"+curCharacter+".hscript"))
 		{
 			switch (curCharacter)
@@ -728,6 +728,7 @@ class Character extends FlxSprite
 				}
 			}
 		}
+	}
 	}
 
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void

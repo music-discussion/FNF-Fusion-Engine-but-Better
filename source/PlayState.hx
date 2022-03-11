@@ -387,7 +387,7 @@ class PlayState extends MusicBeatState
 	public var healthLossMultiplier:Float = 1;
 
 	public var modchartScript:HscriptShit;
-
+	public var colorScript:HscriptShit;
 	public var hscriptArray:Array<HscriptShit> = [];
 
 	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
@@ -1928,6 +1928,9 @@ class PlayState extends MusicBeatState
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
+
+		colorScript = new HscriptShit("assets/images/custom_chars/healthBarColors.hscript");
+		callSoloScript("loadColor", [this], colorScript);
 
 		if (!PlayStateChangeables.flip)
 			{
@@ -4091,28 +4094,47 @@ class PlayState extends MusicBeatState
 		if (health > 4)
 			health = 4;
 		if (!PlayStateChangeables.flip)
-			{
-				if (healthBar.percent < 20)
-					iconP1.animation.curAnim.curFrame = 1;
-				else
-					iconP1.animation.curAnim.curFrame = 0;
-		
-				if (healthBar.percent > 80)
-					iconP2.animation.curAnim.curFrame = 1;
-				else
-					iconP2.animation.curAnim.curFrame = 0;
+		{
+			if (healthBar.percent < 20) {
+				iconP1.iconState = Dying;
+				iconP2.iconState = Winning;
+		//		#if windows
+		//		iconRPC = player1Icon + "-dead";
+		//		#end
+			} else {
+				iconP1.iconState = Normal;
+		//		#if windows
+		//		iconRPC = player1Icon;
+		//		#end
 			}
+			
+			// duo mode shouldn't show low health
+			if (healthBar.percent < 20) {
+				scoreTxt.setFormat("assets/fonts/vcr.ttf", 20, FlxColor.RED, RIGHT, OUTLINE, FlxColor.BLACK);
+			} else {
+				scoreTxt.setFormat("assets/fonts/vcr.ttf", 20, FlxColor.WHITE, RIGHT, OUTLINE, FlxColor.BLACK);
+			}	
+		}
 		else
 		{
-			if (healthBar.percent < 20)
-				iconP2.animation.curAnim.curFrame = 1;
-			else
-				iconP2.animation.curAnim.curFrame = 0;
-	
-			if (healthBar.percent > 80)
-				iconP1.animation.curAnim.curFrame = 1;
-			else
-				iconP1.animation.curAnim.curFrame = 0;
+			if (healthBar.percent > 20) {
+				iconP1.iconState = Winning;
+				iconP2.iconState = Dying;
+		///		#if windows
+		///		iconRPC = player2Icon + "-dead";
+		//		#end
+			} else {
+				iconP2.iconState = Normal;
+		//		#if windows
+		//		iconRPC = player2Icon;
+		//		#end
+			}
+
+			if (healthBar.percent > 20) {
+				scoreTxt.setFormat("assets/fonts/vcr.ttf", 20, FlxColor.RED, RIGHT, OUTLINE, FlxColor.BLACK);
+			} else {
+				scoreTxt.setFormat("assets/fonts/vcr.ttf", 20, FlxColor.WHITE, RIGHT, OUTLINE, FlxColor.BLACK);
+			}	
 		}
 
 		/* if (FlxG.keys.justPressed.NINE)
@@ -4500,7 +4522,7 @@ class PlayState extends MusicBeatState
 					default:
 						dadcam = [0, 0];
 				}
-			}
+			
 
 			if (boyfriend.camOffsets.exists(boyfriend.animation.curAnim.name)) {
 				var daCam = boyfriend.camOffsets.get(boyfriend.animation.curAnim.name);
@@ -4521,7 +4543,11 @@ class PlayState extends MusicBeatState
 				}
 			}
 
-			if (generatedMusic && PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection) {
+		if (generatedMusic && currentSection != null)
+		{
+		//	try 
+		//	{
+			if (PlayState.SONG.notes[Std.int(curStep / 16)].mustHitSection) {
 				switch(scriptableCamera) {
 					case 'static' | 'char':
 						camFollow.setPosition(scriptCamPos[0], scriptCamPos[1]);
@@ -4542,8 +4568,8 @@ class PlayState extends MusicBeatState
 							camFollow.setPosition(dad.getMidpoint().x + dad.followCamX + dadcam[0], dad.getMidpoint().y + dad.followCamY + dadcam[1]);
 					}
 					vocals.volume = 1;
-				}
-			}
+				}}}}
+		//	} catch(exception) { trace(exception.message); }
 		}
 
 		if (camZooming)
