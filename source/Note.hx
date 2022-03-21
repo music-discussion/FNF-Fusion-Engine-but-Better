@@ -362,7 +362,7 @@ class Note extends FlxSprite
 				if (!FlxG.save.data.circleShit)
 					frames = Paths.getSparrowAtlas(noteTexture + 'NOTE_assets');
 				else 
-					frames = FlxAtlasFrames.fromSparrow('assets/images/' + noteTexture + 'circle/NOTE_assets.png', 'assets/images' + noteTexture + 'circle/NOTE_assets.xml');
+					frames = FlxAtlasFrames.fromSparrow(noteTexture + 'circle/NOTE_assets.png', noteTexture + 'circle/NOTE_assets.xml');
 				
 				for (i in 0...9)
 					{

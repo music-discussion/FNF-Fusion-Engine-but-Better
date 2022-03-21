@@ -43,11 +43,14 @@ class HscriptShit //funni modcharts
 {
     public var interp:Interp;
     public var enabled:Bool = false;
-    var script:Expr;
+    public var hscriptPath:String;
+    public var script:Expr;
 
     public function new (freeplayPath:String, path:String = '', inCharacterState:Bool = false)
     {
-        #if sys
+        hscriptPath = '';
+        if (this != null) {
+        #if sys 
 		if (FileSystem.exists(path))
 		{
             try 
@@ -56,6 +59,7 @@ class HscriptShit //funni modcharts
                 enabled = true;
                 setScriptVars();
                 interp.execute(script);
+                hscriptPath = path;
                 trace('HScript loaded Sucessfully. | ' + path);
             } 
             catch(e) 
@@ -74,6 +78,7 @@ class HscriptShit //funni modcharts
                 else 
                     setCharVars(path);
                 interp.execute(script);
+                hscriptPath = freeplayPath;
                 trace('HScript loaded Sucessfully. | ' + freeplayPath);
             } catch(e) { trace(e.message); }
         }
@@ -89,6 +94,7 @@ class HscriptShit //funni modcharts
             trace("no file detected");
         }
         #end
+    }
     }
     public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) 
     {

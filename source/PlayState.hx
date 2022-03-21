@@ -82,6 +82,8 @@ import flash.media.Sound;
 #end
 
 import flixel.group.FlxSpriteGroup;
+import HscriptShit;
+//import HaxeState;
 
 using StringTools;
 
@@ -203,7 +205,7 @@ class PlayState extends MusicBeatState
 	var halloweenLevel:Bool = false;
 
 	var songLength:Float = 0;
-	var kadeEngineWatermark:FlxText;
+	var difficTxt:FlxText;
 	
 	#if windows
 	// Discord RPC variables
@@ -383,12 +385,58 @@ class PlayState extends MusicBeatState
 	public var GF_X:Float = 400;
 	public var GF_Y:Float = 130;
 
+	public var currentLayout:String = "none";
+	public var newLayout:String = "none";
+
 	public var healthGainMultiplier:Float = 1;
 	public var healthLossMultiplier:Float = 1;
+
+	//hscript stuff.
 
 	public var modchartScript:HscriptShit;
 	public var colorScript:HscriptShit;
 	public var hscriptArray:Array<HscriptShit> = [];
+	public var noteStage = "stage";
+
+	public function pushNewScript(path:String, call:String = "loadScript", args:Array<Dynamic>)
+	{
+		var script:HscriptShit = new HscriptShit(path);
+		callSoloScript(script, call, args);
+		hscriptArray.push(script);
+	}
+
+	//public function doFunction(func:Function)
+	//{
+	//
+	//}
+
+	public function destroyScript(script:HscriptShit)
+	{
+		script.interp = null;
+		script.script = null;
+		script = null;
+		for (i in hscriptArray)
+		{
+			if (i == script)
+				hscriptArray.remove(i);
+		}
+	}
+
+	public function destroyScriptByPath(path:String)
+	{
+		var script:HscriptShit = null;
+		for (i in hscriptArray)
+		{
+			if (i.hscriptPath == path) 
+			{
+				hscriptArray.remove(i); 
+				script = i;
+			}
+		}
+		script.interp = null;
+		script.script = null;
+		script = null;
+	}
 
 	public function call(tfisthis:String, shitToGoIn:Array<Dynamic>) //basically Psych Engine's **callOnLuas**
 	{
@@ -1540,6 +1588,7 @@ class PlayState extends MusicBeatState
 							generateFusionStage();
 					}
 		}}
+		noteStage = SONG.stage;
 		//defaults if no gf was found in chart
 		var gfCheck:String = 'gf';
 		
@@ -1964,13 +2013,13 @@ class PlayState extends MusicBeatState
 		add(overhealthBar);
 
 		// Add Kade Engine watermark
-		kadeEngineWatermark = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " - " + diffText + (Main.watermarks ? " | " + MainMenuState.kadeEngineVer : ""), 16);
-		kadeEngineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
-		kadeEngineWatermark.scrollFactor.set();
-		add(kadeEngineWatermark);
+		difficTxt = new FlxText(4,healthBarBG.y + 50,0,SONG.song + " - " + diffText + (Main.watermarks ? " | " + MainMenuState.kadeEngineVer : ""), 16);
+		difficTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
+		difficTxt.scrollFactor.set();
+		add(difficTxt);
 
 		if (PlayStateChangeables.useDownscroll)
-			kadeEngineWatermark.y = FlxG.height * 0.9 + 45;
+			difficTxt.y = FlxG.height * 0.9 + 45;
 
 		scoreTxt = new FlxText(FlxG.width / 2 - 235, healthBarBG.y + 50, 0, "", 20);
 
@@ -2022,23 +2071,17 @@ class PlayState extends MusicBeatState
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
-		if (FlxG.save.data.songPosition)
-		{
-			songPosBG.cameras = [camHUD];
-			songPosBar.cameras = [camHUD];
-		}
-		kadeEngineWatermark.cameras = [camHUD];
-		if (loadRep)
-			replayTxt.cameras = [camHUD];
+		if (FlxG.save.data.songPosition) { songPosBG.cameras = [camHUD]; songPosBar.cameras = [camHUD];	}
 
-		// if (SONG.song == 'South')
-		// FlxG.camera.alpha = 0.7;
-		// UI_camera.zoom = 1;
+		difficTxt.cameras = [camHUD];
+		if (loadRep) replayTxt.cameras = [camHUD];
+		startingSong = true; trace('starting');
 
-		// cameras = [FlxG.cameras.list[1]];
-		startingSong = true;
-		
-		trace('starting');
+		var uiJson = CoolUtil.parseJson(File.getContent("assets/images/custom_ui/ui_layouts/ui.json"));
+		pushNewScript("assets/images/custom_ui/ui_layouts/" + Reflect.field(uiJson, 'layout') + ".hscript", "loadScript", []);
+		currentLayout = Reflect.field(uiJson, 'layout');
+
+		trace('ui done');
 
 		if (isStoryMode)
 		{
@@ -2109,6 +2152,7 @@ class PlayState extends MusicBeatState
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, releaseInput);
 
 		super.create();
+		trace('state created');
 	}
 
 	function fusionIntro(?dialogueBox:DialogueBox):Void
@@ -3935,7 +3979,7 @@ class PlayState extends MusicBeatState
 			if (luaModchart.getVar("showOnlyStrums",'bool'))
 			{
 				healthBarBG.visible = false;
-				kadeEngineWatermark.visible = false;
+				difficTxt.visible = false;
 				healthBar.visible = false;
 				overhealthBar.visible = false;
 				iconP1.visible = false;
@@ -3945,7 +3989,7 @@ class PlayState extends MusicBeatState
 			else
 			{
 				healthBarBG.visible = true;
-				kadeEngineWatermark.visible = true;
+				difficTxt.visible = true;
 				healthBar.visible = true;
 				overhealthBar.visible = false;
 				iconP1.visible = true;
@@ -5671,8 +5715,24 @@ class PlayState extends MusicBeatState
 				pixelShitPart1 = 'weeb/pixelUI/';
 				pixelShitPart2 = '-pixel';
 			}
-	
-			rating.loadGraphic(Paths.image(pixelShitPart1 + daRating + pixelShitPart2));
+
+			var ratingImage:BitmapData;
+			if (FileSystem.exists('assets/images/custom_ui/ui_packs/' + noteStage + '/' + daRating + pixelShitPart2 + ".png")) {
+				ratingImage = BitmapData.fromFile('assets/images/custom_ui/ui_packs/' + noteStage + '/' + daRating + pixelShitPart2 + ".png");
+				rating.loadGraphic(ratingImage);
+			} else {
+				//revert to old.
+				rating.loadGraphic(Paths.image(pixelShitPart1 + daRating + pixelShitPart2));
+			}
+		//	trace(isPixelStage);
+			//rating = new Judgement(0, 0, daRating, preferredJudgement, noteDiffSigned < 0, pixelUI);
+		/*	rating.screenCenter();
+			rating.x = coolText.x - 40;
+			rating.y -= 60;
+			rating.acceleration.y = 550;
+			rating.velocity.y -= FlxG.random.int(140, 175);
+			rating.velocity.x -= FlxG.random.int(0, 10);*/
+
 			rating.screenCenter();
 			rating.y -= 50;
 			rating.x = coolText.x - 125;
@@ -6897,7 +6957,7 @@ class PlayState extends MusicBeatState
 		}
 		//char.x += char.positionArray[0];
 		//char.y += char.positionArray[1];
-		call('onCharChange', [char, curChar, SONG.stage]);
+		call('onCharChange', [char]);
 	}
 
 	function startCharacterLua(name:String)
@@ -6927,6 +6987,65 @@ class PlayState extends MusicBeatState
 			}*/
 		}
 	}
+
+	public function changeNoteUI(newStage:String, pixel:Bool = false)
+	{
+		var stage:String = SONG.stage;
+		if (!(FileSystem.exists('assets/images/custom_ui/ui_packs/' + newStage + '/')))
+		{
+			trace('stage does not exist');
+		}
+		else {
+			stage = newStage;
+		}
+
+		noteStage = newStage;
+		changeStrumTexture('assets/images/custom_ui/ui_packs/' + stage, 0, pixel);
+		changeStrumTexture('assets/images/custom_ui/ui_packs/' + stage, 1, pixel);
+		changeArrowTexture('assets/images/custom_ui/ui_packs/' + stage,    pixel);
+	}
+
+	public function changeUILayout(newLay:String)
+	{
+		var newL:String = newLay;
+		//if (!(FileSystem.exists("assets/images/custom_ui/ui_layouts/" + newLayout + ".hscript")))
+		//	break;
+	/*	var oldLay = newLayout;
+		newLayout = newLay;
+
+		var scriptExists = layoutCheck();
+		if (!scriptExists)
+		{
+			newLayout = oldLay;
+			break;
+		}
+		else {
+			newLayout = newLay;
+			currentLayout = newLay;
+		}*/
+		if (!(FileSystem.exists("assets/images/custom_ui/ui_layouts/" + newLayout + ".hscript")))
+		{
+			//it doesn't exist so we default to the current.
+			newL = currentLayout;
+		}
+		else {
+			//it does exist
+			newL = newLayout;
+		}
+		//before anything else, we gotta make sure this new layout exists.
+
+		destroyScriptByPath("assets/images/custom_ui/ui_layouts/" + currentLayout + ".hscript");
+		//this function effectively removes the script by the path, so I don't have to wast even more code.
+
+		pushNewScript("assets/images/custom_ui/ui_layouts/" + newL + ".hscript", "start", [SONG.song]);
+		currentLayout = newL;
+		//and now the new ui layout is in place. this function adds a new layout to the list of hscripts and calls the start for the layout to switch.
+	}
+
+//	private function layoutCheck():Bool
+//	{
+//		return FileSystem.exists("assets/images/custom_ui/ui_layouts/" + newLayout + ".hscript");
+//	}
 
 	public function changeStage(newStage:String)
 	{

@@ -247,6 +247,8 @@ class Character extends FlxSprite
 					call("init", [this]);
 				}
 
+				if (!(FileSystem.exists("assets/images/custom_chars/"+curCharacter+".hscript"))) {
+
 				switch (isPsychFile)
 				{
 					case false:
@@ -549,6 +551,7 @@ class Character extends FlxSprite
 				//trace('Loaded file to character ' + curCharacter);
 				}
 		}
+	}
 
 		if (setLike) {
 			switch (curCharacter)
@@ -654,9 +657,9 @@ class Character extends FlxSprite
 	 */
 	public function dance()
 	{
-		noDanceTwice++;
-		if (noDanceTwice == 2) {
-			noDanceTwice = 0;
+		//noDanceTwice++;
+		//if (noDanceTwice == 2) {
+		//	noDanceTwice = 0;
 		if (!debugMode && !FileSystem.exists("assets/images/custom_chars/"+curCharacter+".hscript"))
 		{
 			switch (curCharacter)
@@ -728,7 +731,7 @@ class Character extends FlxSprite
 				}
 			}
 		}
-	}
+//	}
 	}
 
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
