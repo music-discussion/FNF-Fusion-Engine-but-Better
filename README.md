@@ -2,6 +2,8 @@
 
 ![OG Fusion Engine logo](https://raw.githubusercontent.com/kidsfreej/FNF-Fusion-Engine/master/art/fusion_engine.png)
 
+### Disclaimer
+Not only has the original engine been discontinued, this has also been discontinued. Psych Engine is still being updated and is 100x better. I recommend you use that. Cya!
 
 https://discord.gg/qPfxxd4XWA
 # If you make a mod, please credit me on the gamebanana or github page!! Also credit kidsfreej!
